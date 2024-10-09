@@ -19,10 +19,10 @@ import com.example.riseandroid.ui.theme.RiseAndroidTheme
 
 class App {
 
-    // This function will be called by MainActivity
-    fun initializeMainActivity(mainActivity: MainActivity) {
+    @Composable
+    fun lumiereApp() {
         // Move the content setup from MainActivity to here
-        mainActivity.setContent {
+
             RiseAndroidTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -35,7 +35,7 @@ class App {
                     )
                 }
             }
-        }
+
     }
 }
 

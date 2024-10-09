@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Surface() {
-                App().initializeMainActivity(this)
+                App().lumiereApp()
             }
         }
         }
