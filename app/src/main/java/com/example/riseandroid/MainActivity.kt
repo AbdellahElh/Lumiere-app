@@ -15,10 +15,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Surface() {
-                App().lumiereApp()
+                LumiereApp()
             }
         }
-        }
+    }
 }
 
 
