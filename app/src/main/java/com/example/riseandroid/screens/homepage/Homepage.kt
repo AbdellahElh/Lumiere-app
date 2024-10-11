@@ -1,10 +1,7 @@
 package com.example.riseandroid.screens.homepage
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -22,12 +19,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.riseandroid.model.Movie
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -39,16 +33,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.riseandroid.R
-import com.example.riseandroid.repository.Datasource
+import com.example.riseandroid.data.Datasource
 
 
 @Composable
 fun Homepage(
+    //homepageViewModel : HomepageViewModel = viewModel()
     recentMovieList: List<Movie> = Datasource().LoadRecentMovies(),
     allMovieList: List<Movie> = Datasource().LoadAllMovies()
 ) {
     val layoutDirection = LocalLayoutDirection.current
     val posterImagePadding = dimensionResource(R.dimen.image_padding)
+    //val homepageUiState by homepageViewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
     Surface(
@@ -84,6 +80,9 @@ fun Homepage(
         }
     }
 }
+
+@Composable
+fun HomepageLayout(modifier: Modifier = Modifier) {}
 
 @Composable
 fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {

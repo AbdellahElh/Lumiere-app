@@ -1,4 +1,4 @@
-package com.example.riseandroid.repository
+package com.example.riseandroid.data
 
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie

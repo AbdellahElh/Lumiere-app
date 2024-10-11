@@ -7,7 +7,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import com.example.riseandroid.mockdata.MovieListMock
-import com.example.riseandroid.repository.Datasource
 import com.example.riseandroid.screens.homepage.Homepage
 import org.junit.Rule
 import org.junit.Test
