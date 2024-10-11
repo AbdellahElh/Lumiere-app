@@ -1,0 +1,21 @@
+package com.example.riseandroid.repository
+
+import com.example.riseandroid.R
+import com.example.riseandroid.model.Movie
+
+class Datasource() {
+    fun LoadRecentMovies() : List<Movie> {
+        return listOf<Movie>(
+            Movie("A new kind of wilderness",R.drawable.screenshot_2024_10_09_224909),
+            Movie("Ezra",R.drawable.screenshot_2024_10_08_105150),
+            Movie("Firebrand", R.drawable.screenshot_2024_10_10_192651),
+        )
+    }
+    fun LoadAllMovies() : List<Movie> {
+        return listOf<Movie>(
+            Movie("James bond", R.drawable.screenshot_2024_10_10_102504),
+            Movie("Tatami", R.drawable.tatami),
+            Movie("Songs of earth", R.drawable.song)
+        )
+    }
+}

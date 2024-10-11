@@ -1,4 +1,6 @@
 package com.example.riseandroid.model
 
-data class Movie(val description: String = "een film", val poster : String) {
+import androidx.annotation.DrawableRes
+
+data class Movie(val title: String,@DrawableRes val posterResourceId : Int) {
 }

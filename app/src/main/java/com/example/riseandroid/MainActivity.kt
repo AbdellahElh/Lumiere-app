@@ -14,11 +14,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Surface() {
-                App().initializeMainActivity(this)
+            RiseAndroidTheme() {
+                LumiereApp()
             }
         }
-        }
+    }
 }
 
 
