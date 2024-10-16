@@ -7,7 +7,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import com.example.riseandroid.mockdata.MovieListMock
-import com.example.riseandroid.screens.homepage.Homepage
+import com.example.riseandroid.ui.screens.homepage.Homepage
+import com.example.riseandroid.ui.screens.homepage.ResultScreen
 import org.junit.Rule
 import org.junit.Test
 
@@ -22,7 +23,7 @@ class HomepageUITest {
     fun titles_Placed_On_Homescreen() {
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
-                Homepage(recentMovieList, allMovieList)
+                ResultScreen(recentMovieList, allMovieList)
             }
         }
         homepageTestRule.onNodeWithText("Nieuwe films").assertIsDisplayed()
@@ -33,7 +34,7 @@ class HomepageUITest {
     fun list_Of_Movies_Is_Shown(){
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
-                Homepage(recentMovieList, allMovieList)
+                ResultScreen(recentMovieList, allMovieList)
             }
         }
         for(movie in recentMovieList) {
