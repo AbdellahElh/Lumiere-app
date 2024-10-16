@@ -25,7 +25,6 @@ import com.example.riseandroid.model.Movie
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,7 +46,6 @@ import com.example.riseandroid.data.Datasource
 fun Homepage(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-
     ) {
 
     val homepageViewModel : HomepageViewModel = viewModel(
@@ -56,23 +54,18 @@ fun Homepage(
 
     val homepageUiState =  homepageViewModel.homepageUiState
 
-    //Variables for when the connection to the api is made
-    //val homepageUiState by homepageViewModel.uiState.collectAsState()
-    /*
     when (homepageUiState) {
-        is homepageUiState.Succes -> HomepageLayout()
-        is homepageUiState.Loading -> HomepageLayout()
-        is homepageUiState.Error -> HomepageLayout()
+        is HomepageUiState.Succes ->  ResultScreen(homepageUiState.recentMovies, homepageUiState.nonRecentMovies)
+        is HomepageUiState.Loading -> LoadingScreen()
+        else -> {ErrorScreen()}
     }
-    */
-    //ResultScreen(recentMovieList, allMovieList)
-    ResultScreen()
+
 }
 
 @Composable
 fun ResultScreen(
     recentMovieList: List<Movie> = Datasource().LoadRecentMovies(),
-    allMovieList: List<Movie> = Datasource().LoadAllMovies(),
+    allMovieList: List<Movie> = Datasource().LoadNonRecentMovies(),
     modifier: Modifier = Modifier
 ) {
     val layoutDirection = LocalLayoutDirection.current

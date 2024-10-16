@@ -12,11 +12,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.lumiere.MoviesRepository
+import com.example.riseandroid.model.Movie
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface HomepageUiState {
-    data class Succes(val movies: String) : HomepageUiState
+    data class Succes(val recentMovies: List<Movie>, val nonRecentMovies : List<Movie>) : HomepageUiState
     object Error : HomepageUiState
     object Loading : HomepageUiState
 }
@@ -26,34 +27,16 @@ class HomepageViewModel(private val moviesRepository: MoviesRepository) : ViewMo
         private set
 
     init {
-        getRecentMovies()
-        getNonRecentMovies()
+        getMovies()
     }
 
-    fun getRecentMovies() {
+    fun getMovies() {
         viewModelScope.launch {
             homepageUiState = HomepageUiState.Loading
             homepageUiState = try {
-                val movieListResult = moviesRepository.getRecentMovies()
-                HomepageUiState.Succes(
-                    "Success: ${movieListResult.size} movies retrieved"
-                )
-            } catch (e: IOException) {
-                HomepageUiState.Error
-            } catch (e: HttpException) {
-                HomepageUiState.Error
-            }
-        }
-    }
-
-    fun getNonRecentMovies() {
-        viewModelScope.launch {
-            homepageUiState = HomepageUiState.Loading
-            homepageUiState = try {
-                val movieListResult = moviesRepository.getNonRecentMovies()
-                HomepageUiState.Succes(
-                    "Success: ${movieListResult.size} movies retrieved"
-                )
+                val recentMovieListResult =  moviesRepository.getRecentMovies()
+                val nonRecentMovieListResult = moviesRepository.getNonRecentMovies()
+                HomepageUiState.Succes(recentMovies = recentMovieListResult, nonRecentMovies = nonRecentMovieListResult)
             } catch (e: IOException) {
                 HomepageUiState.Error
             } catch (e: HttpException) {
@@ -63,6 +46,7 @@ class HomepageViewModel(private val moviesRepository: MoviesRepository) : ViewMo
     }
 
     companion object {
+        private const val TIMEOUT_MILLIS = 5_000L
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as LumiereApplication)

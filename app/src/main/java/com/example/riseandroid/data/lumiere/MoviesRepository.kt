@@ -11,11 +11,12 @@ interface MoviesRepository {
 
 class NetworkMoviesRepository(private val lumiereApiService: LumiereApiService) : MoviesRepository {
     override suspend fun getRecentMovies(): List<Movie> {
+        //add lumiereApiService.get() once ready
         return Datasource().LoadRecentMovies()
     }
 
     override suspend fun getNonRecentMovies(): List<Movie> {
-        return Datasource().LoadRecentMovies()
+        return Datasource().LoadNonRecentMovies()
     }
 
 }

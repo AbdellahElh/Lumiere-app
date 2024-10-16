@@ -11,7 +11,7 @@ class Datasource() {
             Movie("Firebrand", R.drawable.screenshot_2024_10_10_192651),
         )
     }
-    fun LoadAllMovies() : List<Movie> {
+    fun LoadNonRecentMovies() : List<Movie> {
         return listOf<Movie>(
             Movie("James bond", R.drawable.screenshot_2024_10_10_102504),
             Movie("Tatami", R.drawable.tatami),

@@ -22,4 +22,12 @@ class NetworkMoviesRepositoryTest {
                 lumiereApiService = FakeLumiereApiService())
             Assert.assertEquals(FakeDataSource.LoadRecentMoviesMock(), repository.getRecentMovies())
         }
+
+    @Test
+    fun networkMoviesRepository_getNonRecentMovies_verifyMoviesList() =
+        runTest {
+            val repository = NetworkMoviesRepository(
+                lumiereApiService = FakeLumiereApiService())
+            Assert.assertEquals(FakeDataSource.LoadNonRecenMoviesMock(), repository.getNonRecentMovies())
+        }
 }
