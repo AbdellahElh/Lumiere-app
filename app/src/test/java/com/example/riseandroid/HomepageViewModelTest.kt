@@ -5,6 +5,7 @@ import com.example.riseandroid.fake.FakeNetworkMoviesRepository
 import com.example.riseandroid.rules.TestDispatcherRule
 import com.example.riseandroid.ui.screens.homepage.HomepageUiState
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+import kotlinx.coroutines.flow.asFlow
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +22,9 @@ class HomepageViewModelTest {
             moviesRepository = FakeNetworkMoviesRepository()
         )
         Assert.assertEquals(
-            HomepageUiState.Succes(FakeDataSource.LoadRecentMoviesMock(), FakeDataSource.LoadNonRecenMoviesMock()),
+            HomepageUiState.Succes(
+                listOf(FakeDataSource.LoadRecentMoviesMock()).asFlow(),
+                listOf(FakeDataSource.LoadNonRecenMoviesMock()).asFlow()),
             homepageViewModel.homepageUiState
         )
     }

@@ -13,11 +13,12 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.model.Movie
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface HomepageUiState {
-    data class Succes(val recentMovies: List<Movie>, val nonRecentMovies : List<Movie>) : HomepageUiState
+    data class Succes(val recentMovies: Flow<List<Movie>>, val nonRecentMovies : Flow<List<Movie>>) : HomepageUiState
     object Error : HomepageUiState
     object Loading : HomepageUiState
 }

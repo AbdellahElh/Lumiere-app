@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.R
 import com.example.riseandroid.data.Datasource
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 
 @Composable
@@ -55,7 +57,15 @@ fun Homepage(
     val homepageUiState =  homepageViewModel.homepageUiState
 
     when (homepageUiState) {
-        is HomepageUiState.Succes ->  ResultScreen(homepageUiState.recentMovies, homepageUiState.nonRecentMovies)
+        is HomepageUiState.Succes -> {
+            val recentMovies: List<Movie> = runBlocking {
+                homepageUiState.recentMovies.first()
+            }
+            val nonRecentMovies: List<Movie> = runBlocking {
+                homepageUiState.nonRecentMovies.first()
+            }
+            ResultScreen(recentMovies, nonRecentMovies)
+        }
         is HomepageUiState.Loading -> LoadingScreen()
         else -> {ErrorScreen()}
     }
@@ -111,8 +121,9 @@ fun LoadingScreen(
     modifier: Modifier = Modifier
 ) {
     Image(
-        modifier = modifier.size(200.dp)
-                            .testTag("LoadingImage"),
+        modifier = modifier
+            .size(200.dp)
+            .testTag("LoadingImage"),
         painter = painterResource(R.drawable.loading_img),
         contentDescription = stringResource(R.string.loading)
     )

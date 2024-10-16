@@ -1,5 +1,7 @@
 package com.example.riseandroid.data
 
+import com.example.riseandroid.data.entitys.AccountRepository
+import com.example.riseandroid.data.entitys.OfflineAccountRepository
 import retrofit2.Retrofit
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
@@ -7,6 +9,7 @@ import com.example.riseandroid.network.LumiereApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import android.content.Context
 
 
 interface AppContainer {
@@ -28,6 +31,10 @@ class DefaultAppContainer : AppContainer {
 
     override val moviesRepository: MoviesRepository by lazy {
         NetworkMoviesRepository(retrofitService)
+    }
+
+    override  val accountRepository : AccountRepository by lazy {
+        OfflineAccountRepository(Database.getDatabase(context).accountDao())
     }
 
 }

@@ -11,6 +11,7 @@ import com.example.riseandroid.ui.screens.homepage.Homepage
 import com.example.riseandroid.ui.screens.homepage.ResultScreen
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.CountDownLatch
 
 class HomepageUITest {
     @get:Rule
@@ -18,6 +19,8 @@ class HomepageUITest {
 
     val recentMovieList = MovieListMock().LoadRecentMoviesMock()
     val allMovieList = MovieListMock().LoadAllMoviesMock()
+
+    private final val countown : CountDownLatch = CountDownLatch(1)
 
     @Test
     fun titles_Placed_On_Homescreen() {
@@ -53,9 +56,20 @@ class HomepageUITest {
     fun loadingScreen_Is_Shown_When_Loading() {
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
-                ResultScreen(recentMovieList, allMovieList)
-                //countdownlatch
+                Homepage()
             }
         }
+        countown.countDown()
+        homepageTestRule.onNodeWithTag("LoadingImage").assertIsDisplayed()
+    }
+
+    @Test
+    fun errorScreen_Show_When_An_Error_Occurs() {
+        homepageTestRule.setContent {
+            Surface(modifier = Modifier) {
+                Homepage()
+            }
+        }
+        homepageTestRule.onNodeWithTag("ErrorColumn").assertIsDisplayed()
     }
 }
