@@ -62,6 +62,7 @@ fun Homepage(
 
 }
 
+
 @Composable
 fun ResultScreen(
     recentMovieList: List<Movie> = Datasource().LoadRecentMovies(),
@@ -87,14 +88,14 @@ fun ResultScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         Column() {
-            TitleText(title = "Nieuwe films", modifier = Modifier)
+            TitleText(title = stringResource(R.string.nieuwe_films_title), modifier = Modifier)
             MovieList(
                 movieList = recentMovieList,
                 modifier = Modifier
                     .padding(posterImagePadding)
                     .height(350.dp)
             )
-            TitleText(title = "Alle films", modifier = Modifier)
+            TitleText(title = stringResource(R.string.alle_films_title), modifier = Modifier)
             MovieList(
                 movieList = allMovieList,
                 modifier = Modifier
@@ -110,7 +111,8 @@ fun LoadingScreen(
     modifier: Modifier = Modifier
 ) {
     Image(
-        modifier = modifier.size(200.dp),
+        modifier = modifier.size(200.dp)
+                            .testTag("LoadingImage"),
         painter = painterResource(R.drawable.loading_img),
         contentDescription = stringResource(R.string.loading)
     )
@@ -121,7 +123,7 @@ fun ErrorScreen(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.testTag("ErrorColumn"),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

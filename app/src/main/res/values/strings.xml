@@ -4,4 +4,6 @@
     <string name="alle_films">Alle films</string>
     <string name="loading">Loading</string>
     <string name="loading_failed">Failed to load</string>
+    <string name="nieuwe_films_title">Nieuwe films</string>
+    <string name="alle_films_title">Alle films</string>
 </resources>

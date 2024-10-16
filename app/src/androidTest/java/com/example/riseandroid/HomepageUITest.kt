@@ -48,4 +48,14 @@ class HomepageUITest {
             homepageTestRule.onNodeWithTag(movie.title).assertIsDisplayed()
         }
     }
+
+    @Test
+    fun loadingScreen_Is_Shown_When_Loading() {
+        homepageTestRule.setContent {
+            Surface(modifier = Modifier) {
+                ResultScreen(recentMovieList, allMovieList)
+                //countdownlatch
+            }
+        }
+    }
 }
