@@ -121,27 +121,27 @@ fun MovieDetailScreen(movieId: Long? , navController: NavController) {
                         fontWeight = FontWeight.Light,
                         color = Color(0xFFBABFC9)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(16.dp)
-                            .background(Color(0xFF696D74))
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.btn_star),
-                        contentDescription = "Rating",
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = "${movie.rating}",
-                        fontSize = 14.sp,
-                        color = Color(0xFFBABFC9)
-                    )
+//                    Spacer(modifier = Modifier.width(8.dp))
+//                    Box(
+//                        modifier = Modifier
+//                            .width(1.dp)
+//                            .height(16.dp)
+//                            .background(Color(0xFF696D74))
+//                    )
+//                    Spacer(modifier = Modifier.width(8.dp))
+//
+//                    Image(
+//                        painter = painterResource(id = R.drawable.btn_star),
+//                        contentDescription = "Rating",
+//                        modifier = Modifier.size(18.dp)
+//                    )
+//                    Spacer(modifier = Modifier.width(4.dp))
+//
+//                    Text(
+//                        text = "${movie.rating}",
+//                        fontSize = 14.sp,
+//                        color = Color(0xFFBABFC9)
+//                    )
                 }
 
                 Row(

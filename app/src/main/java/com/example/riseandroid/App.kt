@@ -9,6 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.riseandroid.navigation.BottomBar
 import com.example.riseandroid.navigation.NavHostWrapper
+import com.example.riseandroid.screens.AccountScreen
+import com.example.riseandroid.screens.ScanCodeScreen
+import com.example.riseandroid.screens.TicketsScreen
 import com.example.riseandroid.screens.homepage.Homepage
 import com.example.riseandroid.screens.movieDetail.MovieDetailScreen
 
@@ -21,11 +24,20 @@ fun LumiereApp() {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = "homepage",
+            startDestination = "home",
             Modifier.padding(paddingValues)
         ) {
-            composable("homepage") {
+            composable("home") {
                 Homepage(navController = navController)
+            }
+            composable("qrScan") {
+                ScanCodeScreen(navController = navController)
+            }
+            composable("tickets") {
+                TicketsScreen(navController = navController)
+            }
+            composable("account") {
+                AccountScreen(navController = navController)
             }
             composable("movieDetail/{movieId}") { backStackEntry ->
                 val movieId = backStackEntry.arguments?.getString("movieId")?.toLongOrNull()

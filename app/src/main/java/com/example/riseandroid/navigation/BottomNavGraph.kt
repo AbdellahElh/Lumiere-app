@@ -24,13 +24,13 @@ fun BottomNavGraph(
             Homepage(navController = navController)
         }
         composable(route = BottomBarScreen.ScanCode.route) {
-            ScanCodeScreen()
+            ScanCodeScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Tickets.route) {
-            TicketsScreen()
+            TicketsScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Account.route) {
-            AccountScreen()
+            AccountScreen(navController = navController)
         }
     }
 }
