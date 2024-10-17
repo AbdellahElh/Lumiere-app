@@ -10,9 +10,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.Text
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun ScanCodeScreen() {
+fun ScanCodeScreen(navController: NavHostController? = null) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -30,5 +32,7 @@ fun ScanCodeScreen() {
 @Composable
 @Preview
 fun ScanCodeScreenPreview() {
-    ScanCodeScreen()
+    val navController = rememberNavController()
+
+    ScanCodeScreen(navController = navController)
 }
