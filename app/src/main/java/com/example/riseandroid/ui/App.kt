@@ -18,14 +18,6 @@ fun LumiereApp() {
         bottomBar = { BottomBar(navController = navController) }
     ) { paddingValues ->
         NavHostWrapper(navController = navController, paddingValues = paddingValues)
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Homepage(
-                contentPadding = paddingValues
-            )
-        }
     }
 }
 

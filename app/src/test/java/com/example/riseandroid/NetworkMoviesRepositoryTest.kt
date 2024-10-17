@@ -24,8 +24,8 @@ class NetworkMoviesRepositoryTest {
                 lumiereApiService = FakeLumiereApiService()
             )
             Assert.assertEquals(
-                listOf(FakeDataSource.LoadRecentMoviesMock()).asFlow(),
-                repository.getRecentMovies())
+                FakeDataSource.LoadRecentMoviesMock(),
+                repository.getRecentMovies().first())
         }
 
     @Test

@@ -16,8 +16,12 @@ okhttp = "4.11.0"
 retrofit = "2.9.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 navigationCompose = "2.8.3"
+lucideIcons = "1.0.0"
+navigationTesting = "2.8.2"
 
 [libraries]
+lucide-icons = { group = "com.composables", name = "icons-lucide", version.ref = "lucideIcons" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler" , version.ref = "room"}
