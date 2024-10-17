@@ -1,6 +1,5 @@
-package com.example.riseandroid.ui.screens.homepage
+package com.example.riseandroid.fake
 
-import retrofit2.HttpException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,23 +11,19 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.lumiere.MoviesRepository
-import com.example.riseandroid.model.Movie
-import kotlinx.coroutines.flow.Flow
+import com.example.riseandroid.ui.screens.homepage.HomepageUiState
+import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 
-sealed interface HomepageUiState {
-    data class Succes(val recentMovies: Flow<List<Movie>>, val nonRecentMovies : Flow<List<Movie>>) : HomepageUiState
-    object Error : HomepageUiState
-    object Loading : HomepageUiState
-}
 
-class HomepageViewModel(
-    private val moviesRepository: MoviesRepository,
-) : ViewModel() {
+class FakeHomepageViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
     var homepageUiState: HomepageUiState by mutableStateOf(HomepageUiState.Loading)
         private set
+
+    private final val countown : CountDownLatch = CountDownLatch(1)
 
     init {
         getMovies()
@@ -37,6 +32,7 @@ class HomepageViewModel(
     fun getMovies() {
         viewModelScope.launch {
             homepageUiState = HomepageUiState.Loading
+            countown.countDown()
             homepageUiState = try {
                 val recentMovieListResult =  moviesRepository.getRecentMovies()
                 val nonRecentMovieListResult = moviesRepository.getNonRecentMovies()
@@ -48,7 +44,6 @@ class HomepageViewModel(
             }
         }
     }
-
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

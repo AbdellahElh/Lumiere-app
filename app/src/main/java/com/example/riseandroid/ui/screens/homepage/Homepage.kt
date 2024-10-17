@@ -25,6 +25,8 @@ import com.example.riseandroid.model.Movie
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -42,29 +44,29 @@ import com.example.riseandroid.R
 import com.example.riseandroid.data.Datasource
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import java.util.concurrent.CountDownLatch
 
 
 @Composable
 fun Homepage(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    ) {
-
-    val homepageViewModel : HomepageViewModel = viewModel(
+    homepageViewModel : HomepageViewModel = viewModel(
         factory = HomepageViewModel.Factory
     )
+    ) {
 
     val homepageUiState =  homepageViewModel.homepageUiState
 
     when (homepageUiState) {
         is HomepageUiState.Succes -> {
-            val recentMovies: List<Movie> = runBlocking {
-                homepageUiState.recentMovies.first()
-            }
-            val nonRecentMovies: List<Movie> = runBlocking {
-                homepageUiState.nonRecentMovies.first()
-            }
-            ResultScreen(recentMovies, nonRecentMovies)
+            val recentMovies =
+                homepageUiState.recentMovies.collectAsState(initial = emptyList())
+
+            val nonRecentMovies =
+                homepageUiState.nonRecentMovies.collectAsState(initial = emptyList())
+
+            ResultScreen(recentMovies.value, nonRecentMovies.value)
         }
         is HomepageUiState.Loading -> LoadingScreen()
         else -> {ErrorScreen()}
@@ -83,7 +85,7 @@ fun ResultScreen(
     val posterImagePadding = dimensionResource(R.dimen.image_padding)
     val scrollState = rememberScrollState()
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
             .statusBarsPadding()

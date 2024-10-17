@@ -6,6 +6,7 @@ import com.example.riseandroid.fake.FakeDataSource
 import com.example.riseandroid.fake.FakeLumiereApiService
 import com.example.riseandroid.rules.TestDispatcherRule
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
@@ -34,8 +35,8 @@ class NetworkMoviesRepositoryTest {
                 lumiereApiService = FakeLumiereApiService()
             )
             Assert.assertEquals(
-                listOf(FakeDataSource.LoadNonRecenMoviesMock()).asFlow(),
-                repository.getNonRecentMovies()
+                FakeDataSource.LoadNonRecenMoviesMock(),
+                repository.getNonRecentMovies().first()
             )
         }
 }

@@ -14,9 +14,10 @@ import android.content.Context
 
 interface AppContainer {
     val moviesRepository: MoviesRepository
+//    val accountRepository: AccountRepository
 }
 
-class DefaultAppContainer : AppContainer {
+class DefaultAppContainer(private val context: Context) : AppContainer {
     private val BASE_URL = "https://10.0.2.2"
 
     private val retrofit: Retrofit = Retrofit.Builder()
@@ -33,8 +34,8 @@ class DefaultAppContainer : AppContainer {
         NetworkMoviesRepository(retrofitService)
     }
 
-    override  val accountRepository : AccountRepository by lazy {
-        OfflineAccountRepository(Database.getDatabase(context).accountDao())
-    }
+//    override val accountRepository : AccountRepository by lazy {
+//        OfflineAccountRepository(Database.getDatabase(context))
+//    }
 
 }

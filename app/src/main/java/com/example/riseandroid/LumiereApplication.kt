@@ -3,6 +3,7 @@ package com.example.riseandroid
 import android.app.Application
 import com.example.riseandroid.data.AppContainer
 import com.example.riseandroid.data.DefaultAppContainer
+import android.content.Context
 
 
 class LumiereApplication : Application() {
@@ -10,7 +11,7 @@ class LumiereApplication : Application() {
     lateinit var container: AppContainer
     override fun onCreate() {
         super.onCreate()
-        container = DefaultAppContainer()
+        container = DefaultAppContainer(this)
     }
 }
 
