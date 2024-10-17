@@ -15,23 +15,22 @@ fun BottomNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Home.route,
         modifier = modifier
     ) {
         composable(route = BottomBarScreen.Home.route) {
-            Homepage()
+            Homepage(navController = navController)
         }
         composable(route = BottomBarScreen.ScanCode.route) {
-            ScanCodeScreen()
+            ScanCodeScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Tickets.route) {
-            TicketsScreen()
+            TicketsScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Account.route) {
-            AccountScreen()
+            AccountScreen(navController = navController)
         }
     }
 }
