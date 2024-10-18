@@ -10,7 +10,7 @@ class MovieListMock {
             Movie("Ezra", R.drawable.screenshot_2024_10_08_105150),
         )
     }
-    fun LoadAllMoviesMock() : List<Movie> {
+    fun LoadNonRecentMoviesMock() : List<Movie> {
         return listOf<Movie>(
             Movie("James bond", R.drawable.screenshot_2024_10_10_102504)
         )
