@@ -12,9 +12,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.Text
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun AccountScreen() {
+fun AccountScreen(navController: NavHostController? = null) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -33,5 +35,6 @@ fun AccountScreen() {
 @Composable
 @Preview
 fun AccountScreenPreview() {
-    AccountScreen()
+    val navController = rememberNavController()
+    AccountScreen(navController = navController)
 }
