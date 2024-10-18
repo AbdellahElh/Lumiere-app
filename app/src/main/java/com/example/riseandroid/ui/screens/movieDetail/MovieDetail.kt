@@ -1,4 +1,4 @@
-package com.example.riseandroid.screens.movieDetail
+package com.example.riseandroid.ui.screens.movieDetail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.riseandroid.R
-import com.example.riseandroid.repository.Datasource
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,10 +30,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontFamily
+import com.example.riseandroid.data.Datasource
 
 @Composable
 fun MovieDetailScreen(movieId: Long? , navController: NavController) {
-    val movie = Datasource().LoadAllMovies().find { it.movieId == movieId }
+    val movie = Datasource().LoadNonRecentMovies().find { it.movieId == movieId }
     var isExpanded by remember { mutableStateOf(false) }
     if (movie != null) {
         val scrollState = rememberScrollState()
@@ -148,7 +148,7 @@ fun MovieDetailScreen(movieId: Long? , navController: NavController) {
                     modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp),
                 ) {
                     Text(
-                        text = movie.genre,
+                        text = "${movie.genre}",
                         fontSize = 16.sp,
                         color = Color(0xFFB2B5BB),
                         modifier = Modifier

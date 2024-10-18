@@ -5,10 +5,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.riseandroid.screens.AccountScreen
-import com.example.riseandroid.screens.ScanCodeScreen
-import com.example.riseandroid.screens.TicketsScreen
-import com.example.riseandroid.screens.homepage.Homepage
+import com.example.riseandroid.ui.screens.account.AccountScreen
+import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
+import com.example.riseandroid.ui.screens.ticket.TicketsScreen
+import com.example.riseandroid.ui.screens.homepage.Homepage
 
 @Composable
 fun BottomNavGraph(

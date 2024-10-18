@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.riseandroid.R
 import com.example.riseandroid.data.Datasource
 import kotlinx.coroutines.flow.first
@@ -49,6 +50,7 @@ import java.util.concurrent.CountDownLatch
 
 @Composable
 fun Homepage(
+    navController: NavHostController,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     homepageViewModel : HomepageViewModel = viewModel(
