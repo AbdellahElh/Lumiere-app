@@ -40,7 +40,7 @@ fun BottomBar(navController: NavHostController) {
     val currentDestination = navBackStackEntry?.destination
 
 
-    NavigationBar(  containerColor =   Color(0xFF17191F)) {
+    NavigationBar(  containerColor =   Color(0xFF000000)) {
 
         screens.forEach { screen ->
             AddItem(

@@ -1,7 +1,6 @@
 package com.example.riseandroid.screens.homepage
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,14 +40,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.riseandroid.R
 import com.example.riseandroid.repository.Datasource
 
 
 @Composable
 fun Homepage(
-    navController: NavHostController,
     recentMovieList: List<Movie> = Datasource().LoadRecentMovies(),
     allMovieList: List<Movie> = Datasource().LoadAllMovies()
 ) {
@@ -75,7 +72,6 @@ fun Homepage(
             TitleText(title = "Nieuwe films", modifier = Modifier)
             MovieList(
                 movieList = recentMovieList,
-                navController = navController,
                 modifier = Modifier
                     .padding(posterImagePadding)
                     .height(350.dp)
@@ -83,7 +79,6 @@ fun Homepage(
             TitleText(title = "Alle films", modifier = Modifier)
             MovieList(
                 movieList = allMovieList,
-                navController = navController,
                 modifier = Modifier
                     .padding(posterImagePadding)
                     .height(250.dp)
@@ -93,16 +88,9 @@ fun Homepage(
 }
 
 @Composable
-fun MoviePosterCard(
-    movie: Movie,
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.clickable {
-            navController.navigate("movieDetail/${movie.movieId}")
-        }
-    ) {
+fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {
+
+    Column(modifier = modifier) {
         val posterId = movie.posterResourceId
         Image(
             painter = painterResource(posterId),
@@ -122,19 +110,15 @@ fun MoviePosterCard(
             color = Color.White,
         )
     }
+
 }
 
 @Composable
-fun MovieList(
-    movieList: List<Movie>,
-    navController: NavHostController,
-    modifier: Modifier = Modifier
-) {
+fun MovieList(movieList: List<Movie>, modifier: Modifier = Modifier) {
     LazyRow(modifier = modifier) {
-        items(movieList) { movie ->
+        items(movieList) { m ->
             MoviePosterCard(
-                movie = movie,
-                navController = navController,
+                movie = m,
                 modifier = modifier
             )
         }

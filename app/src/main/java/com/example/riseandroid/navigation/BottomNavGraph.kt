@@ -9,29 +9,29 @@ import com.example.riseandroid.screens.AccountScreen
 import com.example.riseandroid.screens.ScanCodeScreen
 import com.example.riseandroid.screens.TicketsScreen
 import com.example.riseandroid.screens.homepage.Homepage
-import com.example.riseandroid.ui.screens.homepage.Homepage
 
 @Composable
 fun BottomNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Home.route,
         modifier = modifier
     ) {
         composable(route = BottomBarScreen.Home.route) {
-            Homepage(navController = navController)
+            Homepage()
         }
         composable(route = BottomBarScreen.ScanCode.route) {
-            ScanCodeScreen(navController = navController)
+            ScanCodeScreen()
         }
         composable(route = BottomBarScreen.Tickets.route) {
-            TicketsScreen(navController = navController)
+            TicketsScreen()
         }
         composable(route = BottomBarScreen.Account.route) {
-            AccountScreen(navController = navController)
+            AccountScreen()
         }
     }
 }
