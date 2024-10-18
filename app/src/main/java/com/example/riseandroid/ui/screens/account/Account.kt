@@ -1,4 +1,4 @@
-package com.example.riseandroid.screens
+package com.example.riseandroid.ui.screens.account
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,29 +10,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.Text
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun ScanCodeScreen(navController: NavHostController? = null) {
+fun AccountScreen(navController: NavHostController? = null) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(Color.Blue)
+            .semantics{ contentDescription ="Account Screen" },
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "QR Code",
+            text = "ACCOUNT",
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.White
         )
     }
 }
 
 @Composable
 @Preview
-fun ScanCodeScreenPreview() {
+fun AccountScreenPreview() {
     val navController = rememberNavController()
-
-    ScanCodeScreen(navController = navController)
+    AccountScreen(navController = navController)
 }

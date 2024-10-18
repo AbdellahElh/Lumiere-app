@@ -36,10 +36,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.riseandroid.R
 import com.example.riseandroid.data.Datasource
 import kotlinx.coroutines.flow.first
@@ -49,6 +52,7 @@ import java.util.concurrent.CountDownLatch
 
 @Composable
 fun Homepage(
+    navController: NavHostController,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     homepageViewModel : HomepageViewModel = viewModel(
@@ -96,7 +100,7 @@ fun ResultScreen(
                 end = WindowInsets.safeDrawing
                     .asPaddingValues()
                     .calculateEndPadding(layoutDirection),
-            ),
+            ).semantics{ contentDescription ="Home Screen" },
         color = MaterialTheme.colorScheme.background
     ) {
         Column() {
@@ -149,9 +153,10 @@ fun ErrorScreen(
 
 @Composable
 fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {
-
+    println(movie)
     Column(modifier = modifier) {
         val posterId = movie.posterResourceId
+        val movieTitle = movie.title
         Image(
             painter = painterResource(posterId),
             contentDescription = null,
@@ -163,10 +168,10 @@ fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {
             contentScale = ContentScale.Crop,
         )
         Text(
-            text = movie.title,
+            text = movieTitle,
             modifier
                 .weight(0.25f)
-                .testTag(movie.title),
+                .testTag(movieTitle),
             color = Color.White,
         )
     }

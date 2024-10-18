@@ -1,4 +1,4 @@
-package com.example.riseandroid.screens
+package com.example.riseandroid.ui.screens.ticket
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

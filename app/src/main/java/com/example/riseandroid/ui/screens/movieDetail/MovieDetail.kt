@@ -1,4 +1,4 @@
-package com.example.riseandroid.screens.movieDetail
+package com.example.riseandroid.ui.screens.movieDetail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.riseandroid.R
-import com.example.riseandroid.repository.Datasource
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,10 +30,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontFamily
+import com.example.riseandroid.data.Datasource
 
 @Composable
 fun MovieDetailScreen(movieId: Long? , navController: NavController) {
-    val movie = Datasource().LoadAllMovies().find { it.movieId == movieId }
+    val movie = Datasource().LoadNonRecentMovies().find { it.movieId == movieId }
     var isExpanded by remember { mutableStateOf(false) }
     if (movie != null) {
         val scrollState = rememberScrollState()
@@ -148,7 +148,7 @@ fun MovieDetailScreen(movieId: Long? , navController: NavController) {
                     modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp),
                 ) {
                     Text(
-                        text = movie.genre,
+                        text = "${movie.genre}",
                         fontSize = 16.sp,
                         color = Color(0xFFB2B5BB),
                         modifier = Modifier
@@ -177,29 +177,29 @@ fun MovieDetailScreen(movieId: Long? , navController: NavController) {
                     color = Color.White,
                     modifier = Modifier.padding(top = 28.dp)
                 )
-
-                val displayedDescription = if (isExpanded) movie.description else movie.description.take(100)
-
-                Text(
-                    text = if (isExpanded) displayedDescription  else "${displayedDescription}...",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Light,
-                    color = Color(0xFF696D74),
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-
-
-                if (movie.description.length > 100) {
-                    Text(
-                        text = if (isExpanded) "Lees Minder" else "Lees Meer",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Light,
-                        color = Color(0xFFE5CB77),
-                        modifier = Modifier
-                            .clickable { isExpanded = !isExpanded }
-
-                    )
-                }
+//
+//                val displayedDescription = if (isExpanded) movie.description else movie.description.take(100)
+//
+//                Text(
+//                    text = if (isExpanded) displayedDescription  else "${displayedDescription}...",
+//                    fontSize = 15.sp,
+//                    fontWeight = FontWeight.Light,
+//                    color = Color(0xFF696D74),
+//                    modifier = Modifier.padding(top = 16.dp)
+//                )
+//
+//
+//                if (movie.description.length > 100) {
+//                    Text(
+//                        text = if (isExpanded) "Lees Minder" else "Lees Meer",
+//                        fontSize = 15.sp,
+//                        fontWeight = FontWeight.Light,
+//                        color = Color(0xFFE5CB77),
+//                        modifier = Modifier
+//                            .clickable { isExpanded = !isExpanded }
+//
+//                    )
+//                }
                 Spacer(modifier = Modifier.height(35.dp))
                 NextStepButton(onClick = { /* volgende stap komt hier */ })
                 Spacer(modifier = Modifier.height(18.dp))
