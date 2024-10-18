@@ -151,9 +151,10 @@ fun ErrorScreen(
 
 @Composable
 fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {
-
+    println(movie)
     Column(modifier = modifier) {
         val posterId = movie.posterResourceId
+        val movieTitle = movie.title
         Image(
             painter = painterResource(posterId),
             contentDescription = null,
@@ -165,10 +166,10 @@ fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {
             contentScale = ContentScale.Crop,
         )
         Text(
-            text = movie.title,
+            text = movieTitle,
             modifier
                 .weight(0.25f)
-                .testTag(movie.title),
+                .testTag(movieTitle),
             color = Color.White,
         )
     }

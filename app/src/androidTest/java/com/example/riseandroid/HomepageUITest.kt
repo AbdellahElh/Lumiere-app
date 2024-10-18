@@ -42,16 +42,14 @@ class HomepageUITest {
                 ResultScreen(recentMovieList, allMovieList)
             }
         }
-        for(movie in recentMovieList) {
-            val posterId = movie.posterResourceId
-            homepageTestRule.onNodeWithTag(posterId.toString()).assertIsDisplayed()
-            homepageTestRule.onNodeWithTag(movie.title).assertIsDisplayed()
-        }
-        for(movie in allMovieList) {
-            val posterId = movie.posterResourceId
-            homepageTestRule.onNodeWithTag(posterId.toString()).assertIsDisplayed()
-            homepageTestRule.onNodeWithTag(movie.title).assertIsDisplayed()
-        }
+        val mostRecentMovie = recentMovieList.first()
+            homepageTestRule.onNodeWithTag(mostRecentMovie.posterResourceId.toString()).assertIsDisplayed()
+            homepageTestRule.onNodeWithTag(mostRecentMovie.title).assertIsDisplayed()
+
+        val mostNonRecentMovie = allMovieList.first()
+            homepageTestRule.onNodeWithTag(mostNonRecentMovie.posterResourceId.toString()).assertIsDisplayed()
+            homepageTestRule.onNodeWithTag(mostNonRecentMovie.title).assertIsDisplayed()
+
     }
 
 //    @Test

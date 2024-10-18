@@ -177,29 +177,29 @@ fun MovieDetailScreen(movieId: Long? , navController: NavController) {
                     color = Color.White,
                     modifier = Modifier.padding(top = 28.dp)
                 )
-
-                val displayedDescription = if (isExpanded) movie.description else movie.description.take(100)
-
-                Text(
-                    text = if (isExpanded) displayedDescription  else "${displayedDescription}...",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Light,
-                    color = Color(0xFF696D74),
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-
-
-                if (movie.description.length > 100) {
-                    Text(
-                        text = if (isExpanded) "Lees Minder" else "Lees Meer",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Light,
-                        color = Color(0xFFE5CB77),
-                        modifier = Modifier
-                            .clickable { isExpanded = !isExpanded }
-
-                    )
-                }
+//
+//                val displayedDescription = if (isExpanded) movie.description else movie.description.take(100)
+//
+//                Text(
+//                    text = if (isExpanded) displayedDescription  else "${displayedDescription}...",
+//                    fontSize = 15.sp,
+//                    fontWeight = FontWeight.Light,
+//                    color = Color(0xFF696D74),
+//                    modifier = Modifier.padding(top = 16.dp)
+//                )
+//
+//
+//                if (movie.description.length > 100) {
+//                    Text(
+//                        text = if (isExpanded) "Lees Minder" else "Lees Meer",
+//                        fontSize = 15.sp,
+//                        fontWeight = FontWeight.Light,
+//                        color = Color(0xFFE5CB77),
+//                        modifier = Modifier
+//                            .clickable { isExpanded = !isExpanded }
+//
+//                    )
+//                }
                 Spacer(modifier = Modifier.height(35.dp))
                 NextStepButton(onClick = { /* volgende stap komt hier */ })
                 Spacer(modifier = Modifier.height(18.dp))
