@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.okhttp)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,5 +77,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.lucide.icons)
     implementation(libs.androidx.navigation.testing)
+    implementation("androidx.compose.material:material-icons-extended:1.7.3")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
 
 }
