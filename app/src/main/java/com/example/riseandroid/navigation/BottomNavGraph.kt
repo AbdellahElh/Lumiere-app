@@ -9,6 +9,7 @@ import com.example.riseandroid.ui.screens.account.AccountScreen
 import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.ticket.TicketsScreen
 import com.example.riseandroid.ui.screens.homepage.Homepage
+import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 
 @Composable
 fun BottomNavGraph(
@@ -32,5 +33,13 @@ fun BottomNavGraph(
         composable(route = BottomBarScreen.Account.route) {
             AccountScreen(navController = navController)
         }
+
+            composable("movieDetail/{movieId}") { backStackEntry ->
+                val movieId = backStackEntry.arguments?.getString("movieId")?.toLongOrNull()
+                if (movieId != null) {
+                    MovieDetailScreen(movieId = movieId, navController = navController)
+                }
+            }
+
     }
 }

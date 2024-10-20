@@ -1,6 +1,7 @@
 package com.example.riseandroid.ui.screens.homepage
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -70,7 +71,7 @@ fun Homepage(
             val nonRecentMovies =
                 homepageUiState.nonRecentMovies.collectAsState(initial = emptyList())
 
-            ResultScreen(recentMovies.value, nonRecentMovies.value)
+            ResultScreen(navController, recentMovies.value, nonRecentMovies.value)
         }
         is HomepageUiState.Loading -> LoadingScreen()
         else -> {ErrorScreen()}
@@ -81,6 +82,7 @@ fun Homepage(
 
 @Composable
 fun ResultScreen(
+    navController: NavHostController,
     recentMovieList: List<Movie> = Datasource().LoadRecentMovies(),
     allMovieList: List<Movie> = Datasource().LoadNonRecentMovies(),
     modifier: Modifier = Modifier
@@ -107,6 +109,7 @@ fun ResultScreen(
             TitleText(title = stringResource(R.string.nieuwe_films_title), modifier = Modifier)
             MovieList(
                 movieList = recentMovieList,
+                navController = navController,
                 modifier = Modifier
                     .padding(posterImagePadding)
                     .height(350.dp)
@@ -114,6 +117,7 @@ fun ResultScreen(
             TitleText(title = stringResource(R.string.alle_films_title), modifier = Modifier)
             MovieList(
                 movieList = allMovieList,
+                navController = navController,
                 modifier = Modifier
                     .padding(posterImagePadding)
                     .height(250.dp)
@@ -152,9 +156,12 @@ fun ErrorScreen(
 }
 
 @Composable
-fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {
+fun MoviePosterCard(movie: Movie, navController: NavHostController, modifier: Modifier = Modifier) {
     println(movie)
-    Column(modifier = modifier) {
+    Column(modifier = modifier.clickable {
+        navController.navigate("movieDetail/${movie.movieId}")
+    }
+    )  {
         val posterId = movie.posterResourceId
         val movieTitle = movie.title
         Image(
@@ -179,11 +186,12 @@ fun MoviePosterCard(movie: Movie, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MovieList(movieList: List<Movie>, modifier: Modifier = Modifier) {
+fun MovieList(movieList: List<Movie>, navController: NavHostController,modifier: Modifier = Modifier) {
     LazyRow(modifier = modifier) {
         items(movieList) { m ->
             MoviePosterCard(
                 movie = m,
+                navController = navController,
                 modifier = modifier
             )
         }
