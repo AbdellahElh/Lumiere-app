@@ -175,7 +175,7 @@ fun Header(navController: NavController) {
                 .clickable { navController.popBackStack() }
         )
         Spacer(modifier = Modifier.weight(1f))
-        Text("Tickets", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+        Text("Checkout", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
         Spacer(modifier = Modifier.weight(1f))
     }
 }
