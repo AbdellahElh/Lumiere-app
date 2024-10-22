@@ -10,9 +10,13 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import android.content.Context
+import com.example.riseandroid.data.lumiere.NetworkTicketRepository
+import com.example.riseandroid.data.lumiere.TicketRepository
 
 
 interface AppContainer {
+    val ticketRepository: TicketRepository
+
     val moviesRepository: MoviesRepository
 //    val accountRepository: AccountRepository
 }
@@ -32,6 +36,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val moviesRepository: MoviesRepository by lazy {
         NetworkMoviesRepository(retrofitService)
+    }
+    override val ticketRepository: TicketRepository by lazy {
+        NetworkTicketRepository(retrofitService)
     }
 
 //    override val accountRepository : AccountRepository by lazy {

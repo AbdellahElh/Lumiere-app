@@ -2,6 +2,7 @@ package com.example.riseandroid.data
 
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.Ticket
 
 class Datasource() {
     fun LoadRecentMovies() : List<Movie> {
@@ -18,4 +19,13 @@ class Datasource() {
             Movie(3, "Songs of earth", R.drawable.song , "Being connected to nature, what does it mean? Father knows and father shows. The director's father is 84. We follow in his footsteps into the mountain home. Into nature's smallest life and out to grand panoramas, where he grew up." , "action"  , "02h 43m", "Destin Daniel Cretton")
         )
     }
+    fun ticketTypes() : List<Ticket>{
+        return listOf<Ticket>(
+            Ticket("Standaard", 12.00),
+            Ticket("65+", 11.50),
+            Ticket("Student (-26j)", 10.00)
+        )
+    }
+
+
 }
