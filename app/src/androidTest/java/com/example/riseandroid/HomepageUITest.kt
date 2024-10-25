@@ -6,11 +6,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import com.example.riseandroid.fake.FakeNetworkMoviesRepository
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import com.example.riseandroid.mockdata.MovieListMock
-import com.example.riseandroid.ui.screens.homepage.Homepage
-import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
 import com.example.riseandroid.ui.screens.homepage.ResultScreen
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
@@ -18,17 +18,20 @@ import java.util.concurrent.CountDownLatch
 class HomepageUITest {
     @get:Rule
     val homepageTestRule = createComposeRule()
-
+    lateinit var navController: TestNavHostController
     val recentMovieList = MovieListMock().LoadRecentMoviesMock()
     val allMovieList = MovieListMock().LoadNonRecentMoviesMock()
 
     private final val countDownLatch : CountDownLatch = CountDownLatch(1)
-
+    @Before
+    fun setup() {
+        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+    }
     @Test
     fun titles_Placed_On_Homescreen() {
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
-                ResultScreen(recentMovieList, allMovieList)
+                ResultScreen(navController, recentMovieList, allMovieList)
             }
         }
         homepageTestRule.onNodeWithText("Nieuwe films").assertIsDisplayed()
@@ -39,7 +42,7 @@ class HomepageUITest {
     fun list_Of_Movies_Is_Shown(){
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
-                ResultScreen(recentMovieList, allMovieList)
+                ResultScreen(navController, recentMovieList, allMovieList)
             }
         }
         val mostRecentMovie = recentMovieList.first()

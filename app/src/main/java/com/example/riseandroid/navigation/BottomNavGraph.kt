@@ -7,7 +7,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.riseandroid.ui.screens.Checkout.CheckoutScreen
 import com.example.riseandroid.ui.screens.account.AccountScreen
 import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.ticket.TicketsScreen
@@ -43,20 +42,7 @@ fun BottomNavGraph(
                 MovieDetailScreen(movieId = movieId, navController = navController)
             }
         }
-        composable(
-            "checkout/{selectedCinema}/{date}/{selectedHour}",
-            arguments = listOf(
-                navArgument("selectedCinema") { type = NavType.StringType },
-                navArgument("date") { type = NavType.StringType },
-                navArgument("selectedHour") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val selectedCinema = backStackEntry.arguments?.getString("selectedCinema") ?: ""
-            val date = backStackEntry.arguments?.getString("date") ?: ""
-            val selectedHour = backStackEntry.arguments?.getString("selectedHour") ?: ""
 
-            CheckoutScreen(navController, selectedCinema, date, selectedHour)
-        }
 
     }
 }

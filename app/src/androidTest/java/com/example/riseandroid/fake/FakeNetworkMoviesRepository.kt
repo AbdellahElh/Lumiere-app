@@ -1,5 +1,6 @@
 package com.example.riseandroid.fake
 
+import com.example.riseandroid.data.Datasource
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.mockdata.MovieListMock
 import com.example.riseandroid.model.Movie
@@ -22,5 +23,9 @@ class FakeNetworkMoviesRepository(
     override suspend fun getNonRecentMovies(): Flow<List<Movie>> {
         val movies = MovieListMock().LoadNonRecentMoviesMock()
         return listOf(movies).asFlow()
+    }
+    override suspend fun getSpecificMovie(movieId: Long): Movie? {
+        val movie = MovieListMock().LoadNonRecentMoviesMock().find { it.movieId == movieId }
+        return movie
     }
 }

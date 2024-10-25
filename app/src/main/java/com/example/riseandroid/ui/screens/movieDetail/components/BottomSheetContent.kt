@@ -1,6 +1,11 @@
 package com.example.riseandroid.ui.screens.movieDetail.components
 
+import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.DatePicker
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,45 +42,59 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.Program
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomSheetContent(context: Context, navController: NavController, onDismiss: () -> Unit) {
-    val cinema = arrayOf("Brugge", "Antwerpen", "Gent", "dsfdsf")
-    var selectedCinema by remember { mutableStateOf(cinema[0]) }
+fun BottomSheetContent(
+    programList: List<Program>,
+    context: Context,
+    navController: NavController,
+    movie: Movie,
+    onDismiss: () -> Unit
+) {
+    val cinemaLocations = programList.groupBy { it.location }.keys.toList()
+    var selectedCinema by remember {
+        mutableStateOf(if (cinemaLocations.contains("Brugge")) { "Brugge" } else cinemaLocations.firstOrNull() ?: "")
+    }
     var isDropdownExpanded by remember { mutableStateOf(false) }
-    val date = remember { mutableStateOf(getCurrentDate()) }
-    val selectedHour = remember { mutableStateOf("12:00") }
+    var selectedDate by remember { mutableStateOf("") }
+    var selectedHour by remember { mutableStateOf("") }
+
+
     var isTimeDropdownExpanded by remember { mutableStateOf(false) }
-    val hours = arrayOf("10:00", "11:00", "12:00", "13:00", "14:00")
-    val calendar = Calendar.getInstance()
-    val datePickerDialog = remember {
-        android.app.DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth -> date.value = "$dayOfMonth/${month + 1}/$year" },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
+    var isDateDropdownExpanded by remember { mutableStateOf(false) }
+
+    val availableDates = programList.filter { it.location == selectedCinema }
+        .map { it.date }.distinct().sorted()
+    LaunchedEffect(Unit) {
+
+        if (availableDates.isNotEmpty()) {
+            selectedDate = availableDates.first()
+            val availableHours = getAvailableHours(programList, selectedCinema, selectedDate)
+            if (availableHours.isNotEmpty()) {
+                selectedHour = availableHours.first()
+            }
+        }
     }
 
-    Box(
 
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFE5CB77))
             .padding(horizontal = 16.dp)
-
     ) {
         Spacer(modifier = Modifier.height(5.dp))
 
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Cinema",
@@ -89,12 +110,11 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                                 Color(0xFF1C1F26).copy(alpha = 0.5f),
                                 shape = RoundedCornerShape(10.dp)
                             )
-                            .clickable { datePickerDialog.show() }
+                            .clickable { isDropdownExpanded = !isDropdownExpanded }
                     ) {
                         ExposedDropdownMenuBox(
                             expanded = isDropdownExpanded,
                             onExpandedChange = { isDropdownExpanded = !isDropdownExpanded }
-
                         ) {
                             TextField(
                                 value = selectedCinema,
@@ -121,12 +141,24 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                                 expanded = isDropdownExpanded,
                                 onDismissRequest = { isDropdownExpanded = false }
                             ) {
-                                cinema.forEach { item ->
+                                cinemaLocations.forEach { location ->
                                     DropdownMenuItem(
-                                        text = { Text(text = item) },
+                                        text = { Text(text = location) },
                                         onClick = {
-                                            selectedCinema = item
+                                            selectedCinema = location
+                                            selectedHour = ""
                                             isDropdownExpanded = false
+
+                                            val newAvailableDates = programList.filter { it.location == selectedCinema }
+                                                .map { it.date }.distinct().sorted()
+
+                                            if (newAvailableDates.isNotEmpty()) {
+                                                selectedDate = newAvailableDates.first()
+                                                val availableHours = getAvailableHours(programList, selectedCinema, selectedDate)
+                                                if (availableHours.isNotEmpty()) {
+                                                    selectedHour = availableHours.first()
+                                                }
+                                            }
                                         }
                                     )
                                 }
@@ -134,13 +166,13 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                         }
                     }
                 }
-
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(24.dp)
             ) {
+
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Datum",
@@ -149,29 +181,61 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                         color = Color(0xFF1C1F26),
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
+
                     Box(
                         modifier = Modifier
-                            .border(
-                                1.dp,
-                                Color(0xFF1C1F26).copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .clickable { datePickerDialog.show() }
+                            .border(1.dp, Color(0xFF1C1F26).copy(alpha = 0.5f), shape = RoundedCornerShape(10.dp))
                     ) {
-                        TextField(
-                            value = date.value,
-                            onValueChange = {},
-                            readOnly = true,
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            textStyle = TextStyle(color = Color.Black)
-                        )
+                        ExposedDropdownMenuBox(
+                            expanded = isDateDropdownExpanded,
+                            onExpandedChange = { isDateDropdownExpanded = !isDateDropdownExpanded }
+                        ) {
+                            println(selectedDate)
+                            TextField(
+                                value = selectedDate,
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDateDropdownExpanded)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor()
+                                    .clickable {
+                                        isDateDropdownExpanded = true
+                                    },
+                                colors = TextFieldDefaults.textFieldColors(
+                                    containerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent
+                                ),
+                                textStyle = TextStyle(color = Color.Black)
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = isDateDropdownExpanded,
+                                onDismissRequest = { isDateDropdownExpanded = false }
+                            ) {
+                                availableDates.forEach { date ->
+                                    DropdownMenuItem(
+                                        text = { Text(text = date) },
+                                        onClick = {
+                                            selectedDate = date
+                                            isDateDropdownExpanded = false
+                                            selectedHour = ""
+                                            println("Selected date: ${selectedDate}, Available hours: ${getAvailableHours(programList, selectedCinema, selectedDate)}")
+
+                                            val availableHours = getAvailableHours(programList, selectedCinema, selectedDate)
+                                            if (availableHours.isNotEmpty()) {
+                                                selectedHour = availableHours.first()
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
-
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Tijd",
@@ -180,21 +244,18 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                         color = Color(0xFF1C1F26),
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
+                    val availableHours = getAvailableHours(programList, selectedCinema, selectedDate)
+
                     Box(
                         modifier = Modifier
-                            .border(
-                                1.dp,
-                                Color(0xFF1C1F26).copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .clickable { datePickerDialog.show() }
+                            .border(1.dp, Color(0xFF1C1F26).copy(alpha = 0.5f), shape = RoundedCornerShape(10.dp))
                     ) {
                         ExposedDropdownMenuBox(
                             expanded = isTimeDropdownExpanded,
                             onExpandedChange = { isTimeDropdownExpanded = !isTimeDropdownExpanded }
                         ) {
                             TextField(
-                                value = selectedHour.value,
+                                value = selectedHour,
                                 onValueChange = {},
                                 readOnly = true,
                                 trailingIcon = {
@@ -202,7 +263,10 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable { isTimeDropdownExpanded = true },
+                                    .menuAnchor()
+                                    .clickable {
+                                        isTimeDropdownExpanded = true
+                                    },
                                 colors = TextFieldDefaults.textFieldColors(
                                     containerColor = Color.Transparent,
                                     focusedIndicatorColor = Color.Transparent,
@@ -215,11 +279,11 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                                 expanded = isTimeDropdownExpanded,
                                 onDismissRequest = { isTimeDropdownExpanded = false }
                             ) {
-                                hours.forEach { hour ->
+                                availableHours.forEach { hour ->
                                     DropdownMenuItem(
                                         text = { Text(text = hour) },
                                         onClick = {
-                                            selectedHour.value = hour
+                                            selectedHour = hour
                                             isTimeDropdownExpanded = false
                                         }
                                     )
@@ -233,16 +297,13 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
 
             Button(
                 onClick = {
-                    onCheckout(selectedCinema, date.value, selectedHour.value, navController)
+                    onCheckout(selectedCinema, selectedDate, selectedHour, movie, navController, context)
                     onDismiss()
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1B1E25)
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B1E25)),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 contentPadding = PaddingValues(vertical = 18.dp)
-
             ) {
                 Text(
                     text = "Checkout",
@@ -252,20 +313,39 @@ fun BottomSheetContent(context: Context, navController: NavController, onDismiss
                 )
             }
             Spacer(modifier = Modifier.height(1.dp))
-
         }
     }
 }
+
+fun getAvailableHours(programList: List<Program>, selectedCinema: String, selectedDate: String): List<String> {
+    return programList
+        .filter { it.location == selectedCinema && it.date == selectedDate }
+        .flatMap { it.hours.split(",") }
+        .distinct()
+        .sorted()
+}
+
 
 fun onCheckout(
     selectedCinema: String,
     date: String,
     selectedHour: String,
-    navController: NavController
+    movie: Movie,
+    navController: NavController,
+    context: Context
 ) {
     val formattedDate = date.replace("/", "-")
-    navController.navigate("checkout/$selectedCinema/$formattedDate/$selectedHour")
+    val url = when (selectedCinema) {
+        "Brugge" -> "https://tickets.lumierecinema.be/lumiere/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
+        "Antwerpen" -> "https://tickets.lumiere-antwerpen.be/lumiereantwerpen/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
+        "Mechelen" -> "https://tickets.lumieremechelen.be/lumieremechelen/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
+        "Cinema Cartoons" -> "https://tickets.cinemacartoons.be/cartoons/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
 
+        else -> ""
+    }
+
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    context.startActivity(intent)
 }
 
 fun getCurrentDate(): String {

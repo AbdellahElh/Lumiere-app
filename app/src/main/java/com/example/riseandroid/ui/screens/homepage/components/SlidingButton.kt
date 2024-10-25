@@ -1,4 +1,5 @@
-package com.example.riseandroid.ui.screens.Checkout.components
+package com.example.riseandroid.ui.screens.homepage.components
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

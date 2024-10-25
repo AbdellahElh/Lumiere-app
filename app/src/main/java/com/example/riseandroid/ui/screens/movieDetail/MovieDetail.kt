@@ -34,6 +34,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.TextField
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import com.example.riseandroid.model.Program
 import com.example.riseandroid.ui.screens.movieDetail.components.BottomSheetContent
 import java.util.Calendar
 
@@ -59,14 +60,16 @@ fun MovieDetailScreen(
 
         is MovieDetailUiState.Success -> {
             val movie = uiState.specificMovie
-            MovieDetailContent(movie = movie, navController = navController)
+            val program =
+                uiState.programList.collectAsState(initial = emptyList())
+            MovieDetailContent(movie = movie,program.value, navController = navController)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieDetailContent(movie: Movie, navController: NavController) {
+fun MovieDetailContent(movie: Movie,programList: List<Program> ,navController: NavController) {
     var isExpanded by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -101,7 +104,7 @@ fun MovieDetailContent(movie: Movie, navController: NavController) {
                 sheetState = rememberModalBottomSheetState(),
                 containerColor = Color(0xFFE5CB77)
             ) {
-                BottomSheetContent(context, navController) { showBottomSheet = false }
+                BottomSheetContent(programList, context, navController, movie) { showBottomSheet = false }
             }
         }
     }
