@@ -1,40 +1,85 @@
 package com.example.riseandroid.ui.screens.account
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.material3.Text
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun AccountScreen(navController: NavHostController? = null) {
-    Box(
+fun AccountScreen(
+    navController: NavController,authViewModel: AccountViewModel
+) {
+    val authState by authViewModel.authState.collectAsState()
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Blue)
-            .semantics{ contentDescription ="Account Screen" },
-        contentAlignment = Alignment.Center
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "ACCOUNT",
-            fontWeight = FontWeight.Bold,
-            color = Color.White
+            text = "Account",
+            fontSize = 30.sp,
+            color = MaterialTheme.colorScheme.onPrimary
         )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if (authState is AuthState.Authenticated) {
+            SuccessMessage()
+        } else {
+            Button(
+                onClick = { navController.navigate("signup") },
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(50.dp)
+            ) {
+                Text("Registreren", fontSize = 20.sp)
+            }
+
+        }
     }
 }
 
 @Composable
-@Preview
-fun AccountScreenPreview() {
-    val navController = rememberNavController()
-    AccountScreen(navController = navController)
+fun SuccessMessage() {
+    Column( modifier = Modifier
+        .fillMaxSize()
+        .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,)
+    {
+        Text(
+            "U bent aangemeld",
+            Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontSize = 18.sp,
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Button(onClick = {},
+            modifier = Modifier
+                .width(300.dp)
+                .height(50.dp)
+        ) {
+            Text("Uitloggen",fontSize = 20.sp)
+        }
+    }
+
+
 }

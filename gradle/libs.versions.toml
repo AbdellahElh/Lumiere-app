@@ -18,6 +18,9 @@ retrofit2KotlinxSerializationConverter = "1.0.0"
 navigationCompose = "2.8.3"
 lucideIcons = "1.0.0"
 navigationTesting = "2.8.2"
+auth0="2.+"
+jwtdecode="2.0.0"
+
 
 [libraries]
 lucide-icons = { group = "com.composables", name = "icons-lucide", version.ref = "lucideIcons" }
@@ -46,6 +49,8 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+auth0-jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
+auth0-android ={ group="com.auth0.android", name = "auth0", version.ref = "auth0"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
