@@ -17,6 +17,13 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        addManifestPlaceholders(
+            mapOf(
+                "auth0Domain" to "@string/com_auth0_domain",
+                "auth0Scheme" to "@string/com_auth0_scheme"
+            )
+        )
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -37,6 +44,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        viewBinding = true
         compose = true
     }
 }
@@ -63,6 +71,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.firebase.crashlytics.buildtools)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,6 +80,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.kotlinx.coroutines.test)
+    implementation (libs.coil.compose)
+    implementation (libs.androidx.navigation.compose.v253)
+
+    implementation ("com.google.dagger:hilt-android:2.44")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
+
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
@@ -80,4 +95,17 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.3")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
 
+    // Auth0 dependencies
+    implementation ("com.auth0.android:auth0:2.+")
+    implementation ("com.auth0.android:jwtdecode:2.+")
+
+    //retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:+")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("androidx.work:work-testing:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.+")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 }

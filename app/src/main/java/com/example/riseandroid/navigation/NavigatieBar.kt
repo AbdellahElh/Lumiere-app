@@ -17,13 +17,17 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.auth0.android.Auth0
+import com.example.riseandroid.ui.screens.signUp.AuthViewModel
 
 
 @Composable
-fun NavHostWrapper(navController: NavHostController, paddingValues: PaddingValues) {
+fun NavHostWrapper(navController: NavHostController, paddingValues: PaddingValues, account: Auth0, authViewModel: AuthViewModel) {
     BottomNavGraph(
         navController = navController,
-        modifier = Modifier.padding(paddingValues)
+        account = account,
+        modifier = Modifier.padding(paddingValues),
+        authViewModel = authViewModel
     )
 }
 
