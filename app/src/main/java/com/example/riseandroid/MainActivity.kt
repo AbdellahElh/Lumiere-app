@@ -11,21 +11,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.auth0.android.Auth0
+import com.example.riseandroid.data.AppContainer
 import com.example.riseandroid.ui.LumiereApp
 import com.example.riseandroid.ui.theme.RiseAndroidTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var appContainer: AppContainer
+
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val account = Auth0("it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG", "alpayozer.eu.auth0.com")
+        appContainer = (application as LumiereApplication).container
         setContent {
             RiseAndroidTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {  innerPadding ->
-                    LumiereApp(
-                        account = account
-                    )
+                    LumiereApp(account = appContainer.authRepo.auth0)
                 }
             }
         }
@@ -40,10 +41,7 @@ class MainActivity : ComponentActivity() {
 fun AppPreview() {
     RiseAndroidTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            val account = Auth0("it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG", "alpayozer.eu.auth0.com")
-            LumiereApp(
-                account = account
-            )
+            LumiereApp(account = Auth0("it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG", "alpayozer.eu.auth0.com"))
         }
     }
 }

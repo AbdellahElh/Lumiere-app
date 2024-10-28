@@ -1,6 +1,7 @@
 package com.example.riseandroid.repository
 
 import android.util.Log
+import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.authentication.storage.CredentialsManager
@@ -19,7 +20,8 @@ import kotlin.coroutines.suspendCoroutine
 
 class Auth0Repo( private val authentication: AuthenticationAPIClient,
                  private val credentialsManager: CredentialsManager,
-                 private val authApi: Auth0Api
+                 private val authApi: Auth0Api,
+                 override val auth0: Auth0
 ) : IAuthRepo {
 
     private suspend fun performLogin(userName: String, password: String): Credentials? {

@@ -11,7 +11,7 @@ import com.auth0.android.result.Credentials
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.repository.APIResource
 import com.example.riseandroid.repository.IAuthRepo
-import com.example.riseandroid.ui.screens.signUp.AuthViewModel
+import com.example.riseandroid.ui.screens.account.AuthViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -61,11 +61,11 @@ class LoginViewModel(
 
                     if (apiResource is APIResource.Success && apiResource.data != null) {
                         // Credentials ontvangen, update de authState
-                        authViewModel.setAuthenticated(apiResource.data) // Update de AuthViewModel
-                        login(apiResource.data) // Roep de login callback aan
+                        authViewModel.setAuthenticated(apiResource.data)
+                        login(apiResource.data)
 
                         // Navigeren naar het accountscherm
-                        _navigateToAccount.emit(true) // Emitteer navigatie
+                        _navigateToAccount.emit(true)
                     } else if (apiResource is APIResource.Error<*>) {
                         _uiState.value = _uiState.value.copy(loginError = true)
                     }

@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.account
 
+//import com.example.riseandroid.ui.screens.signup.AuthState
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -28,8 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.example.riseandroid.ui.screens.signUp.AuthState
-import com.example.riseandroid.ui.screens.signUp.AuthViewModel
 
 @Composable
 fun AccountPage(
@@ -40,7 +39,7 @@ fun AccountPage(
     var notificationsEnabled by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
-    val email by authViewModel.email.collectAsState() // E-mail ophalen van AuthViewModel
+    val email by authViewModel.email.collectAsState()
 
     LaunchedEffect(authState) {
         if (authState is AuthState.Unauthenticated) {

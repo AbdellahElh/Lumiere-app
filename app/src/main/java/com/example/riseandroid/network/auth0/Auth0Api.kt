@@ -1,6 +1,5 @@
 package com.example.riseandroid.network.auth0
 
-import com.auth0.android.result.Credentials
 import retrofit2.Call
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -24,14 +23,6 @@ interface Auth0Api {
                        @Field("password") pwd: String
     ): Call<AuthorizeResponse>
 
-    @FormUrlEncoded
-    @POST("dbconnections/signup")
-    fun signUp(
-        @Field("email") email: String,
-        @Field("password") password: String,
-        @Field("connection") connection: String = "Username-Password-Authentication",
-        @Field("client_id") clientId: String = "it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG"
-    ): Call<Credentials>
 
     @POST("/dbconnections/change_password")
     @FormUrlEncoded

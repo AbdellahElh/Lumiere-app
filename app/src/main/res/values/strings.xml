@@ -6,8 +6,5 @@
     <string name="loading_failed">Failed to load</string>
     <string name="nieuwe_films_title">Nieuwe films</string>
     <string name="alle_films_title">Alle films</string>
-    <string name="com_auth0_domain">alpayozer.eu.auth0.com</string>
-    <string name="com_auth0_client_id">it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG</string>
-    <string name="com_auth0_scheme">app</string>
 </resources>
 

@@ -48,7 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.auth0.android.result.Credentials
 import com.example.riseandroid.repository.APIResource
-import com.example.riseandroid.ui.screens.signUp.AuthViewModel
+import com.example.riseandroid.ui.screens.account.AuthViewModel
 
 @Composable
 fun LoginScreen(

@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.auth0.android.Auth0
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.APIResource
-import com.example.riseandroid.ui.screens.signUp.validation.ValidateEmail
+import com.example.riseandroid.ui.screens.signup.validation.ValidateEmail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

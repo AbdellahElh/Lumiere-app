@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 
 interface IAuthRepo {
 
+    val auth0: Auth0
     suspend fun getCredentials(userName: String, password:String): Flow<APIResource<Credentials>>
     suspend fun signUp(email: String, password: String, connection: String): Flow<APIResource<Credentials>>
     suspend fun logout()
@@ -24,7 +26,11 @@ interface IAuthRepo {
 }
 
 
-class AuthRepo(context: Context, val authApi: Auth0Api, auth0: Auth0): IAuthRepo{
+class AuthRepo(
+    context: Context,
+    val authApi: Auth0Api,
+    override val auth0: Auth0
+) : IAuthRepo {
 
     private val authentication = AuthenticationAPIClient(auth0)
     private val credentialsManager = CredentialsManager(
@@ -39,10 +45,9 @@ class AuthRepo(context: Context, val authApi: Auth0Api, auth0: Auth0): IAuthRepo
         val loadingResource = APIResource.Loading<Credentials>()
         emit(loadingResource)
 
-        val call = authApi.signUp(
-            email = userName,
-            password = password,
-            connection = "Username-Password-Authentication"
+        val call = authApi.getAccessToken(
+            userName = userName,
+            pwd = password
         )
 
         val response = withContext(Dispatchers.IO) {
@@ -50,11 +55,20 @@ class AuthRepo(context: Context, val authApi: Auth0Api, auth0: Auth0): IAuthRepo
         }
 
         if (response.isSuccessful) {
-            val credentials = response.body()
+            val authorizeResponse = response.body()
 
-            if (credentials != null) {
+            if (authorizeResponse != null) {
+                val credentials = Credentials(
+                    idToken = authorizeResponse.access_token,
+                    accessToken = authorizeResponse.access_token,
+                    type = authorizeResponse.token_type,
+                    refreshToken = authorizeResponse.refresh_token,
+                    expiresAt = Date(System.currentTimeMillis() + (authorizeResponse.expires_in * 1000L)),
+                    scope = null
+                )
+
                 Log.d("API", "Login successful. Access token: ${credentials.accessToken}")
-                emit(APIResource.Success<Credentials>(credentials))
+                emit(APIResource.Success(credentials))
             } else {
                 Log.e("API", "Error processing login response")
                 emit(APIResource.Error<Credentials>("Failed to process login. Response was empty."))
@@ -63,40 +77,35 @@ class AuthRepo(context: Context, val authApi: Auth0Api, auth0: Auth0): IAuthRepo
             Log.e("API", "Login unsuccessful: ${response.errorBody()?.string()}")
             emit(APIResource.Error<Credentials>("Login failed: ${response.errorBody()?.string()}"))
         }
-
     }.flowOn(Dispatchers.IO)
+
+
+
 
     override suspend fun signUp(
         email: String,
         password: String,
         connection: String
-    ): Flow<APIResource<Credentials>> = flow {
-        val loadingResource = APIResource.Loading<Credentials>()
+    ): Flow<APIResource<Credentials>> = flow<APIResource<Credentials>> {
+        val loadingResource=APIResource.Loading<Credentials>()
         emit(loadingResource)
 
-        val call = authApi.signUp(
-            email = email,
-            password = password,
-            connection = connection
-        )
-
-        val response = withContext(Dispatchers.IO) {
-            call.execute()
+        var errorMessage: String? = null
+        val signUpCall = authentication.signUp(email, password, email, connection)
+        val signUpResponse: Credentials? = withContext(Dispatchers.IO) {
+            try {
+                signUpCall.execute()
+            } catch (e: Exception) {
+                Log.e("Auth0Repo", "Sign up failed", e)
+                errorMessage = " Dit account bestaat al"
+                null
+            }
         }
 
-        if (response.isSuccessful) {
-            val credentials = response.body()
-
-            if (credentials != null) {
-                Log.d("API", "Registration successful. Access token: ${credentials.accessToken}")
-                emit(APIResource.Success<Credentials>(credentials))
-            } else {
-                Log.e("API", "Error processing registration response")
-                emit(APIResource.Error<Credentials>("Failed to process registration. Response was empty."))
-            }
+        if (signUpResponse != null) {
+            emit(APIResource.Success<Credentials>(signUpResponse))
         } else {
-            Log.e("API", "Registration unsuccessful: ${response.errorBody()?.string()}")
-            emit(APIResource.Error<Credentials>("Registration failed: ${response.errorBody()?.string()}"))
+            emit(APIResource.Error(errorMessage ?: "SignUp error"))
         }
     }.flowOn(Dispatchers.IO)
 
@@ -128,8 +137,7 @@ class AuthRepo(context: Context, val authApi: Auth0Api, auth0: Auth0): IAuthRepo
             emit(APIResource.Error<Void>("Error sending password reset email: ${e.message}"))
         }
     }.flowOn(Dispatchers.IO)
-
-
 }
+
 
 

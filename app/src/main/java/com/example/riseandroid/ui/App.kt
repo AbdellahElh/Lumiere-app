@@ -11,7 +11,9 @@ import androidx.navigation.compose.rememberNavController
 import com.auth0.android.Auth0
 import com.example.riseandroid.navigation.BottomBar
 import com.example.riseandroid.navigation.NavHostWrapper
-import com.example.riseandroid.ui.screens.signUp.AuthViewModel
+import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
+import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModelFactory
+import com.example.riseandroid.ui.screens.account.AuthViewModel
 
 
 @Composable
@@ -25,13 +27,17 @@ fun LumiereApp(account: Auth0) {
     }
 
     val authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory, extras = extras)
+    val forgotPasswordViewModel: ForgotPasswordViewModel = viewModel(
+        factory = ForgotPasswordViewModelFactory(applicationContext, account)
+    )
 
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) { paddingValues ->
         NavHostWrapper(
             navController = navController, paddingValues = paddingValues, account = account,
-            authViewModel = authViewModel
+            authViewModel = authViewModel,
+            forgotPasswordViewModel = forgotPasswordViewModel
         )
     }
 }

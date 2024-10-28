@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,12 +12,10 @@ import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.homepage.Homepage
 import com.example.riseandroid.ui.screens.login.ForgotPasswordScreen
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
-import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModelFactory
 import com.example.riseandroid.ui.screens.login.LoginScreen
-import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
-import com.example.riseandroid.ui.screens.signUp.AuthViewModel
-import com.example.riseandroid.ui.screens.signUp.SignUp
+import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketsScreen
 
 @Composable
@@ -27,6 +24,7 @@ fun BottomNavGraph(
     account: Auth0,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
+    forgotPasswordViewModel: ForgotPasswordViewModel
 ) {
     // Haal de context buiten de `remember`-scope op
     val context = LocalContext.current
@@ -94,10 +92,6 @@ fun BottomNavGraph(
         }
 
         composable(route = "forgotPassword") {
-            val forgotPasswordViewModel: ForgotPasswordViewModel = viewModel(
-                factory = ForgotPasswordViewModelFactory(context, account)
-            )
-
             ForgotPasswordScreen(
                 modifier = modifier,
                 viewModel = forgotPasswordViewModel,
