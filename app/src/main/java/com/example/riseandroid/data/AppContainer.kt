@@ -14,6 +14,12 @@ import com.example.riseandroid.repository.AuthRepo
 import com.example.riseandroid.repository.IAuthRepo
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import android.content.Context
+import com.auth0.android.Auth0
+import com.auth0.android.authentication.AuthenticationAPIClient
 
 
 interface AppContainer {

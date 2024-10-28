@@ -15,6 +15,7 @@ import com.example.riseandroid.ui.screens.login.ForgotPasswordScreen
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModelFactory
 import com.example.riseandroid.ui.screens.login.LoginScreen
+import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.signUp.AuthViewModel
 import com.example.riseandroid.ui.screens.signUp.SignUp
@@ -44,6 +45,7 @@ fun BottomNavGraph(
         startDestination = BottomBarScreen.Home.route,
         modifier = modifier
     ) {
+
         composable(route = BottomBarScreen.Home.route) {
             Homepage(navController = navController)
         }
