@@ -1,18 +1,37 @@
 package com.example.riseandroid.ui.screens.signup
 
 import android.app.Application
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -20,25 +39,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.auth0.android.result.Credentials
-import com.example.riseandroid.repository.APIResource
-import com.example.riseandroid.ui.screens.signup.validation.ValidateEmail
-import com.example.riseandroid.ui.screens.signup.validation.ValidatePassword
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.navigation.NavController
+import com.auth0.android.result.Credentials
 import com.composables.icons.lucide.Eye
 import com.composables.icons.lucide.EyeOff
 import com.composables.icons.lucide.Lucide
-import com.example.riseandroid.ui.screens.account.AccountViewModel
+import com.example.riseandroid.repository.APIResource
+import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.signup.validation.ValidateEmail
+import com.example.riseandroid.ui.screens.signup.validation.ValidatePassword
 
 @Composable
 fun SignUp(signUp: (Credentials) -> Unit,
            modifier: Modifier = Modifier,
            navController: NavController,
-           authViewModel: AccountViewModel
+           authViewModel: AuthViewModel
 ) {
 
     val extras = MutableCreationExtras().apply {
@@ -46,6 +61,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
         set(SignUpViewModel.APPLICATION_KEY, LocalContext.current.applicationContext as Application)
         set(SignUpViewModel.VALIDATE_EMAIL_KEY, ValidateEmail())
         set(SignUpViewModel.VALIDATE_PASSWORD_KEY, ValidatePassword())
+        set(SignUpViewModel.AUTH_VIEW_MODEL_KEY, authViewModel)
     }
     val viewModel: SignUpViewModel = viewModel(
         factory = SignUpViewModel.Factory,
@@ -55,14 +71,28 @@ fun SignUp(signUp: (Credentials) -> Unit,
     val signUpState by viewModel.uiState.collectAsState()
     val apiResponseState by viewModel.authResponse.collectAsState()
 
-    LaunchedEffect(apiResponseState) {
-        if (apiResponseState is APIResource.Success) {
-            val credentials = apiResponseState.data
-            if (credentials != null) {
-                authViewModel.setAuthenticated(credentials)
-                navController.navigate("account")}
-        } else if (apiResponseState is APIResource.Error) {
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        viewModel.navigateToAccount.collect { shouldNavigate ->
+            if (shouldNavigate) {
+                navController.navigate("account")
+            }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.resetSignUpState()
+    }
+
+    IconButton(
+        onClick = { navController.navigate("login") },
+        modifier = Modifier.padding(bottom = 20.dp)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Back",
+            tint = Color.White
+        )
     }
 
     Column(modifier = Modifier
@@ -73,7 +103,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
         Text(
             text = "Registreren",
             fontSize = 30.sp,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = Color.White,
             modifier=Modifier.semantics { contentDescription = "Register Screen"}
         )
 

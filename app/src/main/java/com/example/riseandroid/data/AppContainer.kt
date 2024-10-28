@@ -1,32 +1,35 @@
 package com.example.riseandroid.data
 
-import com.example.riseandroid.data.entitys.AccountRepository
-import com.example.riseandroid.data.entitys.OfflineAccountRepository
-import retrofit2.Retrofit
-import com.example.riseandroid.data.lumiere.MoviesRepository
-import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
-import com.example.riseandroid.network.LumiereApiService
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import android.content.Context
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
+import com.auth0.android.authentication.storage.CredentialsManager
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.riseandroid.data.lumiere.MoviesRepository
+import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
+import com.example.riseandroid.network.LumiereApiService
+import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
+import com.example.riseandroid.repository.AuthRepo
 import com.example.riseandroid.repository.IAuthRepo
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 interface AppContainer {
     val moviesRepository: MoviesRepository
+    val authApiService: Auth0Api
     val authRepo: IAuthRepo
-
+//    val accountRepository: AccountRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
-    private val BASE_URL = "https://dev-x5ihmi3j64lha722.us.auth0.com"
+    private val BASE_URL = "https://alpayozer.eu.auth0.com"
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(
+            GsonConverterFactory.create()
+        )
         .baseUrl(BASE_URL)
         .build()
 
@@ -38,15 +41,31 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         NetworkMoviesRepository(retrofitService)
     }
 
+    override val authApiService: Auth0Api by lazy {
+        retrofit.create(Auth0Api::class.java)
+    }
 
-    //the client provided by auth0
     var auth0: Auth0 = Auth0(context)
     var authentication: AuthenticationAPIClient = AuthenticationAPIClient(auth0)
 
-    override val authRepo: IAuthRepo by lazy {
-        Auth0Repo(authentication)
+    private val credentialsManager: CredentialsManager by lazy {
+        val storage = SharedPreferencesStorage(context)
+        CredentialsManager(authentication, storage)
     }
 
+
+    override val authRepo: IAuthRepo by lazy {
+        AuthRepo(
+        context = context,
+        authApi = authApiService,
+        auth0 = auth0)
+        Auth0Repo(
+            authentication = authentication,
+            credentialsManager = credentialsManager,
+            authApi = authApiService,
+            auth0 = auth0
+        )
+    }
 
 //    override val accountRepository : AccountRepository by lazy {
 //        OfflineAccountRepository(Database.getDatabase(context))
