@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
+import com.example.riseandroid.fake.FakeHomepageViewModel
 import com.example.riseandroid.mockdata.MovieListMock
 import com.example.riseandroid.ui.screens.homepage.ResultScreen
 import org.junit.Before
@@ -19,19 +20,28 @@ class HomepageUITest {
     @get:Rule
     val homepageTestRule = createComposeRule()
     lateinit var navController: TestNavHostController
+
     val recentMovieList = MovieListMock().LoadRecentMoviesMock()
     val allMovieList = MovieListMock().LoadNonRecentMoviesMock()
 
-    private final val countDownLatch : CountDownLatch = CountDownLatch(1)
+    private lateinit var fakeHomepageViewModel: FakeHomepageViewModel
+    private final val countDownLatch: CountDownLatch = CountDownLatch(1)
+
     @Before
     fun setup() {
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+
+        val programRepository = fakeHomepageViewModel = FakeHomepageViewModel(programRepository)
     }
     @Test
     fun titles_Placed_On_Homescreen() {
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
-                ResultScreen(navController, recentMovieList, allMovieList)
+                ResultScreen(
+                    navController = navController,
+                    recentMovies = fakeHomepageViewModel.recentMovies,
+                    allMovies = fakeHomepageViewModel.nonRecentMovies
+                )
             }
         }
         homepageTestRule.onNodeWithText("Nieuwe films").assertIsDisplayed()

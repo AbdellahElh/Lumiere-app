@@ -15,13 +15,14 @@ import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.model.Program
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface HomepageUiState {
-    data class Succes(val recentMovies: Flow<List<Program>>, val nonRecentMovies: Flow<List<Program>>, val programFilms: Flow<List<Program>>) : HomepageUiState
+    data class Succes(val recentMovies: StateFlow<List<Program>>, val nonRecentMovies: Flow<List<Program>>, val programFilms: Flow<List<Program>>) : HomepageUiState
     object Error : HomepageUiState
     object Loading : HomepageUiState
 }
