@@ -5,8 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.example.riseandroid.ui.screens.account.AccountScreen
+
 import com.auth0.android.Auth0
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.homepage.Homepage
@@ -17,6 +21,9 @@ import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketsScreen
+import com.example.riseandroid.ui.screens.homepage.Homepage
+import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
+
 
 @Composable
 fun BottomNavGraph(
@@ -98,6 +105,15 @@ fun BottomNavGraph(
                 navController = navController
             )
         }
+
+        composable("movieDetail/{movieId}") { backStackEntry ->
+            val movieId = backStackEntry.arguments?.getString("movieId")?.toLongOrNull()
+            if (movieId != null) {
+                MovieDetailScreen(movieId = movieId, navController = navController)
+            }
+        }
+
+
     }
 }
 

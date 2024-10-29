@@ -8,6 +8,12 @@ import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import android.content.Context
+import com.example.riseandroid.data.lumiere.NetworkProgramRepository
+import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.AuthRepo
@@ -17,6 +23,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 interface AppContainer {
+    val programRepository: ProgramRepository
+
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val authRepo: IAuthRepo
@@ -39,6 +47,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val moviesRepository: MoviesRepository by lazy {
         NetworkMoviesRepository(retrofitService)
+    }
+    override val programRepository: ProgramRepository by lazy {
+        NetworkProgramRepository(retrofitService)
     }
 
     override val authApiService: Auth0Api by lazy {

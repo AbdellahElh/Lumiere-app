@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.asFlow
 interface MoviesRepository {
     suspend fun getRecentMovies() : Flow<List<Movie>>
     suspend fun getNonRecentMovies() : Flow<List<Movie>>
+    suspend fun getSpecificMovie(movieId : Long) : Movie?
+
+
 }
 
 class NetworkMoviesRepository(private val lumiereApiService: LumiereApiService) : MoviesRepository {
@@ -20,6 +23,11 @@ class NetworkMoviesRepository(private val lumiereApiService: LumiereApiService) 
     override suspend fun getNonRecentMovies(): Flow<List<Movie>> {
         val movies = Datasource().LoadNonRecentMovies()
         return listOf(movies).asFlow()
+    }
+
+    override suspend fun getSpecificMovie(movieId: Long): Movie? {
+        val movie = Datasource().LoadNonRecentMovies().find { it.movieId == movieId }
+        return movie
     }
 
 }
