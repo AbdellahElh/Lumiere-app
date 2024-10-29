@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
+import com.auth0.android.Auth0
 import com.example.riseandroid.navigation.BottomBar
 import com.example.riseandroid.navigation.BottomBarScreen
 import com.example.riseandroid.navigation.NavHostWrapper
@@ -30,11 +31,16 @@ class NavigationTest {
                 navigatorProvider.addNavigator(ComposeNavigator())
             }
 
+            val mockAuth0 = Auth0("clientId", "domain")
+
             // Set up the BottomBar and NavHostWrapper for testing
             Scaffold(
                 bottomBar = { BottomBar(navController = navController) }
             ) { paddingValues ->
-                NavHostWrapper(navController = navController, paddingValues = paddingValues)
+                NavHostWrapper(
+                    navController = navController, paddingValues = paddingValues,
+                    account = mockAuth0
+                )
             }
         }
     }
