@@ -8,10 +8,8 @@ import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
-
 import com.example.riseandroid.data.lumiere.NetworkProgramRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
-import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo

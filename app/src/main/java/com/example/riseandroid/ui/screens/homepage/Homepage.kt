@@ -285,7 +285,7 @@ fun ResultScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding( 16.dp),
+                        .padding(10.dp),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.Top
                 ) {
