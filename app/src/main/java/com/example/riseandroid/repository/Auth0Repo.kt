@@ -3,20 +3,23 @@ package com.example.riseandroid.repository
 import android.util.Log
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
-import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.authentication.storage.CredentialsManager
-import com.auth0.android.callback.Callback
 import com.auth0.android.result.Credentials
-import com.auth0.android.result.DatabaseUser
 import com.example.riseandroid.network.auth0.Auth0Api
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
+
+interface IAuthRepo {
+
+    val auth0: Auth0
+    suspend fun getCredentials(userName: String, password:String): Flow<APIResource<Credentials>>
+    suspend fun signUp(email: String, password: String, connection: String): Flow<APIResource<Credentials>>
+    suspend fun logout()
+    suspend fun sendForgotPasswordEmail(email: String): Flow<APIResource<Void>>
+}
 
 class Auth0Repo( private val authentication: AuthenticationAPIClient,
                  private val credentialsManager: CredentialsManager,
@@ -54,69 +57,32 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         email: String,
         password: String,
         connection: String
-    ): Flow<APIResource<Credentials>> = flow {
-        emit(APIResource.Loading<Credentials>())
+    ): Flow<APIResource<Credentials>> = flow<APIResource<Credentials>> {
+        val loadingResource=APIResource.Loading<Credentials>()
+        emit(loadingResource)
 
-        val response = performSignUp(email, password, connection)
+        var errorMessage: String? = null
+        val signUpCall = authentication.signUp(email, password, email, connection)
+        val signUpResponse: Credentials? = withContext(Dispatchers.IO) {
+            try {
+                signUpCall.execute()
+            } catch (e: Exception) {
+                Log.e("Auth0Repo", "Sign up failed", e)
+                errorMessage = " Dit account bestaat al"
+                null
+            }
+        }
 
-        if (response != null) {
-            emit(APIResource.Success(response))
+        if (signUpResponse != null) {
+            emit(APIResource.Success<Credentials>(signUpResponse))
         } else {
-            emit(APIResource.Error("Issue with Auth API during sign-up"))
+            emit(APIResource.Error(errorMessage ?: "SignUp error"))
         }
     }.flowOn(Dispatchers.IO)
 
     override suspend fun logout() {
         credentialsManager.clearCredentials()
         Log.d("API", "User logged out. Credentials cleared.")
-    }
-
-    private suspend fun performSignUp(
-        email: String,
-        password: String,
-        connection: String
-    ): Credentials? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val databaseUser = createUserAsync(email, password, connection)
-
-                if (databaseUser != null) {
-                    return@withContext performLogin(email, password)
-                } else {
-                    // Als de gebruiker niet kon worden aangemaakt, geef null terug
-                    null
-                }
-            } catch (e: Exception) {
-                // Log de fout of handel deze af
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    private suspend fun createUserAsync(
-        email: String,
-        password: String,
-        connection: String
-    ): DatabaseUser? {
-        return suspendCoroutine { continuation ->
-            authentication.createUser(
-                email,
-                password,
-                connection,
-                connection = "Username-Password-Authentication",
-                userMetadata = null
-            )
-                .start(object : Callback<DatabaseUser, AuthenticationException> {
-                    override fun onSuccess(result: DatabaseUser) {
-                        continuation.resume(result)
-                    }
-
-                    override fun onFailure(error: AuthenticationException) {
-                        continuation.resumeWithException(error)
-                    }
-                })
-        }
     }
 
     override suspend fun sendForgotPasswordEmail(email: String): Flow<APIResource<Void>> = flow {
@@ -138,6 +104,5 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
             emit(APIResource.Error<Void>("Failed to send password reset email: ${e.message}"))
         }
     }.flowOn(Dispatchers.IO)
-
 
 }

@@ -1,6 +1,9 @@
 package com.example.riseandroid.ui.screens.movieDetail
 
-import androidx.compose.runtime.*
+import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -13,6 +16,9 @@ import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.model.Movie
 import com.example.riseandroid.model.Program
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -32,6 +38,9 @@ class MovieDetailViewModel(
 
     var movieDetailUiState: MovieDetailUiState by mutableStateOf(MovieDetailUiState.Loading)
         private set
+
+    private val _allMovies = MutableStateFlow<List<Movie>>(emptyList())
+    val allMovies: StateFlow<List<Movie>> = _allMovies.asStateFlow()
 
     init {
         getMovie()
@@ -69,4 +78,30 @@ class MovieDetailViewModel(
         }
     }
 }
+
+class MoviesViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
+    private val _allMovies = MutableStateFlow<List<Movie>>(emptyList())
+    val allMovies: StateFlow<List<Movie>> = _allMovies.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            moviesRepository.getAllMovies().collect { movies ->
+                _allMovies.value = movies
+            }
+        }
+    }
+}
+
+class MoviesViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MoviesViewModel((application as LumiereApplication).container.moviesRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+
+
 

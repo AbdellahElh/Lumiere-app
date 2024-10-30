@@ -2,7 +2,6 @@ package com.example.riseandroid.data.lumiere
 
 
 import com.example.riseandroid.data.Datasource
-import com.example.riseandroid.model.Movie
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.network.LumiereApiService
 import kotlinx.coroutines.flow.Flow
@@ -14,9 +13,6 @@ interface ProgramRepository {
     suspend fun getProgramsLocation(location: String) : Flow<List<Program>>
     suspend fun getMoviesLocation(location: String) : Flow<List<Program>>
     suspend fun getProgramsForMovie(movieId: Long): Flow<List<Program>>
-
-
-
 }
 
 class NetworkProgramRepository(private val lumiereApiService: LumiereApiService) : ProgramRepository {
@@ -46,7 +42,6 @@ class NetworkProgramRepository(private val lumiereApiService: LumiereApiService)
             emit(programs.filter { it.movie.movieId == movieId })
         }
     }
-
 
 }
 

@@ -7,9 +7,9 @@ import com.example.riseandroid.model.Program
 class Datasource() {
     fun LoadRecentMovies() : List<Movie> {
         return listOf<Movie>(
-            Movie(1077050, "A new kind of wilderness",R.drawable.screenshot_2024_10_09_224909, "James Bond has left active service. His peace is short-lived when Felix Leiter, an old friend from the CIA, turns up asking for help, leading Bond onto the trail of a mysterious villain armed with dangerous new technology." , "action", "02h 43m", "Destin Daniel Cretton"),
-            Movie(1077038, "Ezra",R.drawable.screenshot_2024_10_08_105150 , "The Iranian female judoka Leila is at the World Judo Championships, intent on bringing home Iran's first gold medal." , "action"  , "02h 43m", "Destin Daniel Cretton"),
-            Movie(1077579, "Firebrand", R.drawable.screenshot_2024_10_10_192651 , "Being connected to nature, what does it mean? Father knows and father shows. The director's father is 84. We follow in his footsteps into the mountain home. Into nature's smallest life and out to grand panoramas, where he grew up." , "action"  , "02h 43m", "Destin Daniel Cretton"),
+            Movie(1077051, "A new kind of wilderness",R.drawable.screenshot_2024_10_09_224909, "James Bond has left active service. His peace is short-lived when Felix Leiter, an old friend from the CIA, turns up asking for help, leading Bond onto the trail of a mysterious villain armed with dangerous new technology." , "action", "02h 43m", "Destin Daniel Cretton"),
+            Movie(1077039, "Ezra",R.drawable.screenshot_2024_10_08_105150 , "The Iranian female judoka Leila is at the World Judo Championships, intent on bringing home Iran's first gold medal." , "action"  , "02h 43m", "Destin Daniel Cretton"),
+            Movie(1077580, "Firebrand", R.drawable.screenshot_2024_10_10_192651 , "Being connected to nature, what does it mean? Father knows and father shows. The director's father is 84. We follow in his footsteps into the mountain home. Into nature's smallest life and out to grand panoramas, where he grew up." , "action"  , "02h 43m", "Destin Daniel Cretton"),
         )
     }
     fun LoadNonRecentMovies() : List<Movie> {
