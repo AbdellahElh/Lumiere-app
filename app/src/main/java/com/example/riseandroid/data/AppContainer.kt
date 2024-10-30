@@ -8,10 +8,7 @@ import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import android.content.Context
+
 import com.example.riseandroid.data.lumiere.NetworkProgramRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.network.auth0.Auth0Api

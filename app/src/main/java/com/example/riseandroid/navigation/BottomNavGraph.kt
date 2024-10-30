@@ -9,10 +9,9 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.riseandroid.ui.screens.account.AccountScreen
+import com.example.riseandroid.ui.screens.account.AccountPage
 
 import com.auth0.android.Auth0
-import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.homepage.Homepage
 import com.example.riseandroid.ui.screens.login.ForgotPasswordScreen
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel

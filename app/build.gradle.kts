@@ -88,7 +88,6 @@ dependencies {
     implementation (libs.androidx.navigation.compose.v253)
 
     implementation ("com.google.dagger:hilt-android:2.44")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
 
     //Room
     implementation(libs.androidx.room.runtime)
@@ -104,9 +103,6 @@ dependencies {
     implementation ("com.auth0.android:jwtdecode:2.+")
 
     //retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:+")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.work:work-testing:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.+")
 

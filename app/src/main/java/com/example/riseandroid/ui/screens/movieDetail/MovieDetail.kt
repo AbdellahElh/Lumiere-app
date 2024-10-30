@@ -80,23 +80,26 @@ fun MovieDetailContent(movie: Movie,programList: List<Program> ,navController: N
             .padding(16.dp),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier.verticalScroll(scrollState),
-            verticalArrangement = Arrangement.Top
-        ) {
-            Spacer(modifier = Modifier.height(14.dp))
-            MovieDetailHeader(navController)
-            Spacer(modifier = Modifier.height(32.dp))
-            MoviePoster(movie)
-            Spacer(modifier = Modifier.height(20.dp))
-            MovieInfo(movie)
-            Spacer(modifier = Modifier.height(10.dp))
-            MovieDescription(movie, isExpanded) { isExpanded = !isExpanded }
-            Spacer(modifier = Modifier.height(35.dp))
-            NextStepButton(onClick = { showBottomSheet = true })
-            Spacer(modifier = Modifier.height(18.dp))
-        }
+        Box {
 
+            Column(
+                modifier = Modifier
+                    .verticalScroll(scrollState)
+                    .padding(top = 60.dp)
+            ) {
+                Spacer(modifier = Modifier.height(14.dp))
+                MoviePoster(movie)
+                Spacer(modifier = Modifier.height(20.dp))
+                MovieInfo(movie)
+                Spacer(modifier = Modifier.height(10.dp))
+                MovieDescription(movie, isExpanded) { isExpanded = !isExpanded }
+                Spacer(modifier = Modifier.height(35.dp))
+                NextStepButton(onClick = { showBottomSheet = true })
+                Spacer(modifier = Modifier.height(18.dp))
+            }
+
+            MovieDetailHeader(navController = navController)
+        }
         if (showBottomSheet) {
             val context = LocalContext.current
             ModalBottomSheet(
@@ -110,35 +113,42 @@ fun MovieDetailContent(movie: Movie,programList: List<Program> ,navController: N
     }
 }
 
-
 @Composable
 fun MovieDetailHeader(navController: NavController) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        color = MaterialTheme.colorScheme.background
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.btn_back),
-            contentDescription = "Back",
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { navController.popBackStack() }
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = "Details Movie",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.White,
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Image(
-            painter = painterResource(id = R.drawable.btn_bookmark),
-            contentDescription = "Bookmark",
-            modifier = Modifier.size(24.dp)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.btn_back),
+                contentDescription = "Back",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { navController.popBackStack() }
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "Details Movie",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White, // Text color for contrast
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Image(
+                painter = painterResource(id = R.drawable.btn_bookmark),
+                contentDescription = "Bookmark",
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
+
 
 @Composable
 fun MoviePoster(movie: Movie) {
