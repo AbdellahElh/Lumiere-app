@@ -1,7 +1,7 @@
 package com.example.riseandroid.ui.screens.account
 
-//import com.example.riseandroid.ui.screens.signup.AuthState
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,10 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
+import com.example.riseandroid.R
 
 @Composable
 fun AccountPage(
@@ -62,14 +63,14 @@ fun AccountPage(
         )
 
         Image(
-            painter = rememberAsyncImagePainter("https://example.com/path/to/profile_image.jpg"),
+            painter = painterResource(R.drawable.account),
             contentDescription = "Profile Image",
             modifier = Modifier
                 .size(100.dp)
                 .padding(bottom = 16.dp)
         )
 
-        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp) // E-mail weergeven
+        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -85,7 +86,16 @@ fun AccountPage(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { /* actie voor watchlist */ }, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = {
+                if (authState is AuthState.Authenticated && email != null) {
+                    navController.navigate("watchlist/${email}")
+                } else {
+                    Toast.makeText(context, "Je moet ingelogd zijn om de watchlist te bekijken", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Watchlist")
         }
 

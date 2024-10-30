@@ -103,7 +103,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
         Text(
             text = "Registreren",
             fontSize = 30.sp,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.primary,
             modifier=Modifier.semantics { contentDescription = "Register Screen"}
         )
 
