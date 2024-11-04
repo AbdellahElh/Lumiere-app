@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from the repository
-                 git branch: 'main', credentialsId: 'keycontainer', url: 'git@github.com:KarimDM/testandroid.git'
+                 git branch: 'main', credentialsId: 'keycontainer', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
             }
         }
         
