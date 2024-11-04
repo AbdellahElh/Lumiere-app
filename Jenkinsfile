@@ -19,6 +19,8 @@ pipeline {
             steps {
                 // Ensure gradlew has execute permissions
                 sh 'chmod +x ./gradlew'
+                sh './gradlew --stop'
+                sh 'rm -rf ~/.gradle/daemon'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
                 sh './gradlew build --no-daemon'
