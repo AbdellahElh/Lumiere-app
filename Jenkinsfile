@@ -7,6 +7,13 @@ pipeline {
         PATH = "${ANDROID_HOME}/platform-tools:${GRADLE_HOME}/bin:${env.PATH}"  // Add tools to PATH
         GRADLE_OPTS="-Xmx4g -Dorg.gradle.jvmargs=-Xmx4g"
     }
+    
+    stages {
+        stage('Prepare Workspace') {
+            steps {
+                deleteDir()  // Clears the workspace
+            }
+        }
 
     stages {
         stage('Checkout') {
