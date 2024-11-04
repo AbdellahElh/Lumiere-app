@@ -6,7 +6,7 @@ pipeline {
         GRADLE_HOME = "/opt/gradle-8.10.2"        // Adjust to your actual Gradle path
         PATH = "${ANDROID_HOME}/platform-tools:${GRADLE_HOME}/bin:${env.PATH}"  // Add tools to PATH
         GRADLE_OPTS="-Xmx4g -Dorg.gradle.jvmargs=-Xmx4g"
-        GRADLE_OPTS="-Dorg.gradle.daemon.idletimeout=600000"  # 10 minutes
+        GRADLE_OPTS="-Dorg.gradle.daemon.idletimeout=600000"
     }
 
     stages {
