@@ -4,19 +4,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.auth0.android.Auth0
+import com.example.riseandroid.model.Movie
 import com.example.riseandroid.ui.screens.account.AccountPage
+import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.Homepage
 import com.example.riseandroid.ui.screens.login.ForgotPasswordScreen
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.login.LoginScreen
+import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
+import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
-import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketsScreen
+import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
+import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+
 
 @Composable
 fun BottomNavGraph(
@@ -24,19 +32,11 @@ fun BottomNavGraph(
     account: Auth0,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    forgotPasswordViewModel: ForgotPasswordViewModel
+    forgotPasswordViewModel: ForgotPasswordViewModel,
+    allMovies: List<Movie>,
+    watchlistViewModel: WatchlistViewModel,
 ) {
-    // Haal de context buiten de `remember`-scope op
     val context = LocalContext.current
-
-//    // Maak de Auth0Api-instantie met Retrofit aan
-//    val authApi: Auth0Api = remember {
-//        Retrofit.Builder()
-//            .baseUrl("https://alpayozer.eu.auth0.com/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//            .create(Auth0Api::class.java)
-//    }
 
     NavHost(
         navController = navController,
@@ -45,7 +45,7 @@ fun BottomNavGraph(
     ) {
 
         composable(route = BottomBarScreen.Home.route) {
-            Homepage(navController = navController)
+            Homepage(navController = navController) // WEIZIGEN
         }
         composable(route = BottomBarScreen.ScanCode.route) {
             ScanCodeScreen(navController = navController)
@@ -97,6 +97,33 @@ fun BottomNavGraph(
                 viewModel = forgotPasswordViewModel,
                 navController = navController
             )
+        }
+
+        composable("movieDetail/{movieId}") { backStackEntry ->
+            val movieId = backStackEntry.arguments?.getString("movieId")?.toLongOrNull()
+            if (movieId != null) {
+                MovieDetailScreen(
+                    movieId = movieId,
+                    navController = navController,
+                    viewModel = viewModel<MovieDetailViewModel>(factory = MovieDetailViewModel.provideFactory(movieId)),
+                    watchlistViewModel = watchlistViewModel,
+                    authViewModel = authViewModel
+                )
+            }
+        }
+
+        composable("watchlist/{email}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email")
+            if (email != null) {
+                WatchlistScreen(
+                    viewModel = watchlistViewModel,
+                    allMovies = allMovies,
+                    onMovieClick = { movieId ->
+                        navController.navigate("movieDetail/$movieId")
+                    },
+                    navController = navController
+                )
+            }
         }
     }
 }

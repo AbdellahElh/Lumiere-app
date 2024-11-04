@@ -1,5 +1,6 @@
 package com.example.riseandroid.navigation
 
+import android.app.Application
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -9,27 +10,47 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.auth0.android.Auth0
-import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
+import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModel
+import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModelFactory
+import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 
 @Composable
-fun NavHostWrapper(navController: NavHostController, paddingValues: PaddingValues, account: Auth0, authViewModel: AuthViewModel, forgotPasswordViewModel: ForgotPasswordViewModel) {
+fun NavHostWrapper(
+    navController: NavHostController,
+    paddingValues: PaddingValues,
+    account: Auth0,
+    authViewModel: AuthViewModel,
+    forgotPasswordViewModel: ForgotPasswordViewModel,
+) {
+    val context = LocalContext.current
+    val moviesViewModel: MoviesViewModel = viewModel(factory = MoviesViewModelFactory(context.applicationContext as Application))
+    val watchlistViewModel: WatchlistViewModel = viewModel()
+
+    val allMovies by moviesViewModel.allMovies.collectAsState()
+
     BottomNavGraph(
         navController = navController,
         account = account,
         modifier = Modifier.padding(paddingValues),
         authViewModel = authViewModel,
-        forgotPasswordViewModel = forgotPasswordViewModel
+        forgotPasswordViewModel = forgotPasswordViewModel,
+        allMovies = allMovies,
+        watchlistViewModel = watchlistViewModel
     )
 }
 

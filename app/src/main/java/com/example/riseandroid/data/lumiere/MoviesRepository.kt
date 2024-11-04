@@ -5,10 +5,14 @@ import com.example.riseandroid.model.Movie
 import com.example.riseandroid.network.LumiereApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 
 interface MoviesRepository {
     suspend fun getRecentMovies() : Flow<List<Movie>>
     suspend fun getNonRecentMovies() : Flow<List<Movie>>
+    suspend fun getSpecificMovie(movieId : Long) : Movie?
+    suspend fun getAllMovies(): Flow<List<Movie>>
+
 }
 
 class NetworkMoviesRepository(private val lumiereApiService: LumiereApiService) : MoviesRepository {
@@ -22,4 +26,14 @@ class NetworkMoviesRepository(private val lumiereApiService: LumiereApiService) 
         return listOf(movies).asFlow()
     }
 
+    override suspend fun getSpecificMovie(movieId: Long): Movie? {
+        val movie = Datasource().LoadNonRecentMovies().find { it.movieId == movieId }
+        return movie
+    }
+
+    override suspend fun getAllMovies(): Flow<List<Movie>> {
+        return combine(getRecentMovies(), getNonRecentMovies()) { recentMovies, nonRecentMovies ->
+            (recentMovies + nonRecentMovies).distinctBy { it.movieId }
+        }
+    }
 }

@@ -8,15 +8,18 @@ import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
+import com.example.riseandroid.data.lumiere.NetworkProgramRepository
+import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
-import com.example.riseandroid.repository.AuthRepo
 import com.example.riseandroid.repository.IAuthRepo
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
 interface AppContainer {
+    val programRepository: ProgramRepository
+
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val authRepo: IAuthRepo
@@ -40,6 +43,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
     override val moviesRepository: MoviesRepository by lazy {
         NetworkMoviesRepository(retrofitService)
     }
+    override val programRepository: ProgramRepository by lazy {
+        NetworkProgramRepository(retrofitService)
+    }
 
     override val authApiService: Auth0Api by lazy {
         retrofit.create(Auth0Api::class.java)
@@ -55,10 +61,6 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
 
     override val authRepo: IAuthRepo by lazy {
-        AuthRepo(
-        context = context,
-        authApi = authApiService,
-        auth0 = auth0)
         Auth0Repo(
             authentication = authentication,
             credentialsManager = credentialsManager,

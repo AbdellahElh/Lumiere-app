@@ -89,6 +89,7 @@ fun LoginScreen(
     ) {
         Text(
             text = "Login",
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.headlineMedium,
             fontSize = 32.sp,
             textAlign = TextAlign.Center,
@@ -102,7 +103,7 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             onValueChange = { viewModel.updateUserName(it) },
-            label = { Text(text = "Username") },
+            label = { Text(text = "Email") },
             isError = loginState.loginError
         )
 
