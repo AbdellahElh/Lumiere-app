@@ -22,10 +22,10 @@ pipeline {
                 // Ensure gradlew has execute permissions
                 sh 'chmod +x ./gradlew'
                 sh './gradlew --stop'
-                sh 'rm -rf ~/.gradle/daemon'
+                sh './gradlew --clean'
+                sh './gradlew --build'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
-                sh './gradlew build --no-daemon'
                 sh './gradlew assembleDebug'
                 // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
