@@ -14,6 +14,7 @@ pipeline {
                 deleteDir()  // Clears the workspace
             }
         }
+    }
 
     stages {
         stage('Checkout') {
