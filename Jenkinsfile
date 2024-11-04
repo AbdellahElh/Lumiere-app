@@ -21,8 +21,8 @@ pipeline {
                 // Ensure gradlew has execute permissions
                 sh 'chmod +x ./gradlew'
                 sh './gradlew --stop'
-                sh './gradlew --clean'
-                sh './gradlew --build'
+                sh './gradlew clean'
+                sh './gradlew build'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
                 sh './gradlew assembleDebug'
