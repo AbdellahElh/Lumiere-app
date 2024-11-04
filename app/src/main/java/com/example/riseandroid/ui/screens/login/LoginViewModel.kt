@@ -9,7 +9,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.auth0.android.result.Credentials
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.repository.APIResource
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.IAuthRepo
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -28,15 +28,15 @@ class LoginViewModel(
     private val _uiState = MutableStateFlow(LoginState())
     val uiState: StateFlow<LoginState> = _uiState.asStateFlow()
 
-    private val _authResponse = MutableStateFlow<APIResource<Credentials>>(APIResource.Initial())
-    val authResponse: StateFlow<APIResource<Credentials>> = _authResponse
+    private val _authResponse = MutableStateFlow<ApiResource<Credentials>>(ApiResource.Initial())
+    val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
 
     // We voegen een nieuwe flow toe om de navigatie te beheren
     private val _navigateToAccount = MutableSharedFlow<Boolean>()
     val navigateToAccount: SharedFlow<Boolean> = _navigateToAccount
 
     fun resetAuthResponse() {
-        _authResponse.value = APIResource.Initial()
+        _authResponse.value = ApiResource.Initial()
     }
 
     fun updateUserName(name: String) {
@@ -59,14 +59,14 @@ class LoginViewModel(
                 .collect { apiResource ->
                     _authResponse.value = apiResource
 
-                    if (apiResource is APIResource.Success && apiResource.data != null) {
+                    if (apiResource is ApiResource.Success && apiResource.data != null) {
                         // Credentials ontvangen, update de authState
                         authViewModel.setAuthenticated(apiResource.data)
                         login(apiResource.data)
 
                         // Navigeren naar het accountscherm
                         _navigateToAccount.emit(true)
-                    } else if (apiResource is APIResource.Error<*>) {
+                    } else if (apiResource is ApiResource.Error<*>) {
                         _uiState.value = _uiState.value.copy(loginError = true)
                     }
                 }

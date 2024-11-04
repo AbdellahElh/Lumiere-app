@@ -9,7 +9,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.auth0.android.result.Credentials
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.repository.APIResource
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.IAuthRepo
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.signup.validation.ValidateEmail
@@ -32,8 +32,8 @@ class SignUpViewModel(val signUpCallback: (Credentials) -> Unit,
     private val _uiState = MutableStateFlow(SignUpState())
     val uiState: StateFlow<SignUpState> = _uiState.asStateFlow()
 
-    private val _authResponse = MutableStateFlow<APIResource<Credentials>>(APIResource.Initial())
-    val authResponse: StateFlow<APIResource<Credentials>> = _authResponse
+    private val _authResponse = MutableStateFlow<ApiResource<Credentials>>(ApiResource.Initial())
+    val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
 
     private val _navigateToAccount = MutableSharedFlow<Boolean>()
     val navigateToAccount: SharedFlow<Boolean> = _navigateToAccount
@@ -77,13 +77,13 @@ class SignUpViewModel(val signUpCallback: (Credentials) -> Unit,
             ).collect { apiResource ->
                 _authResponse.value = apiResource
 
-                if (apiResource is APIResource.Success) {
+                if (apiResource is ApiResource.Success) {
                     apiResource.data?.let { credentials ->
                         authViewModel.setAuthenticated(credentials)
                         signUpCallback(credentials)
                         _navigateToAccount.emit(true)
                     }
-                } else if (apiResource is APIResource.Error) {
+                } else if (apiResource is ApiResource.Error) {
                     _uiState.value = _uiState.value.copy(signUpError = true)
                 }
             }

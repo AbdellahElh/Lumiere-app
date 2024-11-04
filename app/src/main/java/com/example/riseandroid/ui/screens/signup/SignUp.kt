@@ -44,7 +44,7 @@ import com.auth0.android.result.Credentials
 import com.composables.icons.lucide.Eye
 import com.composables.icons.lucide.EyeOff
 import com.composables.icons.lucide.Lucide
-import com.example.riseandroid.repository.APIResource
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.signup.validation.ValidateEmail
 import com.example.riseandroid.ui.screens.signup.validation.ValidatePassword
@@ -131,7 +131,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (signUpState.signUpError && apiResponseState is APIResource.Error) {
+        if (signUpState.signUpError && apiResponseState is ApiResource.Error) {
             ErrorMessage(apiResponseState)
         }
         else if(signUpState.emailError!=null)
@@ -156,7 +156,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
                 .height(50.dp)
                 .semantics { contentDescription = "Register Button" }
         ) {
-            if (apiResponseState is APIResource.Loading)
+            if (apiResponseState is ApiResource.Loading)
                 Text("Aan het laden...",fontSize = 20.sp)
             else
                 Text("Registreer",fontSize = 20.sp)
@@ -165,7 +165,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
 }
 
 @Composable
-fun ErrorMessage(apiResponse: APIResource<Credentials>) {
+fun ErrorMessage(apiResponse: ApiResource<Credentials>) {
     Text("Error: ${apiResponse.message}",
         fontSize = 18.sp,
         color =  MaterialTheme.colorScheme.error
