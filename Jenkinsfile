@@ -21,6 +21,7 @@ pipeline {
                 sh 'chmod +x ./gradlew'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
+                sh './gradlew build --no-daemon'
                 sh './gradlew assembleDebug'
                 // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
