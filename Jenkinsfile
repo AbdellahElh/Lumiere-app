@@ -9,9 +9,10 @@ pipeline {
     }
 
     stages {
-        stage('Prepare Workspace') {
+        stage('Cleanup') {
             steps {
-                deleteDir()  // Clears the workspace
+                // Clean the workspace
+                cleanWs()
             }
         }
         stage('Checkout') {
