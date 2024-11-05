@@ -31,7 +31,7 @@ pipeline {
                 sh './gradlew --version'
                 //sh './gradlew assembleDebug'
                 // Use Gradle to clean and build the APK
-                sh './gradlew clean assembleRelease --debug'
+                sh './gradlew clean assembleRelease'
             }
         }
         
