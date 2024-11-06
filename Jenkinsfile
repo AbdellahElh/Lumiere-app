@@ -6,12 +6,6 @@ pipeline {
         GRADLE_HOME = "/opt/gradle-8.10.2"        // Adjust to your actual Gradle path
         PATH = "${ANDROID_HOME}/platform-tools:${GRADLE_HOME}/bin:${env.PATH}"  // Add tools to PATH
     }
-    stages {
-    stage('Prepare Workspace') {
-        steps {
-            deleteDir()  // Clears the workspace
-        }
-    }
 
     stages {
         stage('Checkout') {
@@ -20,7 +14,6 @@ pipeline {
                  git branch: 'main', credentialsId: 'keycontainer', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
             }
         }
-        
         
         stage('Build') {
             steps {
