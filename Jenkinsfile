@@ -5,6 +5,7 @@ pipeline {
         ANDROID_HOME = "/opt/android-sdk"  // Adjust to your actual SDK path
         GRADLE_HOME = "/opt/gradle-8.10.2"        // Adjust to your actual Gradle path
         PATH = "${ANDROID_HOME}/platform-tools:${GRADLE_HOME}/bin:${env.PATH}"  // Add tools to PATH
+        GRADLE_OPTS="-Xmx4g -Dorg.gradle.jvmargs=-Xmx4g"
     }
 
     stages {
@@ -34,6 +35,17 @@ pipeline {
                 $ANDROID_HOME/build-tools/35.0.0/zipalign -v 4 \
                 app/build/outputs/apk/release/app-release-unsigned.apk \
                 app/build/outputs/apk/release/app-release-signed.apk
+                '''
+
+                // Sign the APK using apksigner
+                sh '''
+                $ANDROID_HOME/build-tools/35.0.0/apksigner sign \
+                --ks /var/jenkins_home/keystore.jks \
+                --ks-key-alias RiseAndroid \
+                --ks-pass pass:Devops \
+                --key-pass pass:Devops \
+                --out app/build/outputs/apk/release/app-release-signed.apk \
+                app/build/outputs/apk/release/app-release-aligned.apk
                 '''
             }
         }
