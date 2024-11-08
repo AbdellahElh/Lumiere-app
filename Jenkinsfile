@@ -9,6 +9,12 @@ pipeline {
     }
 
     stages {
+        stage('Cleanup') {
+            steps {
+                // Clean the workspace
+                cleanWs()
+            }
+        }
         stage('Checkout') {
             steps {
                 // Checkout the code from the repository
@@ -20,9 +26,11 @@ pipeline {
             steps {
                 // Ensure gradlew has execute permissions
                 sh 'chmod +x ./gradlew'
+                sh './gradlew --stop'
+                sh './gradlew clean'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
-                sh './gradlew assembleDebug'
+                //sh './gradlew assembleDebug'
                 // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
             }
