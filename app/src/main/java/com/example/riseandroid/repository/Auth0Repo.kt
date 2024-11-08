@@ -15,10 +15,10 @@ import kotlinx.coroutines.withContext
 interface IAuthRepo {
 
     val auth0: Auth0
-    suspend fun getCredentials(userName: String, password:String): Flow<APIResource<Credentials>>
-    suspend fun signUp(email: String, password: String, connection: String): Flow<APIResource<Credentials>>
+    suspend fun getCredentials(userName: String, password:String): Flow<ApiResource<Credentials>>
+    suspend fun signUp(email: String, password: String, connection: String): Flow<ApiResource<Credentials>>
     suspend fun logout()
-    suspend fun sendForgotPasswordEmail(email: String): Flow<APIResource<Void>>
+    suspend fun sendForgotPasswordEmail(email: String): Flow<ApiResource<Void>>
 }
 
 class Auth0Repo( private val authentication: AuthenticationAPIClient,
@@ -41,15 +41,15 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
     override suspend fun getCredentials(
         userName: String,
         password: String
-    ): Flow<APIResource<Credentials>> = flow {
-        emit(APIResource.Loading<Credentials>())
+    ): Flow<ApiResource<Credentials>> = flow {
+        emit(ApiResource.Loading<Credentials>())
 
         val response = performLogin(userName, password)
 
         if (response != null) {
-            emit(APIResource.Success(response))
+            emit(ApiResource.Success(response))
         } else {
-            emit(APIResource.Error("Issue with Auth API"))
+            emit(ApiResource.Error("Issue with Auth API"))
         }
     }.flowOn(Dispatchers.IO)
 
@@ -57,8 +57,8 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         email: String,
         password: String,
         connection: String
-    ): Flow<APIResource<Credentials>> = flow<APIResource<Credentials>> {
-        val loadingResource=APIResource.Loading<Credentials>()
+    ): Flow<ApiResource<Credentials>> = flow<ApiResource<Credentials>> {
+        val loadingResource=ApiResource.Loading<Credentials>()
         emit(loadingResource)
 
         var errorMessage: String? = null
@@ -74,9 +74,9 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         }
 
         if (signUpResponse != null) {
-            emit(APIResource.Success<Credentials>(signUpResponse))
+            emit(ApiResource.Success<Credentials>(signUpResponse))
         } else {
-            emit(APIResource.Error(errorMessage ?: "SignUp error"))
+            emit(ApiResource.Error(errorMessage ?: "SignUp error"))
         }
     }.flowOn(Dispatchers.IO)
 
@@ -85,8 +85,8 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         Log.d("API", "User logged out. Credentials cleared.")
     }
 
-    override suspend fun sendForgotPasswordEmail(email: String): Flow<APIResource<Void>> = flow {
-        emit(APIResource.Loading<Void>()) // Emit loading state
+    override suspend fun sendForgotPasswordEmail(email: String): Flow<ApiResource<Void>> = flow {
+        emit(ApiResource.Loading<Void>()) // Emit loading state
 
         try {
             val call = authApi.sendForgotPasswordEmail(email) // Auth0 API gebruiken
@@ -94,14 +94,14 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
             withContext(Dispatchers.IO) {
                 val response = call.execute()
                 if (response.isSuccessful) {
-                    emit(APIResource.Success(null) as APIResource<Void>)
+                    emit(ApiResource.Success(null) as ApiResource<Void>)
                 } else {
-                    emit(APIResource.Error<Void>("Failed to send password reset email: ${response.errorBody()?.string()}"))
+                    emit(ApiResource.Error<Void>("Failed to send password reset email: ${response.errorBody()?.string()}"))
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(APIResource.Error<Void>("Failed to send password reset email: ${e.message}"))
+            emit(ApiResource.Error<Void>("Failed to send password reset email: ${e.message}"))
         }
     }.flowOn(Dispatchers.IO)
 

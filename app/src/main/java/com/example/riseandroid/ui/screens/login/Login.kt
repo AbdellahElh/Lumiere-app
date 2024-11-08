@@ -47,7 +47,7 @@ import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.auth0.android.result.Credentials
-import com.example.riseandroid.repository.APIResource
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 
 @Composable
@@ -116,7 +116,7 @@ fun LoginScreen(
             toggleVisible = { passwordVisible = !passwordVisible }
         )
 
-        if (loginState.loginError && apiResponseState is APIResource.Error) {
+        if (loginState.loginError && apiResponseState is ApiResource.Error) {
             ErrorMessage(apiResponseState)
         }
 
@@ -139,7 +139,7 @@ fun LoginScreen(
                     contentColor = Color.White
                 )
             ) {
-                if (apiResponseState is APIResource.Loading)
+                if (apiResponseState is ApiResource.Loading)
                     Text("Loading...")
                 else {
                     Text("Login")
@@ -182,7 +182,7 @@ fun LoginScreen(
 
 
 @Composable
-fun ErrorMessage(apiResponse: APIResource<Credentials>) {
+fun ErrorMessage(apiResponse: ApiResource<Credentials>) {
     Text(
         "The combination of username and password is not found. " + apiResponse.message,
         color = MaterialTheme.colorScheme.error,
