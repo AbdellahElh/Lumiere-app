@@ -22,7 +22,6 @@ pipeline {
                 sh 'chmod +x ./gradlew'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
-                sh './gradlew assembleDebug'
                 // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
             }
@@ -30,25 +29,25 @@ pipeline {
         
         stage('Sign APK') {
             steps {              
-                // Align the APK
-                sh '''
-                $ANDROID_HOME/build-tools/35.0.0/zipalign -v 4 \
-                app/build/outputs/apk/release/app-release-unsigned.apk \
-                app/build/outputs/apk/release/app-release-signed.apk
-                '''
+            // Align the APK
+            sh '''
+            $ANDROID_HOME/build-tools/35.0.0/zipalign -v 4 \
+            app/build/outputs/apk/release/app-release-unsigned.apk \
+            app/build/outputs/apk/release/app-release-aligned.apk
+            '''
 
-                // Sign the APK using apksigner
-                sh '''
-                $ANDROID_HOME/build-tools/35.0.0/apksigner sign \
-                --ks /var/jenkins_home/keystore.jks \
-                --ks-key-alias RiseAndroid \
-                --ks-pass pass:Devops \
-                --key-pass pass:Devops \
-                --out app/build/outputs/apk/release/app-release-signed.apk \
-                app/build/outputs/apk/release/app-release-aligned.apk
-                '''
-            }
+            // Sign the APK using apksigner
+            sh '''
+            $ANDROID_HOME/build-tools/35.0.0/apksigner sign \
+            --ks /var/jenkins_home/keystore.jks \
+            --ks-key-alias RiseAndroid \
+            --ks-pass pass:Devops \
+            --key-pass pass:Devops \
+            --out app/build/outputs/apk/release/app-release-signed.apk \
+            app/build/outputs/apk/release/app-release-aligned.apk
+            '''
         }
+}
         
         stage('Archive APK') {
             steps {
