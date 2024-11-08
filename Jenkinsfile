@@ -9,12 +9,6 @@ pipeline {
     }
 
     stages {
-        stage('Cleanup') {
-            steps {
-                // Clean the workspace
-                cleanWs()
-            }
-        }
         stage('Checkout') {
             steps {
                 // Checkout the code from the repository
@@ -26,11 +20,9 @@ pipeline {
             steps {
                 // Ensure gradlew has execute permissions
                 sh 'chmod +x ./gradlew'
-                sh './gradlew --stop'
-                sh './gradlew clean'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
-                //sh './gradlew assembleDebug'
+                sh './gradlew assembleDebug'
                 // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
             }
@@ -43,6 +35,17 @@ pipeline {
                 $ANDROID_HOME/build-tools/35.0.0/zipalign -v 4 \
                 app/build/outputs/apk/release/app-release-unsigned.apk \
                 app/build/outputs/apk/release/app-release-signed.apk
+                '''
+
+                // Sign the APK using apksigner
+                sh '''
+                $ANDROID_HOME/build-tools/35.0.0/apksigner sign \
+                --ks /var/jenkins_home/keystore.jks \
+                --ks-key-alias RiseAndroid \
+                --ks-pass pass:Devops \
+                --key-pass pass:Devops \
+                --out app/build/outputs/apk/release/app-release-signed.apk \
+                app/build/outputs/apk/release/app-release-aligned.apk
                 '''
             }
         }
