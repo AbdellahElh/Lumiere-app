@@ -5,9 +5,16 @@ pipeline {
         ANDROID_HOME = "/opt/android-sdk"  // Adjust to your actual SDK path
         GRADLE_HOME = "/opt/gradle-8.10.2"        // Adjust to your actual Gradle path
         PATH = "${ANDROID_HOME}/platform-tools:${GRADLE_HOME}/bin:${env.PATH}"  // Add tools to PATH
+        GRADLE_OPTS="-Xmx4g -Dorg.gradle.jvmargs=-Xmx4g"
     }
 
     stages {
+        stage('Cleanup') {
+            steps {
+                // Clean the workspace
+                cleanWs()
+            }
+        }
         stage('Checkout') {
             steps {
                 // Checkout the code from the repository
@@ -19,9 +26,11 @@ pipeline {
             steps {
                 // Ensure gradlew has execute permissions
                 sh 'chmod +x ./gradlew'
+                sh './gradlew --stop'
+                sh './gradlew clean'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
-                sh './gradlew assembleDebug'
+                //sh './gradlew assembleDebug'
                 // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
             }

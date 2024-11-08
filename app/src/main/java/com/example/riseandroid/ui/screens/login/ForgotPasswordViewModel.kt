@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.auth0.android.Auth0
 import com.example.riseandroid.network.auth0.Auth0Api
-import com.example.riseandroid.repository.APIResource
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.ui.screens.signup.validation.ValidateEmail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,25 +49,25 @@ class ForgotPasswordViewModel(
                 try {
                     val response = authApi.sendForgotPasswordEmail(email).execute()
                     if (response.isSuccessful) {
-                        APIResource.Success(response.body())
+                        ApiResource.Success(response.body())
                     } else {
-                        APIResource.Error(response.message())
+                        ApiResource.Error(response.message())
                     }
                 } catch (e: Exception) {
-                    APIResource.Error(e.message ?: "Unknown error")
+                    ApiResource.Error(e.message ?: "Unknown error")
                 }
             }
 
-            if (result is APIResource.Loading) {
+            if (result is ApiResource.Loading) {
                 _isLoading.value = true
             }
 
-            if (result is APIResource.Success) {
+            if (result is ApiResource.Success) {
                 _message.value = "Password reset email sent successfully!"
                 _isLoading.value = false
             }
 
-            if (result is APIResource.Error) {
+            if (result is ApiResource.Error) {
                 _message.value = result.message
                 _isLoading.value = false
             }
