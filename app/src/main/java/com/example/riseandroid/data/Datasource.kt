@@ -3,6 +3,7 @@ package com.example.riseandroid.data
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
 import com.example.riseandroid.model.Program
+import com.example.riseandroid.model.Ticket
 
 class Datasource() {
     fun LoadRecentMovies() : List<Movie> {
@@ -45,10 +46,20 @@ class Datasource() {
             Program(tatamiMovie, "2024-11-31", "18:00", "Brugge"),
             Program(songOfEarth, "2024-11-21", "21:00", "Brugge")
 
+        )
+    }
+    fun loadTickets() : List<Ticket> {
+        return listOf(
+            Ticket(1345346, 1, "James bond", "2024-11-22", "18:00", "Mechelen"),
+            Ticket(2345345, 1, "Tatami", "2024-11-20", "18:00", "Mechelen"),
+            Ticket(3345345, 1, "Songs of earth", "2024-11-21", "18:00", "Mechelen"),
+            Ticket(4345345, 1, "James bond", "2024-11-20", "18:00", "Mechelen"),
+
             )
     }
 
 
 
 
-    }
+
+}
