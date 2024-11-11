@@ -123,7 +123,6 @@ fun MovieDetailContent(
             .padding(16.dp),
         color = MaterialTheme.colorScheme.background
     ) {
-        // Verplaats LazyColumn hier zonder de ModalBottomSheet
         LazyColumn(
             verticalArrangement = Arrangement.Top,
             modifier = Modifier.fillMaxSize()
