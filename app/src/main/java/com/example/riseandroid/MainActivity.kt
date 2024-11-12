@@ -14,6 +14,14 @@ import com.auth0.android.Auth0
 import com.example.riseandroid.data.AppContainer
 import com.example.riseandroid.ui.LumiereApp
 import com.example.riseandroid.ui.theme.RiseAndroidTheme
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getSystemService
 
 class MainActivity : ComponentActivity() {
     private lateinit var appContainer: AppContainer
@@ -21,6 +29,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel()
         enableEdgeToEdge()
         appContainer = (application as LumiereApplication).container
         setContent {
@@ -43,5 +52,22 @@ fun AppPreview() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             LumiereApp(account = Auth0("it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG", "alpayozer.eu.auth0.com"))
         }
+    }
+}
+
+private fun createNotificationChannel() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val name = "ReminderChannel"
+        val descriptionText = "Channel for Movie Reminders"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel("REMINDER_CHANNEL", name, importance).apply {
+            description = descriptionText
+        }
+//        val notificationManager: NotificationManager =
+//            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+
+
     }
 }
