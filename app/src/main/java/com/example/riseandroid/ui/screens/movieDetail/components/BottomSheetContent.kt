@@ -338,9 +338,6 @@ fun onCheckout(
     val formattedDate = date.replace("/", "-")
     val dateTimeString = "$formattedDate $selectedHour"
 
-    // Log the formatted date and time string for debugging
-    println("Formatted dateTimeString: $dateTimeString")
-
     // Parse the date and time into a Calendar object
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
     val showDate: Calendar? = try {
@@ -348,8 +345,8 @@ fun onCheckout(
             time = dateFormat.parse(dateTimeString)
         }
     } catch (e: Exception) {
-        println("Error parsing date: ${e.message}") // Log parsing errors
-        null // Handle the case where parsing fails
+        println("Error parsing date: ${e.message}")
+        null
     }
 
     if (showDate != null) {
@@ -365,15 +362,14 @@ fun onCheckout(
             if (notificationTime.before(currentTime)) {
                 println("Triggering immediate notification for movieId: ${movie.movieId}")
                 // If the show is less than 2 days away, trigger the notification immediately
-                LumiereApplication().displayImmediateNotification(context, movie.movieId)
+                LumiereApplication().displayImmediateNotification(context, movie.movieId, movie.title, selectedCinema, formattedDate)
             } else {
                 println("Scheduling notification for movieId: ${movie.movieId} at ${notificationTime.time}")
                 // Schedule the notification for 2 days before the show date
-                LumiereApplication().scheduleNotification(context, movie.movieId, notificationTime)
+                LumiereApplication().scheduleNotification(context, movie.movieId, movie.title, selectedCinema, formattedDate, notificationTime)
             }
         }
     } else {
-        // Log a message if showDate is null
         println("showDate is null, notification scheduling skipped")
     }
 

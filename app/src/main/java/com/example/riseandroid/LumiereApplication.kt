@@ -23,35 +23,32 @@ class LumiereApplication : Application() {
         container = DefaultAppContainer(context = applicationContext)
     }
 
-    fun scheduleNotification(context: Context, movieId: Long, date: Calendar) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
-            val intent = Intent(context, NotificationReceiver::class.java).apply {
-                putExtra("MOVIE_ID", movieId)
-            }
-            val pendingIntent = PendingIntent.getBroadcast(
-                context,
-                movieId.toInt(),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, date.timeInMillis, pendingIntent)
-        } else {
-            // Handle the case where the app cannot schedule exact alarms
-            println("Cannot schedule exact alarms. Permission not granted or API level is below 31.")
+    fun scheduleNotification(context: Context, movieId: Long, movieName: String, location: String, date: String, dateTime: Calendar) {
+        val intent = Intent(context, NotificationReceiver::class.java).apply {
+            putExtra("MOVIE_ID", movieId)
+            putExtra("MOVIE_NAME", movieName)
+            putExtra("LOCATION", location)
+            putExtra("DATE", date)
         }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            movieId.toInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, dateTime.timeInMillis, pendingIntent)
     }
 
 
-    fun displayImmediateNotification(context: Context, movieId: Long) {
-        println("Displaying immediate notification for movieId: $movieId") // Log for debugging
+
+    fun displayImmediateNotification(context: Context, movieId: Long, movieName: String, location: String, date: String) {
         if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
             val notification = NotificationCompat.Builder(context, "REMINDER_CHANNEL")
                 .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your app's icon
-                .setContentTitle("Upcoming Movie Reminder")
-                .setContentText("Your movie is coming up soon!")
+                .setContentTitle("Reminder for $movieName")
+                .setContentText("Your movie at $location on $date is coming up soon.")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
 
@@ -62,6 +59,7 @@ class LumiereApplication : Application() {
             println("Notifications are not enabled on this device.") // Log if notifications are disabled
         }
     }
+
 
 
 
