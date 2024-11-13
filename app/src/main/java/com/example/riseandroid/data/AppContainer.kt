@@ -9,7 +9,10 @@ import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.data.lumiere.NetworkProgramRepository
+import com.example.riseandroid.data.lumiere.NetworkTicketRepository
+
 import com.example.riseandroid.data.lumiere.ProgramRepository
+import com.example.riseandroid.data.lumiere.TicketRepository
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo
@@ -22,6 +25,8 @@ interface AppContainer {
 
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
+    val ticketRepository: TicketRepository
+
     val authRepo: IAuthRepo
 //    val accountRepository: AccountRepository
 }
@@ -46,7 +51,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
     override val programRepository: ProgramRepository by lazy {
         NetworkProgramRepository(retrofitService)
     }
-
+    override val ticketRepository: TicketRepository by lazy {
+        NetworkTicketRepository(retrofitService)
+    }
     override val authApiService: Auth0Api by lazy {
         retrofit.create(Auth0Api::class.java)
     }

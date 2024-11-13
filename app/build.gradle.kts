@@ -101,7 +101,9 @@ dependencies {
     // Auth0 dependencies
     implementation ("com.auth0.android:auth0:2.+")
     implementation ("com.auth0.android:jwtdecode:2.+")
-
+    //QR CODE
+    implementation("com.google.zxing:core:3.5.1")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     //retrofit
     implementation("androidx.work:work-testing:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.+")
