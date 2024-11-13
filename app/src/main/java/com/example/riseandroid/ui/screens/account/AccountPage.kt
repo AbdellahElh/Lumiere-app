@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,45 +60,36 @@ fun AccountPage(
             text = "Account",
             style = MaterialTheme.typography.headlineMedium,
             fontSize = 32.sp,
-            modifier = Modifier.padding(bottom = 32.dp)
+            modifier = Modifier.padding(bottom = 32.dp),
+            color = Color.White
         )
 
         Image(
             painter = painterResource(R.drawable.account),
             contentDescription = "Profile Image",
             modifier = Modifier
-                .size(100.dp)
+                .size(120.dp)
                 .padding(bottom = 16.dp)
         )
 
-        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp)
+        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp, color = Color.White)
 
         Spacer(modifier = Modifier.height(32.dp))
-
-        Button(onClick = { /* actie voor tickets */ }, modifier = Modifier.fillMaxWidth()) {
-            Text("Mijn Tickets")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = { /* actie voor beurten kaart */ }, modifier = Modifier.fillMaxWidth()) {
-            Text("10 Beurten Kaart")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
                 if (authState is AuthState.Authenticated && email != null) {
                     navController.navigate("watchlist/${email}")
                 } else {
-                    Toast.makeText(context, "Je moet ingelogd zijn om de watchlist te bekijken", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "U moet ingelogd zijn om de watchlist te bekijken", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Watchlist")
         }
+
+        Spacer(modifier = Modifier.weight(1f))
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -106,7 +98,7 @@ fun AccountPage(
                 checked = notificationsEnabled,
                 onCheckedChange = { notificationsEnabled = it }
             )
-            Text("Ik wil graag notificaties ontvangen voor nieuwe films en events")
+            Text("Ik wil graag notificaties ontvangen voor nieuwe films en events", color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
