@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.Movie
 import com.example.riseandroid.model.Program
 import java.text.SimpleDateFormat
@@ -335,18 +336,61 @@ fun onCheckout(
     context: Context
 ) {
     val formattedDate = date.replace("/", "-")
+    val dateTimeString = "$formattedDate $selectedHour"
+
+    // Log the formatted date and time string for debugging
+    println("Formatted dateTimeString: $dateTimeString")
+
+    // Parse the date and time into a Calendar object
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+    val showDate: Calendar? = try {
+        Calendar.getInstance().apply {
+            time = dateFormat.parse(dateTimeString)
+        }
+    } catch (e: Exception) {
+        println("Error parsing date: ${e.message}") // Log parsing errors
+        null // Handle the case where parsing fails
+    }
+
+    if (showDate != null) {
+        showDate.let {
+            // Create a Calendar instance for the notification time (2 days before)
+            val notificationTime = Calendar.getInstance().apply {
+                timeInMillis = it.timeInMillis
+                add(Calendar.DAY_OF_YEAR, -2) // 2 days before the show date
+            }
+
+            val currentTime = Calendar.getInstance()
+
+            if (notificationTime.before(currentTime)) {
+                println("Triggering immediate notification for movieId: ${movie.movieId}")
+                // If the show is less than 2 days away, trigger the notification immediately
+                LumiereApplication().displayImmediateNotification(context, movie.movieId)
+            } else {
+                println("Scheduling notification for movieId: ${movie.movieId} at ${notificationTime.time}")
+                // Schedule the notification for 2 days before the show date
+                LumiereApplication().scheduleNotification(context, movie.movieId, notificationTime)
+            }
+        }
+    } else {
+        // Log a message if showDate is null
+        println("showDate is null, notification scheduling skipped")
+    }
+
+    // Redirect to the corresponding URL for ticket purchase
     val url = when (selectedCinema) {
         "Brugge" -> "https://tickets.lumierecinema.be/lumiere/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
         "Antwerpen" -> "https://tickets.lumiere-antwerpen.be/lumiereantwerpen/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
         "Mechelen" -> "https://tickets.lumieremechelen.be/lumieremechelen/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
         "Cinema Cartoons" -> "https://tickets.cinemacartoons.be/cartoons/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
-
         else -> ""
     }
 
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     context.startActivity(intent)
 }
+
+
 
 fun getCurrentDate(): String {
     val calendar = Calendar.getInstance()

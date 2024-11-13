@@ -28,9 +28,9 @@ class MovieListMock {
         val songOfEarth = Movie(1077579, "Songs of earth", R.drawable.song , "Being connected to nature, what does it mean? Father knows and father shows. The director's father is 84. We follow in his footsteps into the mountain home. Into nature's smallest life and out to grand panoramas, where he grew up." , "action"  , "02h 43m", "Destin Daniel Cretton")
 
         return listOf(
-            Program(jamesBondMovie, "2024-11-20", "18:00", "Mechelen"),
+            Program(jamesBondMovie, "2024-11-14", "18:00", "Mechelen"),
             Program(tatamiMovie, "2024-11-21", "21:00", "Cinema Cartoons"),
-            Program(jamesBondMovie, "2024-11-22", "19:30", "Brugge"),
+            Program(jamesBondMovie, "2024-11-14", "19:30", "Brugge"),
             Program(jamesBondMovie, "2024-11-22", "21:30", "Brugge"),
             Program(tatamiMovie, "2024-11-23", "16:00", "Mechelen"),
             Program(songOfEarth, "2024-11-21", "21:00", "Cinema Cartoons"),
