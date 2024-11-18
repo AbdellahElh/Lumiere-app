@@ -2,6 +2,7 @@ package com.example.riseandroid.mockdata
 
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 
 class MovieListMock {
@@ -47,5 +48,35 @@ class MovieListMock {
             Program(songOfEarth, "2024-11-21", "21:00", "Brugge")
 
         )
+    }
+
+    fun LoadAllMoviesMock(): List<MovieModel> {
+        return listOf(MovieModel(
+            id = 1,
+            name = "FakeMovie1",
+            cinemas = emptyList(),
+            cast = emptyList(),
+            cover = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+            genre = "",
+            duration = "",
+            director = "",
+            description = "",
+            video = "",
+            videoPlaceholderUrl = ""
+        ),
+            MovieModel(
+                id = 2,
+                name = "FakeMovie2",
+                cinemas = emptyList(),
+                cast = emptyList(),
+                cover = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+                genre = "",
+                duration = "",
+                director = "",
+                description = "",
+                video = "",
+                videoPlaceholderUrl = ""
+            ))
+
     }
 }

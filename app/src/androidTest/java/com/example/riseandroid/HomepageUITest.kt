@@ -4,6 +4,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.testing.TestNavHostController
@@ -21,8 +22,8 @@ class HomepageUITest {
     val homepageTestRule = createComposeRule()
     lateinit var navController: TestNavHostController
 
-    val recentMovieList = MovieListMock().LoadRecentMoviesMock()
-    val allMovieList = MovieListMock().LoadNonRecentMoviesMock()
+    val recentMovieList = MovieListMock().LoadProgramsMock()
+    val allMoviesList = MovieListMock().LoadAllMoviesMock()
 
     private lateinit var fakeHomepageViewModel: FakeHomepageViewModel
     private final val countDownLatch: CountDownLatch = CountDownLatch(1)
@@ -31,7 +32,7 @@ class HomepageUITest {
     fun setup() {
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
-        val programRepository = fakeHomepageViewModel = FakeHomepageViewModel(programRepository)
+        //fakeHomepageViewModel = FakeHomepageViewModel(programRepository)
     }
     @Test
     fun titles_Placed_On_Homescreen() {
@@ -39,8 +40,10 @@ class HomepageUITest {
             Surface(modifier = Modifier) {
                 ResultScreen(
                     navController = navController,
-                    recentMovies = fakeHomepageViewModel.recentMovies,
-                    allMovies = fakeHomepageViewModel.nonRecentMovies
+                    recentMovieList =recentMovieList,
+                    programList = recentMovieList,
+                    allMoviesNonRecent = allMoviesList,
+                    modifier = Modifier,
                 )
             }
         }
@@ -52,16 +55,22 @@ class HomepageUITest {
     fun list_Of_Movies_Is_Shown(){
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
-                ResultScreen(navController, recentMovieList, allMovieList)
+                ResultScreen(
+                    navController = navController,
+                    recentMovieList =recentMovieList,
+                    programList = recentMovieList,
+                    allMoviesNonRecent = allMoviesList,
+                    modifier = Modifier,
+                )
             }
         }
         val mostRecentMovie = recentMovieList.first()
-            homepageTestRule.onNodeWithTag(mostRecentMovie.posterResourceId.toString()).assertIsDisplayed()
-            homepageTestRule.onNodeWithTag(mostRecentMovie.title).assertIsDisplayed()
+            homepageTestRule.onNodeWithTag(mostRecentMovie.movie.posterResourceId.toString()).assertIsDisplayed()
+            homepageTestRule.onNodeWithTag(mostRecentMovie.movie.title).assertIsDisplayed()
 
-        val mostNonRecentMovie = allMovieList.first()
-            homepageTestRule.onNodeWithTag(mostNonRecentMovie.posterResourceId.toString()).assertIsDisplayed()
-            homepageTestRule.onNodeWithTag(mostNonRecentMovie.title).assertIsDisplayed()
+        val mostNonRecentMovie = allMoviesList.first()
+            homepageTestRule.onNodeWithContentDescription(mostNonRecentMovie.name).assertIsDisplayed()
+
 
     }
 

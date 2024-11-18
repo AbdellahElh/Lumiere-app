@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage
 
+import android.util.Log
 import retrofit2.HttpException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,7 +13,11 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.lumiere.ProgramRepository
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
+import com.example.riseandroid.repository.ApiResource
+import com.example.riseandroid.repository.IMovieRepo
+import com.example.riseandroid.repository.NetworkResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,34 +25,117 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 sealed interface HomepageUiState {
-    data class Succes(val recentMovies: StateFlow<List<Program>>, val nonRecentMovies: Flow<List<Program>>, val programFilms: Flow<List<Program>>) : HomepageUiState
+    data class Succes(val allMovies: StateFlow<List<MovieModel>>,
+                      val recentMovies: StateFlow<List<Program>>,
+                      val programFilms: Flow<List<Program>>) : HomepageUiState
     object Error : HomepageUiState
     object Loading : HomepageUiState
 }
 
 class HomepageViewModel(
     private val programRepository: ProgramRepository,
+    private val movieRepo: IMovieRepo,
 ) : ViewModel() {
     var homepageUiState: HomepageUiState by mutableStateOf(HomepageUiState.Loading)
         private set
     private val _recentMovies = MutableStateFlow<List<Program>>(emptyList())
     val recentMovies = _recentMovies.asStateFlow()
 
-    private val _nonRecentMovies = MutableStateFlow<List<Program>>(emptyList())
-    val nonRecentMovies = _nonRecentMovies.asStateFlow()
+    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
+    val allMovies = _allMovies.asStateFlow()
 
     private val _programFilms = MutableStateFlow<List<Program>>(emptyList())
     val programFilms = _programFilms.asStateFlow()
 
+    private val _selectedDate = MutableStateFlow(getCurrentDate())
+    val selectedDate= _selectedDate.asStateFlow()
+
+    private val _selectedCinemas = MutableStateFlow<List<String>>(listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons"))
+    val selectedCinemas= _selectedCinemas.asStateFlow()
+
+    fun updateFilters(date: String, cinemas: List<String>) {
+        _selectedDate.value = date
+        _selectedCinemas.value = cinemas
+    }
 
 
     var moviesLocation: String by mutableStateOf("Brugge")
         private set
+
+    private fun getCurrentDate(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return dateFormat.format(Date())
+    }
+
     init {
         getMovies()
+        getAllMoviesList()
     }
+
+    private fun getAllMoviesList() {
+        viewModelScope.launch {
+            movieRepo.getAllMoviesList(selectedDate.value, selectedCinemas.value)
+                .collect { resource ->
+                    if (resource is ApiResource.Loading) {
+                        homepageUiState = HomepageUiState.Loading
+                    } else if (resource is ApiResource.Success) {
+                        val movies = resource.data ?: emptyList()
+                        _allMovies.value = movies
+                        homepageUiState = HomepageUiState.Succes(
+                            allMovies = _allMovies,
+                            recentMovies = recentMovies,
+                            programFilms = programFilms,
+                        )
+                    } else if (resource is ApiResource.Error) {
+                        try {
+                            val localMovies = movieRepo.getAllMovieListFromLocal()
+                            if (localMovies is NetworkResult.Success && localMovies.data.isNotEmpty()) {
+                                _allMovies.value = localMovies.data
+                                homepageUiState = HomepageUiState.Succes(
+                                    allMovies = _allMovies,
+                                    recentMovies = recentMovies,
+                                    programFilms = programFilms,
+                                )
+                            } else {
+                                homepageUiState = HomepageUiState.Error
+                            }
+                        } catch (e: Exception) {
+                            homepageUiState = HomepageUiState.Error
+                        }
+
+                    }
+                }
+        }
+    }
+
+
+
+    fun applyFilters() {
+
+        viewModelScope.launch {
+            homepageUiState = HomepageUiState.Loading
+            try {
+                getAllMoviesList()
+
+                homepageUiState = HomepageUiState.Succes(
+                    recentMovies = recentMovies,
+                    programFilms = programFilms,
+                    allMovies = allMovies
+                )
+            } catch (e: IOException) {
+                homepageUiState = HomepageUiState.Error
+            } catch (e: HttpException) {
+                homepageUiState = HomepageUiState.Error
+            }
+        }
+    }
+
+
 
     fun getMovies() {
         viewModelScope.launch {
@@ -59,12 +147,11 @@ class HomepageViewModel(
                 programFilms.collectLatest { _programFilms.value = it }
                 movieList.collectLatest {
                     _recentMovies.value = it
-                    _nonRecentMovies.value = it
                 }
                 HomepageUiState.Succes(
                     recentMovies = recentMovies,
-                    nonRecentMovies = nonRecentMovies,
-                    programFilms = programFilms
+                    programFilms = programFilms,
+                    allMovies = allMovies
                 )
             } catch (e: IOException) {
                 HomepageUiState.Error
@@ -91,12 +178,11 @@ class HomepageViewModel(
                 programFilms.collectLatest { _programFilms.value = it }
                 movieList.collectLatest {
                     _recentMovies.value = it
-                    _nonRecentMovies.value = it
                 }
                 HomepageUiState.Succes(
                     recentMovies = recentMovies,
-                    nonRecentMovies = nonRecentMovies,
-                    programFilms = programFilms
+                    programFilms = programFilms,
+                    allMovies = allMovies
                 )
             } catch (e: IOException) {
                 HomepageUiState.Error
@@ -113,7 +199,8 @@ class HomepageViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as LumiereApplication)
                 val programRepository = application.container.programRepository
-                HomepageViewModel(programRepository = programRepository)
+                val movieRepo=application.container.movieRepo
+                HomepageViewModel(programRepository = programRepository,movieRepo=movieRepo)
             }
         }
     }

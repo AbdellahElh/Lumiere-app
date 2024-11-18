@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -61,7 +60,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.riseandroid.R
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
+import com.example.riseandroid.ui.screens.homepage.components.ListAllMovies
+import com.example.riseandroid.ui.screens.homepage.components.MoviesFilters
 import com.example.riseandroid.ui.screens.homepage.components.SlidingButton
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -71,7 +73,6 @@ import java.util.Locale
 fun Homepage(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
     homepageViewModel: HomepageViewModel = viewModel(factory = HomepageViewModel.Factory),
 ) {
 
@@ -80,16 +81,16 @@ fun Homepage(
     when (homepageUiState) {
         is HomepageUiState.Succes -> {
             val recentMovies by homepageViewModel.recentMovies.collectAsState()
-            val nonRecentMovies by homepageViewModel.nonRecentMovies.collectAsState()
             val programList by homepageViewModel.programFilms.collectAsState()
+            val allMoviesNonRecent by homepageViewModel.allMovies.collectAsState()
 
             ResultScreen(
                 navController = navController,
                 recentMovieList = recentMovies,
-                allMovieList = nonRecentMovies,
                 programList = programList,
                 modifier = modifier,
-                homepageViewModel = homepageViewModel
+                homepageViewModel = homepageViewModel,
+                allMoviesNonRecent=allMoviesNonRecent
             )
         }
         is HomepageUiState.Loading -> LoadingScreen()
@@ -104,8 +105,8 @@ fun Homepage(
 fun ResultScreen(
     navController: NavHostController,
     recentMovieList: List<Program>,
-    allMovieList: List<Program>,
     programList: List<Program>,
+    allMoviesNonRecent:List<MovieModel>,
     modifier: Modifier = Modifier,
     homepageViewModel: HomepageViewModel = viewModel(
         factory = HomepageViewModel.Factory
@@ -118,6 +119,7 @@ fun ResultScreen(
     var isFilms by remember { mutableStateOf(true) }
     var expandedLocaties by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf("Brugge") }
+
     val options = listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
 
     Surface(
@@ -133,7 +135,7 @@ fun ResultScreen(
                     .calculateEndPadding(layoutDirection),
             )
             .semantics { contentDescription = "Home Screen" },
-    color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background
 
     ) {
         Column() {
@@ -188,7 +190,7 @@ fun ResultScreen(
                         .fillMaxWidth()
                         .padding(10.dp),
 
-                            horizontalArrangement = Arrangement.Start,
+                    horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.Top
                 ) {
                     Column {
@@ -272,12 +274,15 @@ fun ResultScreen(
                 )
 
                 TitleText(title = stringResource(R.string.alle_films_title), modifier = Modifier)
-                MovieList(
-                    movieList = allMovieList,
+
+                MoviesFilters(homepageViewModel=homepageViewModel)
+
+                ListAllMovies(
+                    allMoviesNonRecent = allMoviesNonRecent,
                     navController = navController,
                     modifier = Modifier
                         .padding(posterImagePadding)
-                        .height(300.dp)
+                        .height(400.dp)
                 )
             }
             else{
@@ -372,13 +377,19 @@ fun ResultScreen(
 fun LoadingScreen(
     modifier: Modifier = Modifier
 ) {
-    Image(
+    Box(
         modifier = modifier
-            .size(200.dp)
-            .testTag("LoadingImage"),
-        painter = painterResource(R.drawable.loading_img),
-        contentDescription = stringResource(R.string.loading)
-    )
+            .fillMaxSize() // Ensure the box takes up the full screen
+    ) {
+        Image(
+            modifier = Modifier
+                .size(200.dp)
+                .align(Alignment.Center) // Center the image in the Box
+                .testTag("LoadingImage"),
+            painter = painterResource(R.drawable.loading_img),
+            contentDescription = stringResource(R.string.loading)
+        )
+    }
 }
 
 @Composable
