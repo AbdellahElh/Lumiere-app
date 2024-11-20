@@ -17,6 +17,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import com.example.riseandroid.data.lumiere.ProgramRepository
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,9 @@ class FakeHomepageViewModel(
 
     private val _programFilms = MutableStateFlow<List<Program>>(emptyList())
     val programFilms = _programFilms.asStateFlow()
+
+    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
+    val allMovies = _allMovies.asStateFlow()
 
     private final val countown : CountDownLatch = CountDownLatch(1)
 
@@ -60,7 +64,7 @@ class FakeHomepageViewModel(
                 }
                 HomepageUiState.Succes(
                     recentMovies = recentMovies,
-                    nonRecentMovies = nonRecentMovies,
+                    allMovies = allMovies,
                     programFilms = programFilms
                 )
             } catch (e: IOException) {
@@ -93,7 +97,7 @@ class FakeHomepageViewModel(
                 }
                 HomepageUiState.Succes(
                     recentMovies = recentMovies,
-                    nonRecentMovies = nonRecentMovies,
+                    allMovies = allMovies,
                     programFilms = programFilms
                 )
             } catch (e: IOException) {
@@ -111,7 +115,7 @@ class FakeHomepageViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as LumiereApplication)
                 val programRepository = application.container.programRepository
-                HomepageViewModel(programRepository = programRepository)
+                HomepageViewModel(programRepository = programRepository,application.container.movieRepo)
             }
         }
     }

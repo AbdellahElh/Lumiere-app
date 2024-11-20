@@ -5,6 +5,7 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.riseandroid.R
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
@@ -13,15 +14,24 @@ import com.example.riseandroid.data.lumiere.NetworkTicketRepository
 
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.data.lumiere.TicketRepository
+import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo
+import com.example.riseandroid.repository.MovieRepo
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.InputStream
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 
 
 interface AppContainer {
     val programRepository: ProgramRepository
+
+    val movieRepo:MovieRepo
 
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
@@ -33,6 +43,16 @@ interface AppContainer {
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
     private val BASE_URL = "https://alpayozer.eu.auth0.com"
+    private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
+
+    private val riseDatabase = RiseDatabase.getDatabase(context)
+    private val movieDao = riseDatabase.movieDao()
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+    private val httpClient: OkHttpClient = SslHelper.createOkHttpClient(context, loggingInterceptor)
+
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(
@@ -43,6 +63,22 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val retrofitService: LumiereApiService by lazy {
         retrofit.create(LumiereApiService::class.java)
+    }
+
+    private val retrofitBackend: Retrofit = Retrofit.Builder()
+        .addConverterFactory(GsonConverterFactory.create())
+        .client(httpClient)
+        .baseUrl(BASE_URL_BACKEND)
+        .build()
+
+    private val retrofitServiceBackend: MoviesApi by lazy {
+        retrofitBackend.create(MoviesApi::class.java)
+    }
+
+    override val movieRepo: MovieRepo by lazy {
+        val movieDao = movieDao
+        val movieApi = retrofitServiceBackend
+        MovieRepo(movieDao, movieApi)
     }
 
     override val moviesRepository: MoviesRepository by lazy {

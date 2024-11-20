@@ -9,7 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.test.core.app.ApplicationProvider
-import com.example.riseandroid.ui.screens.authentication.AuthViewModel
+import com.example.riseandroid.fake.FakeAuthRepo
+import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.signup.SignUp
 import org.junit.Before
 import org.junit.Rule
@@ -25,7 +26,9 @@ class SignUpUITest {
     @Before
     fun setup() {
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        authViewModel = AuthViewModel()
+        authViewModel = AuthViewModel(
+            authRepo = FakeAuthRepo()
+        )
     }
 
     @Test

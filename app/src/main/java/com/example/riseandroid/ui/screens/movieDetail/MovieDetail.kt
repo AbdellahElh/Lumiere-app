@@ -55,7 +55,6 @@ import com.example.riseandroid.ui.screens.homepage.LoadingScreen
 import com.example.riseandroid.ui.screens.movieDetail.components.BottomSheetContent
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
-
 @Composable
 fun MovieDetailScreen(
     movieId: Long,
@@ -70,8 +69,6 @@ fun MovieDetailScreen(
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
     val context = LocalContext.current
-    println("Current watchlist: $watchlistState")
-    println("Checking if $movieId is in watchlist: ${watchlistState.contains(movieId)}")
     val isInWatchlist = watchlistState.contains(movieId)
 
     when (val uiState = viewModel.movieDetailUiState) {
@@ -80,6 +77,7 @@ fun MovieDetailScreen(
         is MovieDetailUiState.Success -> {
             val movie = uiState.specificMovie
             val program = uiState.programList.collectAsState(initial = emptyList())
+
             MovieDetailContent(
                 movie = movie,
                 programList = program.value,
@@ -89,6 +87,12 @@ fun MovieDetailScreen(
                 onWatchlistClick = {
                     if (isUserLoggedIn) {
                         watchlistViewModel.toggleMovieInWatchlist(movieId)
+                        val message = if (isInWatchlist) {
+                            "${movie.title} is verwijderd uit je watchlist"
+                        } else {
+                            "${movie.title} is toegevoegd aan je watchlist"
+                        }
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(
                             context,
@@ -101,7 +105,6 @@ fun MovieDetailScreen(
         }
     }
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
