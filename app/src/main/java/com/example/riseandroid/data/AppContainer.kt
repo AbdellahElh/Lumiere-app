@@ -42,7 +42,7 @@ interface AppContainer {
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
-    private val BASE_URL = "https://alpayozer.eu.auth0.com"
+    private val BASE_URL = "https://dev-viwl48rh7lran3ul.us.auth0.com"
     private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
 
     private val riseDatabase = RiseDatabase.getDatabase(context)

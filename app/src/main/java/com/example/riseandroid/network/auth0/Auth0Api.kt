@@ -8,7 +8,7 @@ import retrofit2.http.POST
 interface Auth0Api {
 
     companion object {
-        const val BASE_URL = "https://alpayozer.eu.auth0.com/"
+        const val BASE_URL = "https://dev-viwl48rh7lran3ul.us.auth0.com/"
     }
 
 

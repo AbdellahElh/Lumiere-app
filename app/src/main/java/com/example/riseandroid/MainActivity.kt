@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 fun AppPreview() {
     RiseAndroidTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            LumiereApp(account = Auth0("it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG", "alpayozer.eu.auth0.com"))
+            LumiereApp(account = Auth0("UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9", "dev-viwl48rh7lran3ul.us.auth0.com"))
         }
     }
 }
