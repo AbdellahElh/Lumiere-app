@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="com_auth0_scheme">app</string>
-    <string name="com_auth0_domain">alpayozer.eu.auth0.com</string>
-    <string name="com_auth0_client_id">it8XxtD6gPwh8XQODS3vrZ4FrtfZoTOG</string>
+    <string name="com_auth0_domain">dev-viwl48rh7lran3ul.us.auth0.com</string>
+    <string name="com_auth0_client_id">UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9</string>
 </resources>
