@@ -55,7 +55,7 @@ class LoginViewModel(
 
     fun onSubmit() {
         viewModelScope.launch {
-            authRepo.getCredentials(userName = uiState.value.username, password = uiState.value.password)
+            authRepo.performLogin(userName = uiState.value.username, password = uiState.value.password)
                 .collect { apiResource ->
                     _authResponse.value = apiResource
 
