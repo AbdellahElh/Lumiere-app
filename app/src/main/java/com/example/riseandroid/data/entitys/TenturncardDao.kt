@@ -17,6 +17,8 @@ interface TenturncardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTenturncards(cards: List<TenturncardEntity>)
 
+    @Insert
+    suspend fun addTenturncard(card : TenturncardEntity)
 
     @Update
     suspend fun updateTenturncard(card: TenturncardEntity)
