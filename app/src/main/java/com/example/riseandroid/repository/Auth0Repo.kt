@@ -15,10 +15,11 @@ import kotlinx.coroutines.withContext
 interface IAuthRepo {
 
     val auth0: Auth0
-    suspend fun getCredentials(userName: String, password:String): Flow<ApiResource<Credentials>>
+    suspend fun getCredentials(): Flow<ApiResource<Credentials>>
     suspend fun signUp(email: String, password: String, connection: String): Flow<ApiResource<Credentials>>
     suspend fun logout()
     suspend fun sendForgotPasswordEmail(email: String): Flow<ApiResource<Void>>
+    suspend fun performLogin(userName: String, password: String): Flow<ApiResource<Credentials>>
 }
 
 class Auth0Repo( private val authentication: AuthenticationAPIClient,
@@ -27,31 +28,34 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
                  override val auth0: Auth0
 ) : IAuthRepo {
 
-    private suspend fun performLogin(userName: String, password: String): Credentials? {
-        return withContext(Dispatchers.IO) {
-            try {
-                authentication.login(userName, password).execute()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-    }
-
-    override suspend fun getCredentials(
-        userName: String,
-        password: String
-    ): Flow<ApiResource<Credentials>> = flow {
-        emit(ApiResource.Loading<Credentials>())
-
-        val response = performLogin(userName, password)
-
-        if (response != null) {
-            emit(ApiResource.Success(response))
-        } else {
-            emit(ApiResource.Error("Issue with Auth API"))
+    override suspend fun performLogin(userName: String, password: String): Flow<ApiResource<Credentials>> = flow {
+        try {
+            val credentials = authentication.login(userName, password)
+                .setScope("openid profile email offline_access")
+                .execute()
+            // Store the credentials securely using CredentialsManager
+            credentialsManager.saveCredentials(credentials)
+            emit(ApiResource.Success<Credentials>(credentials))
+        } catch (e: Exception) {
+            emit(ApiResource.Error<Credentials>(e.message ?: "Login failed"))
         }
     }.flowOn(Dispatchers.IO)
+
+    override suspend fun getCredentials(): Flow<ApiResource<Credentials>> = flow {
+        emit(ApiResource.Loading<Credentials>())
+        try {
+            val credentials = credentialsManager.awaitCredentials()
+            if (credentials != null){
+                emit(ApiResource.Success<Credentials>(credentials))
+            }
+            else {
+                emit(ApiResource.Error<Credentials>("No credentials found"))
+            }
+        }catch (e : Exception){
+            emit(ApiResource.Error<Credentials>(e.message ?: "Failed to get credentials"))
+        }
+    }.flowOn(Dispatchers.IO)
+
 
     override suspend fun signUp(
         email: String,
