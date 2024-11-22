@@ -39,7 +39,9 @@ class NavigationTest {
             ) { paddingValues ->
                 NavHostWrapper(
                     navController = navController, paddingValues = paddingValues,
-                    account = mockAuth0
+                    account = mockAuth0,
+                    authViewModel = TODO(),
+                    forgotPasswordViewModel = TODO()
                 )
             }
         }

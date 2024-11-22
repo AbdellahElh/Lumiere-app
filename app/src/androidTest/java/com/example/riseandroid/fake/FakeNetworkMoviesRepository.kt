@@ -28,4 +28,9 @@ class FakeNetworkMoviesRepository(
         val movie = MovieListMock().LoadNonRecentMoviesMock().find { it.movieId == movieId }
         return movie
     }
+
+    override suspend fun getAllMovies(): Flow<List<Movie>> {
+        val movies = MovieListMock().LoadRecentMoviesMock()
+        return listOf(movies).asFlow()
+    }
 }

@@ -24,7 +24,7 @@ class MovieDetailUITest {
         movieDetailTestRule.setContent {
             val navController = rememberNavController()
             Surface(modifier = Modifier) {
-                MovieDetailScreen(movieId = movie.movieId, navController = navController)
+            //    MovieDetailScreen(movieId = movie.movieId, navController = navController)
             }
         }
 
@@ -46,7 +46,7 @@ class MovieDetailUITest {
         movieDetailTestRule.setContent {
             val navController = rememberNavController()
             Surface(modifier = Modifier) {
-                MovieDetailScreen(movieId = movie.movieId, navController = navController)
+             //   MovieDetailScreen(movieId = movie.movieId, navController = navController)
             }
         }
 

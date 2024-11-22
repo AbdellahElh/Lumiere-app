@@ -2,8 +2,8 @@ package com.example.riseandroid.model
 
 data class MovieModel(
     val id: Int,
-    val name: String,
-    val cover: String?,
+    val title: String,
+    val coverImageUrl: String?,
     val genre: String?,
     val duration: String?,
     val director: String?,
@@ -15,7 +15,7 @@ data class MovieModel(
 )
 
 data class Cinema(
-    val Id:Int,
+    val id:Int,
     val name: String,
     val showtimes: List<String> = emptyList()
 )

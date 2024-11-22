@@ -55,11 +55,12 @@ class MovieFiltersUITest {
         composeTestRule.onNodeWithText("Mechelen").assertExists()
         composeTestRule.onNodeWithText("Cinema Cartoons").assertExists()
 
-        composeTestRule.onNodeWithContentDescription("SelectedAntwerpen")
-            .assertExists()
-        composeTestRule.onNodeWithText("Antwerpen").performClick()
+
         composeTestRule.onNodeWithContentDescription("SelectedAntwerpen")
             .assertDoesNotExist()
+        composeTestRule.onNodeWithText("Antwerpen").performClick()
+        composeTestRule.onNodeWithContentDescription("SelectedAntwerpen")
+            .assertExists()
 
         composeTestRule.onNodeWithText("Toepassen").assertIsDisplayed()
         composeTestRule.onNodeWithText("Toepassen").performClick()
