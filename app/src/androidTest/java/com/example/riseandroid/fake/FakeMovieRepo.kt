@@ -12,10 +12,10 @@ class FakeMovieRepo : IMovieRepo {
     private val fakeMovies = listOf(
         MovieModel(
             id = 1,
-            name = "Fake Movie1",
+            title = "Fake Movie1",
             cinemas = emptyList(),
             cast = emptyList(),
-            cover = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+            coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
             genre = "",
             duration = "",
             director = "",
@@ -25,10 +25,10 @@ class FakeMovieRepo : IMovieRepo {
         ),
         MovieModel(
             id = 2,
-            name = "Fake Movie2",
+            title = "Fake Movie2",
             cinemas = emptyList(),
             cast = emptyList(),
-            cover = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+            coverImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             genre = "",
             duration = "",
             director = "",
@@ -41,18 +41,12 @@ class FakeMovieRepo : IMovieRepo {
     override suspend fun getAllMoviesList(
         selectedDate: String,
         selectedCinemas: List<String>
-    ):  Flow<ApiResource<List<MovieModel>>> {
+    ): Flow<List<MovieModel>> {
         return flow {
-            emit(ApiResource.Success(fakeMovies))
+            emit(fakeMovies)
         }
     }
 
-    override suspend fun getAllMovieListFromLocal(): NetworkResult<List<MovieModel>> {
-        return try {
-            NetworkResult.Success(fakeMovies)
-        } catch (e: Exception) {
-            NetworkResult.Error(e)
-        }
-    }
+
 }
 

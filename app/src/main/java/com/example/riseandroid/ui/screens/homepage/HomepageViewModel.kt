@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
+import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
@@ -55,14 +56,15 @@ class HomepageViewModel(
     private val _selectedDate = MutableStateFlow(getCurrentDate())
     val selectedDate= _selectedDate.asStateFlow()
 
-    private val _selectedCinemas = MutableStateFlow<List<String>>(listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons"))
+    private val _selectedCinemas = MutableStateFlow<List<String>>(emptyList())
+    val options = listOf<String>("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
     val selectedCinemas= _selectedCinemas.asStateFlow()
 
     fun updateFilters(date: String, cinemas: List<String>) {
         _selectedDate.value = date
         _selectedCinemas.value = cinemas
+        Log.d("HomepageViewModel", "Filters updated: date=${_selectedDate.value}, cinemas=${_selectedCinemas.value}")
     }
-
 
     var moviesLocation: String by mutableStateOf("Brugge")
         private set
@@ -79,49 +81,33 @@ class HomepageViewModel(
 
     private fun getAllMoviesList() {
         viewModelScope.launch {
-            movieRepo.getAllMoviesList(selectedDate.value, selectedCinemas.value)
-                .collect { resource ->
-                    if (resource is ApiResource.Loading) {
-                        homepageUiState = HomepageUiState.Loading
-                    } else if (resource is ApiResource.Success) {
-                        val movies = resource.data ?: emptyList()
+            Log.d("HomepageViewModel", "getAllMovies: date=${_selectedDate.value}, cinemas=${_selectedCinemas.value}")
+            homepageUiState = HomepageUiState.Loading
+
+            val cinemas = if (selectedCinemas.value.isEmpty()) {
+                listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
+            } else {
+                selectedCinemas.value
+            }
+
+            movieRepo.getAllMoviesList(selectedDate.value, cinemas)
+                .collect { movies ->
                         _allMovies.value = movies
                         homepageUiState = HomepageUiState.Succes(
                             allMovies = _allMovies,
                             recentMovies = recentMovies,
                             programFilms = programFilms,
                         )
-                    } else if (resource is ApiResource.Error) {
-                        try {
-                            val localMovies = movieRepo.getAllMovieListFromLocal()
-                            if (localMovies is NetworkResult.Success && localMovies.data.isNotEmpty()) {
-                                _allMovies.value = localMovies.data
-                                homepageUiState = HomepageUiState.Succes(
-                                    allMovies = _allMovies,
-                                    recentMovies = recentMovies,
-                                    programFilms = programFilms,
-                                )
-                            } else {
-                                homepageUiState = HomepageUiState.Error
-                            }
-                        } catch (e: Exception) {
-                            homepageUiState = HomepageUiState.Error
-                        }
 
-                    }
                 }
         }
     }
 
-
-
     fun applyFilters() {
-
         viewModelScope.launch {
             homepageUiState = HomepageUiState.Loading
             try {
                 getAllMoviesList()
-
                 homepageUiState = HomepageUiState.Succes(
                     recentMovies = recentMovies,
                     programFilms = programFilms,

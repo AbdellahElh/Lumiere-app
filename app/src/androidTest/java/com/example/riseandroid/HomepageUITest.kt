@@ -69,7 +69,7 @@ class HomepageUITest {
             homepageTestRule.onNodeWithTag(mostRecentMovie.movie.title).assertIsDisplayed()
 
         val mostNonRecentMovie = allMoviesList.first()
-            homepageTestRule.onNodeWithContentDescription(mostNonRecentMovie.name).assertIsDisplayed()
+            homepageTestRule.onNodeWithContentDescription(mostNonRecentMovie.title).assertIsDisplayed()
 
 
     }

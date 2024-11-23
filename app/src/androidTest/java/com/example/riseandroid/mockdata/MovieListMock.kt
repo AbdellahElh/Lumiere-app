@@ -53,10 +53,10 @@ class MovieListMock {
     fun LoadAllMoviesMock(): List<MovieModel> {
         return listOf(MovieModel(
             id = 1,
-            name = "FakeMovie1",
+            title = "FakeMovie1",
             cinemas = emptyList(),
             cast = emptyList(),
-            cover = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+            coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
             genre = "",
             duration = "",
             director = "",
@@ -66,10 +66,10 @@ class MovieListMock {
         ),
             MovieModel(
                 id = 2,
-                name = "FakeMovie2",
+                title = "FakeMovie2",
                 cinemas = emptyList(),
                 cast = emptyList(),
-                cover = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+                coverImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
                 genre = "",
                 duration = "",
                 director = "",

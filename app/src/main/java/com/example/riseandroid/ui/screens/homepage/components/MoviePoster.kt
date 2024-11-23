@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,8 +26,8 @@ import com.example.riseandroid.model.MovieModel
 
 @Composable
 fun MoviePoster(movie: MovieModel, navController: NavHostController, modifier: Modifier = Modifier) {
-    val imageUrl = movie.cover
-
+    val imageUrl = movie.coverImageUrl
+    Log.d("MoviePoster",imageUrl ?: "No image URL available")
     Column(modifier = modifier.clickable {
         navController.navigate("movieDetail/${movie.id}")
     }.fillMaxWidth()
@@ -45,7 +46,7 @@ fun MoviePoster(movie: MovieModel, navController: NavHostController, modifier: M
         )  {
             AsyncImage(
                 model = imageUrl,
-                contentDescription = movie.name,
+                contentDescription = movie.title,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp)),
@@ -53,8 +54,8 @@ fun MoviePoster(movie: MovieModel, navController: NavHostController, modifier: M
             )
         }
         Text(
-            text = movie.name,
-            modifier = Modifier.fillMaxWidth().padding(8.dp).testTag(movie.name),
+            text = movie.title,
+            modifier = Modifier.fillMaxWidth().padding(8.dp).testTag(movie.title),
             color = Color.White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
