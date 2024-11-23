@@ -45,8 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -76,11 +78,10 @@ fun MovieDetailScreen(
         is MovieDetailUiState.Error -> ErrorScreen()
         is MovieDetailUiState.Success -> {
             val movie = uiState.specificMovie
-            val program = uiState.programList.collectAsState(initial = emptyList())
 
             MovieDetailContent(
                 movie = movie,
-                programList = program.value,
+                programList = emptyList(), // Voeg programma's toe als nodig
                 navController = navController,
                 isInWatchlist = isInWatchlist,
                 isUserLoggedIn = isUserLoggedIn,
@@ -110,7 +111,7 @@ fun MovieDetailScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailContent(
-    movie: Movie,
+    movie: MovieModel,
     programList: List<Program>,
     navController: NavController,
     isInWatchlist: Boolean,
@@ -162,6 +163,7 @@ fun MovieDetailContent(
         }
     }
 }
+
 
 @Composable
 fun MovieItem(movie: Movie, onClick: () -> Unit) {
@@ -249,7 +251,7 @@ fun MovieDetailHeader(
 
 
 @Composable
-fun MoviePoster(movie: Movie) {
+fun MoviePoster(movie: MovieModel) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -257,7 +259,7 @@ fun MoviePoster(movie: Movie) {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(movie.posterResourceId),
+            painter = rememberImagePainter(movie.coverImageUrl),
             contentDescription = "Movie Poster",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -269,7 +271,7 @@ fun MoviePoster(movie: Movie) {
 }
 
 @Composable
-fun MovieInfo(movie: Movie) {
+fun MovieInfo(movie: MovieModel) {
     Text(
         text = movie.title,
         fontSize = 28.sp,
@@ -308,7 +310,7 @@ fun MovieInfo(movie: Movie) {
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = "${movie.length}",
+            text = "${movie.duration}",
             fontSize = 14.sp,
             color = Color(0xFFB2B5BB),
             modifier = Modifier
@@ -320,7 +322,7 @@ fun MovieInfo(movie: Movie) {
 }
 
 @Composable
-fun MovieDescription(movie: Movie, isExpanded: Boolean, onToggleExpand: () -> Unit) {
+fun MovieDescription(movie: MovieModel, isExpanded: Boolean, onToggleExpand: () -> Unit) {
     Text(
         text = "Beschrijving",
         fontSize = 28.sp,
@@ -330,17 +332,19 @@ fun MovieDescription(movie: Movie, isExpanded: Boolean, onToggleExpand: () -> Un
     )
 
     val displayedDescription =
-        if (isExpanded) movie.description else movie.description.take(100)
+        if (isExpanded) movie.description else movie.description?.take(100)
 
-    Text(
-        text = if (isExpanded) displayedDescription else "$displayedDescription...",
+    (if (isExpanded) displayedDescription else "$displayedDescription...")?.let {
+        Text(
+        text = it,
         fontSize = 15.sp,
         fontWeight = FontWeight.Light,
         color = Color(0xFF696D74),
         modifier = Modifier.padding(top = 16.dp)
     )
+    }
 
-    if (movie.description.length > 100) {
+    if (movie.description?.length!! > 100) {
         Text(
             text = if (isExpanded) "Lees Minder" else "Lees Meer",
             fontSize = 15.sp,

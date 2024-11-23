@@ -1,7 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage
 
 import android.util.Log
-import retrofit2.HttpException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,19 +11,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
-import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.IMovieRepo
-import com.example.riseandroid.repository.NetworkResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -59,6 +56,21 @@ class HomepageViewModel(
     private val _selectedCinemas = MutableStateFlow<List<String>>(emptyList())
     val options = listOf<String>("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
     val selectedCinemas= _selectedCinemas.asStateFlow()
+
+    private val _selectedMovie = MutableStateFlow<MovieModel?>(null)
+    val selectedMovie: StateFlow<MovieModel?> = _selectedMovie.asStateFlow()
+
+    fun fetchMovieById(id: Int) {
+        viewModelScope.launch {
+            try {
+                val movie = movieRepo.getSpecificMovie(id.toLong())
+                _selectedMovie.value = movie
+            } catch (e: Exception) {
+                _selectedMovie.value = null
+            }
+        }
+    }
+
 
     fun updateFilters(date: String, cinemas: List<String>) {
         _selectedDate.value = date

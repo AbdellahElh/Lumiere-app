@@ -1,17 +1,18 @@
 package com.example.riseandroid.ui.screens.homepage.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.navigation.NavHostController
-import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.R
-import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.riseandroid.R
+import com.example.riseandroid.model.MovieModel
 
 
 @Composable
@@ -38,8 +39,13 @@ fun ListAllMovies(
                     navController = navController,
                     modifier = modifier
                         .padding(dimensionResource(R.dimen.image_padding))
+                        .clickable {
+                            navController.navigate("movieDetail/${movie.id}")
+                        }
                 )
             }
         }
     }
 }
+
+

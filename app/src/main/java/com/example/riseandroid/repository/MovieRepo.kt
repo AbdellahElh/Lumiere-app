@@ -1,7 +1,6 @@
 package com.example.riseandroid.repository
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.CinemaEntity
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.MovieEntity
@@ -12,17 +11,14 @@ import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
     suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>): Flow<List<MovieModel>>
+    suspend fun getSpecificMovie(movieId: Long): MovieModel
 }
 
 class MovieRepo(
@@ -46,6 +42,10 @@ class MovieRepo(
                 }
             }
 
+    }
+
+    override suspend fun getSpecificMovie(movieId: Long): MovieModel {
+        return movieApi.getMovieById(movieId.toInt())
     }
 
     suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>) {

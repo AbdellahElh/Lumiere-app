@@ -14,24 +14,27 @@ import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
+import com.example.riseandroid.repository.IMovieRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface MovieDetailUiState {
-    data class Success(val specificMovie: Movie, val programList: Flow<List<Program>>) : MovieDetailUiState
+    data class Success(val specificMovie: MovieModel, val programList: Flow<List<Program>>) : MovieDetailUiState
     object Error : MovieDetailUiState
     object Loading : MovieDetailUiState
 }
 
 class MovieDetailViewModel(
     private val movieId: Long,
-    private val moviesRepository: MoviesRepository,
+    private val movieRepo: IMovieRepo, // MoviesRepository wordt niet meer gebruikt!!!
     private val programRepository: ProgramRepository
 
 ) : ViewModel() {
@@ -39,29 +42,33 @@ class MovieDetailViewModel(
     var movieDetailUiState: MovieDetailUiState by mutableStateOf(MovieDetailUiState.Loading)
         private set
 
+    private val _programList = MutableStateFlow<List<Program>>(emptyList())
+    val programList: StateFlow<List<Program>> = _programList.asStateFlow()
+
     private val _allMovies = MutableStateFlow<List<Movie>>(emptyList())
     val allMovies: StateFlow<List<Movie>> = _allMovies.asStateFlow()
 
     init {
-        getMovie()
+        getMovieDetails()
     }
 
-    private fun getMovie() {
+    private fun getMovieDetails() {
         viewModelScope.launch {
             movieDetailUiState = MovieDetailUiState.Loading
-            movieDetailUiState = try {
-                val specificMovie = moviesRepository.getSpecificMovie(movieId)
-                val programList = programRepository.getProgramsForMovie(movieId)
+            try {
+                val specificMovie = movieRepo.getSpecificMovie(movieId)
+                val programs = programRepository.getProgramsForMovie(movieId).firstOrNull() ?: emptyList()
 
                 if (specificMovie != null) {
-                    MovieDetailUiState.Success(specificMovie, programList)
+                    _programList.value = programs
+                    movieDetailUiState = MovieDetailUiState.Success(specificMovie, programList)
                 } else {
-                    MovieDetailUiState.Error
+                    movieDetailUiState = MovieDetailUiState.Error
                 }
             } catch (e: IOException) {
-                MovieDetailUiState.Error
+                movieDetailUiState = MovieDetailUiState.Error
             } catch (e: HttpException) {
-                MovieDetailUiState.Error
+                movieDetailUiState = MovieDetailUiState.Error
             }
         }
     }
@@ -70,10 +77,10 @@ class MovieDetailViewModel(
         fun provideFactory(movieId: Long): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as LumiereApplication)
-                val moviesRepository = application.container.moviesRepository
+                val movieRepo = application.container.movieRepo
                 val programRepository = application.container.programRepository
 
-                MovieDetailViewModel(movieId, moviesRepository,programRepository )
+                MovieDetailViewModel(movieId, movieRepo, programRepository)
             }
         }
     }
