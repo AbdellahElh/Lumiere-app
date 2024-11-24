@@ -32,7 +32,7 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         try {
             val credentials = authentication.login(userName, password)
                 .setScope("openid profile email offline_access")
-                //.setAudience("https://api.gent5.com/") VRAGEN
+                //.setAudience("https://api.gent5.com/")
                 .execute()
             credentialsManager.saveCredentials(credentials)
             emit(ApiResource.Success<Credentials>(credentials))

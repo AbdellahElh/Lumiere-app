@@ -56,6 +56,32 @@ class DefaultAppContainer(
     }
 
     private val httpClient: OkHttpClient = SslHelper.createOkHttpClient(context, loggingInterceptor)
+        .newBuilder()
+        .addInterceptor { chain ->
+            val state = authViewModel.authState.value
+            val token = when (state) {
+                is AuthState.Authenticated -> state.credentials.accessToken
+                else -> null
+            }
+
+            if (token.isNullOrEmpty()) {
+                Log.w("HttpClient", "Geen geldig token beschikbaar. Verzoek zonder token.")
+            } else {
+                Log.d("HttpClient", "Token gevonden: $token")
+            }
+
+            val request = chain.request().newBuilder().apply {
+                if (!token.isNullOrEmpty()) {
+                    addHeader("Authorization", "Bearer $token")
+                }
+            }.build()
+
+            chain.proceed(request)
+        }
+        .build()
+
+
+
 
     private val retrofitBackend: Retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
