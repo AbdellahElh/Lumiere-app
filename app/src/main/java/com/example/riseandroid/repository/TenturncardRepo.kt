@@ -9,6 +9,7 @@ import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.internal.userAgent
@@ -76,20 +77,19 @@ class TenturncardRepository(
                 tenturncardDao.addTenturncard(newTenturncard)
                 emit(ApiResource.Success(newTenturncard))
             }
+            else {
+                emit(ApiResource.Error<TenturncardEntity>("Failed to add tenturncard"))
+            }
         }catch (e : Exception){
             emit(ApiResource.Error<TenturncardEntity>(message = e.message ?: "Failed to add tenturncard"))
         }
     }
 
-    suspend fun getLoggedInUserId() : Int {
-        val resource = authrepo.getCredentials().first()
-        val idToken = resource.data?.user?.getId()
-        if (idToken != null) {
-            return idToken.toInt()
-        }
-        else{
-            throw Exception("De gebruiker moet ingelogd zijn")
-        }
+    suspend fun getLoggedInUserId(): Int {
+        val flowResult = authrepo.getLoggedInId().firstOrNull()
+        // If the flow result is null or the data is null, throw an exception
+        val accountId = flowResult?.data ?: throw IllegalStateException("De gebruiker moet ingelogd zijn")
+        return accountId
     }
     //Repo spreekt db aan om daar een flow aan te vragen
     //DAO geeft flow objecten

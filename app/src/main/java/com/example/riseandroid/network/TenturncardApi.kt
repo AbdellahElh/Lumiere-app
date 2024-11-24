@@ -13,5 +13,5 @@ interface TenturncardApi {
     @POST("/api/add/{activationCode}")
     suspend fun addTenturncard(
         @Path("activationCode") activationCode: String,
-    ) : Result<Tenturncard>
+    ) : Result<Unit>
 }

@@ -8,6 +8,7 @@ import com.auth0.android.result.Credentials
 import com.example.riseandroid.network.auth0.Auth0Api
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
@@ -20,6 +21,7 @@ interface IAuthRepo {
     suspend fun logout()
     suspend fun sendForgotPasswordEmail(email: String): Flow<ApiResource<Void>>
     suspend fun performLogin(userName: String, password: String): Flow<ApiResource<Credentials>>
+    suspend fun getLoggedInId() : Flow<ApiResource<Int>>
 }
 
 class Auth0Repo( private val authentication: AuthenticationAPIClient,
@@ -41,6 +43,7 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         }
     }.flowOn(Dispatchers.IO)
 
+
     override suspend fun getCredentials(): Flow<ApiResource<Credentials>> = flow {
         emit(ApiResource.Loading<Credentials>())
         try {
@@ -56,6 +59,18 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         }
     }.flowOn(Dispatchers.IO)
 
+    override suspend fun getLoggedInId(): Flow<ApiResource<Int>> = flow {
+        val resource = getCredentials().first()
+        val idToken = resource.data?.user?.getId()
+        val authIdSplit = idToken?.split("|")
+        val accountId = authIdSplit?.get(1)?.toInt()
+        if (idToken != null) {
+            emit(ApiResource.Success<Int>(accountId))
+        }
+        else{
+            emit(ApiResource.Error<Int>("Gebruiker moet ingelogd zijn"))
+        }
+    }
 
     override suspend fun signUp(
         email: String,
