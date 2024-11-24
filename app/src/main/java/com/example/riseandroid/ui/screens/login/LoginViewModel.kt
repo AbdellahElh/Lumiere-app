@@ -31,7 +31,6 @@ class LoginViewModel(
     private val _authResponse = MutableStateFlow<ApiResource<Credentials>>(ApiResource.Initial())
     val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
 
-    // We voegen een nieuwe flow toe om de navigatie te beheren
     private val _navigateToAccount = MutableSharedFlow<Boolean>()
     val navigateToAccount: SharedFlow<Boolean> = _navigateToAccount
 
@@ -55,21 +54,21 @@ class LoginViewModel(
 
     fun onSubmit() {
         viewModelScope.launch {
-            authRepo.performLogin(userName = uiState.value.username, password = uiState.value.password)
-                .collect { apiResource ->
-                    _authResponse.value = apiResource
+            authRepo.performLogin(
+                userName = uiState.value.username,
+                password = uiState.value.password
+            ).collect { apiResource ->
+                _authResponse.value = apiResource
 
-                    if (apiResource is ApiResource.Success && apiResource.data != null) {
-                        // Credentials ontvangen, update de authState
-                        authViewModel.setAuthenticated(apiResource.data)
-                        login(apiResource.data)
+                if (apiResource is ApiResource.Success && apiResource.data != null) {
+                    authViewModel.setAuthenticated(apiResource.data)
+                    login(apiResource.data)
 
-                        // Navigeren naar het accountscherm
-                        _navigateToAccount.emit(true)
-                    } else if (apiResource is ApiResource.Error<*>) {
-                        _uiState.value = _uiState.value.copy(loginError = true)
-                    }
+                    _navigateToAccount.emit(true)
+                } else if (apiResource is ApiResource.Error<*>) {
+                    _uiState.value = _uiState.value.copy(loginError = true)
                 }
+            }
         }
     }
 

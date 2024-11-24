@@ -32,8 +32,8 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         try {
             val credentials = authentication.login(userName, password)
                 .setScope("openid profile email offline_access")
+                //.setAudience("https://api.gent5.com/") VRAGEN
                 .execute()
-            // Store the credentials securely using CredentialsManager
             credentialsManager.saveCredentials(credentials)
             emit(ApiResource.Success<Credentials>(credentials))
         } catch (e: Exception) {

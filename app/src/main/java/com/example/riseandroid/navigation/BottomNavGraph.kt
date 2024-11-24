@@ -24,9 +24,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.auth0.android.Auth0
-import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -39,7 +38,6 @@ import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
-import com.example.riseandroid.ui.screens.ticket.TicketScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
@@ -51,7 +49,7 @@ fun BottomNavGraph(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     forgotPasswordViewModel: ForgotPasswordViewModel,
-    allMovies: List<Movie>,
+    allMovies: List<MovieModel>,
     watchlistViewModel: WatchlistViewModel,
 ) {
     val context = LocalContext.current
@@ -146,30 +144,30 @@ fun BottomNavGraph(
         }
 
         composable("movieDetail/{movieId}") { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getString("movieId")?.toLongOrNull()
+            val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
             if (movieId != null) {
                 MovieDetailScreen(
                     movieId = movieId,
                     navController = navController,
-                    viewModel = viewModel<MovieDetailViewModel>(factory = MovieDetailViewModel.provideFactory(movieId)),
+                    viewModel = viewModel<MovieDetailViewModel>(
+                        factory = MovieDetailViewModel.provideFactory(movieId)
+                    ),
                     watchlistViewModel = watchlistViewModel,
                     authViewModel = authViewModel
                 )
             }
         }
 
-        composable("watchlist/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email")
-            if (email != null) {
-                WatchlistScreen(
-                    viewModel = watchlistViewModel,
-                    allMovies = allMovies,
-                    onMovieClick = { movieId ->
-                        navController.navigate("movieDetail/$movieId")
-                    },
-                    navController = navController
-                )
-            }
+
+        composable("watchlist") {
+            WatchlistScreen(
+                viewModel = watchlistViewModel,
+                allMovies = allMovies,
+                onMovieClick = { movieId ->
+                    navController.navigate("movieDetail/$movieId")
+                },
+                navController = navController
+            )
         }
     }
 }

@@ -31,6 +31,14 @@ class AuthViewModel(val authRepo: IAuthRepo) : ViewModel() {
         _email.value = credentials.user.email
     }
 
+    fun getAccessToken(): String? {
+        val currentState = authState.value
+        return if (currentState is AuthState.Authenticated) {
+            currentState.credentials.accessToken
+        } else {
+            null
+        }
+    }
 
     fun resetSignUpState() {
         _signUpState.value = SignUpState()

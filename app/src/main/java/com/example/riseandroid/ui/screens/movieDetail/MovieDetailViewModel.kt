@@ -1,6 +1,5 @@
 package com.example.riseandroid.ui.screens.movieDetail
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,9 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
-import com.example.riseandroid.model.Movie
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.repository.IMovieRepo
@@ -33,10 +30,9 @@ sealed interface MovieDetailUiState {
 }
 
 class MovieDetailViewModel(
-    private val movieId: Long,
+    private val movieId: Int,
     private val movieRepo: IMovieRepo, // MoviesRepository wordt niet meer gebruikt!!!
     private val programRepository: ProgramRepository
-
 ) : ViewModel() {
 
     var movieDetailUiState: MovieDetailUiState by mutableStateOf(MovieDetailUiState.Loading)
@@ -45,8 +41,8 @@ class MovieDetailViewModel(
     private val _programList = MutableStateFlow<List<Program>>(emptyList())
     val programList: StateFlow<List<Program>> = _programList.asStateFlow()
 
-    private val _allMovies = MutableStateFlow<List<Movie>>(emptyList())
-    val allMovies: StateFlow<List<Movie>> = _allMovies.asStateFlow()
+    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList()) // Gebruik MovieModel
+    val allMovies: StateFlow<List<MovieModel>> = _allMovies.asStateFlow()
 
     init {
         getMovieDetails()
@@ -56,12 +52,14 @@ class MovieDetailViewModel(
         viewModelScope.launch {
             movieDetailUiState = MovieDetailUiState.Loading
             try {
+                // Ophalen van de specifieke MovieModel
                 val specificMovie = movieRepo.getSpecificMovie(movieId)
+                // Ophalen van programma's voor de specifieke movie
                 val programs = programRepository.getProgramsForMovie(movieId).firstOrNull() ?: emptyList()
 
                 if (specificMovie != null) {
                     _programList.value = programs
-                    movieDetailUiState = MovieDetailUiState.Success(specificMovie, programList)
+                    movieDetailUiState = MovieDetailUiState.Success(specificMovie, programRepository.getProgramsForMovie(movieId))
                 } else {
                     movieDetailUiState = MovieDetailUiState.Error
                 }
@@ -74,7 +72,7 @@ class MovieDetailViewModel(
     }
 
     companion object {
-        fun provideFactory(movieId: Long): ViewModelProvider.Factory = viewModelFactory {
+        fun provideFactory(movieId: Int): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as LumiereApplication)
                 val movieRepo = application.container.movieRepo
@@ -86,29 +84,20 @@ class MovieDetailViewModel(
     }
 }
 
-class MoviesViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
-    private val _allMovies = MutableStateFlow<List<Movie>>(emptyList())
-    val allMovies: StateFlow<List<Movie>> = _allMovies.asStateFlow()
+class MoviesViewModel(private val movieRepo: IMovieRepo) : ViewModel() {
+
+    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
+    val allMovies: StateFlow<List<MovieModel>> = _allMovies
 
     init {
+        loadAllMovies()
+    }
+
+    private fun loadAllMovies() {
         viewModelScope.launch {
-            moviesRepository.getAllMovies().collect { movies ->
+            movieRepo.getAllMoviesList("", emptyList()).collect { movies ->
                 _allMovies.value = movies
             }
         }
     }
 }
-
-class MoviesViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MoviesViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MoviesViewModel((application as LumiereApplication).container.moviesRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
-
-
-
-

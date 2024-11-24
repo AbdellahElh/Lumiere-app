@@ -63,7 +63,7 @@ class HomepageViewModel(
     fun fetchMovieById(id: Int) {
         viewModelScope.launch {
             try {
-                val movie = movieRepo.getSpecificMovie(id.toLong())
+                val movie = movieRepo.getSpecificMovie(id)
                 _selectedMovie.value = movie
             } catch (e: Exception) {
                 _selectedMovie.value = null

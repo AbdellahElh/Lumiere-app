@@ -106,4 +106,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.auth0.android:jwtdecode:2.0.0")
+
 }

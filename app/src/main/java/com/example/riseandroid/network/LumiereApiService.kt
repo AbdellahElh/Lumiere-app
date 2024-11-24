@@ -1,16 +1,13 @@
 package com.example.riseandroid.network
 
-import com.example.riseandroid.model.Movie
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.Retrofit
+import com.example.riseandroid.model.MovieModel
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface LumiereApiService {
-    @GET("moviesEndpoint")
-    suspend fun getMovies(): List<Movie>
+    @GET("api/Movies")
+    suspend fun getMovies(): List<MovieModel>
+
+    @GET("api/Movies/{id}")
+    suspend fun getMovieById(@Path("id") id: Int): MovieModel
 }
-
-
-

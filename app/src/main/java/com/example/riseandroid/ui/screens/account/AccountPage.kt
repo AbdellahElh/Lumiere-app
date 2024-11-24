@@ -79,7 +79,7 @@ fun AccountPage(
         Button(
             onClick = {
                 if (authState is AuthState.Authenticated && email != null) {
-                    navController.navigate("watchlist/${email}")
+                    navController.navigate("watchlist")
                 } else {
                     Toast.makeText(context, "U moet ingelogd zijn om de watchlist te bekijken", Toast.LENGTH_SHORT).show()
                 }

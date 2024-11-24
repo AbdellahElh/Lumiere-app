@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
     suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>): Flow<List<MovieModel>>
-    suspend fun getSpecificMovie(movieId: Long): MovieModel
+    suspend fun getSpecificMovie(movieId: Int): MovieModel
 }
 
 class MovieRepo(
@@ -44,7 +44,7 @@ class MovieRepo(
 
     }
 
-    override suspend fun getSpecificMovie(movieId: Long): MovieModel {
+    override suspend fun getSpecificMovie(movieId: Int): MovieModel {
         return movieApi.getMovieById(movieId.toInt())
     }
 

@@ -1,6 +1,5 @@
 package com.example.riseandroid.navigation
 
-import android.app.Application
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -22,11 +21,12 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.auth0.android.Auth0
+import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModel
-import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModelFactory
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModelFactory
 
 
 @Composable
@@ -38,8 +38,15 @@ fun NavHostWrapper(
     forgotPasswordViewModel: ForgotPasswordViewModel,
 ) {
     val context = LocalContext.current
-    val moviesViewModel: MoviesViewModel = viewModel(factory = MoviesViewModelFactory(context.applicationContext as Application))
-    val watchlistViewModel: WatchlistViewModel = viewModel()
+    val application = context.applicationContext as LumiereApplication
+    val movieRepo = application.container.movieRepo
+    val moviesViewModel = MoviesViewModel(movieRepo = movieRepo)
+    val watchlistViewModel: WatchlistViewModel = viewModel(
+        factory = WatchlistViewModelFactory(
+            watchlistRepo = application.container.watchlistRepo,
+            userId = application.container.userId
+        )
+    )
 
     val allMovies by moviesViewModel.allMovies.collectAsState()
 

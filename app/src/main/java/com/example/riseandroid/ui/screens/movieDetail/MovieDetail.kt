@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.movieDetail
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -59,7 +60,7 @@ import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 @Composable
 fun MovieDetailScreen(
-    movieId: Long,
+    movieId: Int,
     navController: NavController,
     viewModel: MovieDetailViewModel = viewModel(
         factory = MovieDetailViewModel.provideFactory(movieId)
@@ -71,7 +72,7 @@ fun MovieDetailScreen(
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
     val context = LocalContext.current
-    val isInWatchlist = watchlistState.contains(movieId)
+    val isInWatchlist = watchlistViewModel.isInWatchlist(movieId)
 
     when (val uiState = viewModel.movieDetailUiState) {
         is MovieDetailUiState.Loading -> LoadingScreen()
@@ -81,13 +82,14 @@ fun MovieDetailScreen(
 
             MovieDetailContent(
                 movie = movie,
-                programList = emptyList(), // Voeg programma's toe als nodig
+                programList = uiState.programList.collectAsState(initial = emptyList()).value,
                 navController = navController,
                 isInWatchlist = isInWatchlist,
                 isUserLoggedIn = isUserLoggedIn,
                 onWatchlistClick = {
+                    Log.d("MovieDetailScreen", "Bookmark button clicked for movie ID: $movieId")
                     if (isUserLoggedIn) {
-                        watchlistViewModel.toggleMovieInWatchlist(movieId)
+                        watchlistViewModel.toggleMovieInWatchlist(movie)
                         val message = if (isInWatchlist) {
                             "${movie.title} is verwijderd uit je watchlist"
                         } else {
