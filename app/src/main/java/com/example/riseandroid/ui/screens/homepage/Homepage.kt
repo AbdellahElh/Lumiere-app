@@ -59,10 +59,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.ui.screens.homepage.components.ListAllMovies
+import com.example.riseandroid.ui.screens.homepage.components.MoviePosterItem
 import com.example.riseandroid.ui.screens.homepage.components.MoviesFilters
 import com.example.riseandroid.ui.screens.homepage.components.SlidingButton
 import java.text.SimpleDateFormat
@@ -79,18 +82,14 @@ fun Homepage(
     val homepageUiState = homepageViewModel.homepageUiState
 
     when (homepageUiState) {
-        is HomepageUiState.Succes -> {
-            val recentMovies by homepageViewModel.recentMovies.collectAsState()
-            val programList by homepageViewModel.programFilms.collectAsState()
-            val allMoviesNonRecent by homepageViewModel.allMovies.collectAsState()
+        is HomepageUiState.Success -> {
 
             ResultScreen(
                 navController = navController,
-                recentMovieList = recentMovies,
-                programList = programList,
+                programList = homepageUiState.programFilms,
+                moviePosters = homepageUiState.moviePosters,
                 modifier = modifier,
-                homepageViewModel = homepageViewModel,
-                allMoviesNonRecent=allMoviesNonRecent
+                homepageViewModel = homepageViewModel
             )
         }
         is HomepageUiState.Loading -> LoadingScreen()
@@ -104,15 +103,11 @@ fun Homepage(
 @Composable
 fun ResultScreen(
     navController: NavHostController,
-    recentMovieList: List<Program>,
     programList: List<Program>,
-    allMoviesNonRecent:List<MovieModel>,
+    moviePosters: List<MoviePoster>,
     modifier: Modifier = Modifier,
-    homepageViewModel: HomepageViewModel = viewModel(
-        factory = HomepageViewModel.Factory
-    ),
-
-    ) {
+    homepageViewModel: HomepageViewModel = viewModel(factory = HomepageViewModel.Factory),
+) {
     val layoutDirection = LocalLayoutDirection.current
     val posterImagePadding = dimensionResource(R.dimen.image_padding)
     val scrollState = rememberScrollState()
@@ -182,8 +177,7 @@ fun ResultScreen(
             Spacer(modifier = Modifier.height(33.dp))
             ToggleFilmOrEvent(isFilms) { isFilms = !isFilms }
             Spacer(modifier = Modifier.height(50.dp))
-            if (isFilms){
-
+            if (isFilms) {
 
                 Row(
                     modifier = Modifier
@@ -262,30 +256,26 @@ fun ResultScreen(
                             }
                         }
                     }
-
-
                 }
-                MovieList(
-                    movieList = recentMovieList,
-                    navController = navController,
+                // **New Section: Movie Posters Ordered by Release Date**
+                TitleText(title = "Latest Movies", modifier = Modifier.padding(start = 16.dp, top = 16.dp))
+
+                LazyRow(
                     modifier = Modifier
-                        .padding(posterImagePadding)
-                        .height(400.dp)
-                )
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    items(moviePosters) { poster ->
+                        MoviePosterItem(
+                            moviePoster = poster,
+                            navController = navController,
+                            modifier = Modifier
+                                .width(150.dp)
+                        )
+                    }
+                }
 
-                TitleText(title = stringResource(R.string.alle_films_title), modifier = Modifier)
-
-                MoviesFilters(homepageViewModel=homepageViewModel)
-
-                ListAllMovies(
-                    allMoviesNonRecent = allMoviesNonRecent,
-                    navController = navController,
-                    modifier = Modifier
-                        .padding(posterImagePadding)
-                        .height(400.dp)
-                )
-            }
-            else{
+            } else {
 
                 Row(
                     modifier = Modifier
@@ -419,45 +409,37 @@ fun ToggleFilmOrEvent(isFilms: Boolean, onToggle: () -> Unit) {
     }
 }
 @Composable
-fun MoviePosterCard(movie: Program, navController: NavHostController, modifier: Modifier = Modifier) {
-    println(movie)
-    Column(modifier = modifier.clickable {
-        navController.navigate("movieDetail/${movie.movie.movieId}")
-    }
-    )  {
-        val posterId = movie.movie.posterResourceId
-        val movieTitle = movie.movie.title
+fun MoviePosterCard(movie: MovieModel, navController: NavHostController, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.clickable {
+            navController.navigate("movieDetail/${movie.id}")
+        }
+    ) {
         Image(
-            painter = painterResource(posterId),
+            painter = rememberAsyncImagePainter(movie.coverImageUrl),
             contentDescription = null,
             modifier = modifier
                 .fillMaxWidth()
                 .weight(0.75f)
-                .clip(MaterialTheme.shapes.medium)
-                .testTag(posterId.toString())
-                .testTag(movie.movie.posterResourceId.toString()) ,
-
+                .clip(MaterialTheme.shapes.medium),
             contentScale = ContentScale.Crop,
         )
         Text(
-            text = movieTitle,
-            modifier
-                .weight(0.25f)
-                .testTag(movieTitle),
+            text = movie.title,
+            modifier = modifier.weight(0.25f),
             color = Color.White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )
     }
-
 }
 
 @Composable
-fun MovieList(movieList: List<Program>, navController: NavHostController, modifier: Modifier = Modifier) {
+fun MovieList(movieList: List<MovieModel>, navController: NavHostController, modifier: Modifier = Modifier) {
     LazyRow(modifier = modifier) {
-        items(movieList) { m ->
+        items(movieList) { movie ->
             MoviePosterCard(
-                movie = m,
+                movie = movie,
                 navController = navController,
                 modifier = modifier
             )

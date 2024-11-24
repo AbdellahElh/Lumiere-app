@@ -18,6 +18,7 @@ import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo
+import com.example.riseandroid.repository.MoviePosterRepo
 import com.example.riseandroid.repository.MovieRepo
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -32,7 +33,7 @@ interface AppContainer {
     val programRepository: ProgramRepository
 
     val movieRepo:MovieRepo
-
+    val moviePosterRepo: MoviePosterRepo
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val ticketRepository: TicketRepository
@@ -60,6 +61,11 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         )
         .baseUrl(BASE_URL)
         .build()
+
+
+    override val moviePosterRepo: MoviePosterRepo by lazy {
+        MoviePosterRepo(retrofitBackend.create(MoviesApi::class.java))
+    }
 
     private val retrofitService: LumiereApiService by lazy {
         retrofit.create(LumiereApiService::class.java)
