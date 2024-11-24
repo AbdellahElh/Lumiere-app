@@ -11,7 +11,7 @@ import com.example.riseandroid.data.entitys.ShowtimeEntity
 import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.entitys.TenturncardEntity
 
-@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class, TenturncardEntity::class], version = 1, exportSchema = false)
+@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class, TenturncardEntity::class], version = 2, exportSchema = false)
 abstract class RiseDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
