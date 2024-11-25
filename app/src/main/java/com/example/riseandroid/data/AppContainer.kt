@@ -5,40 +5,34 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
-import com.example.riseandroid.R
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
-import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.data.lumiere.NetworkProgramRepository
 import com.example.riseandroid.data.lumiere.NetworkTicketRepository
-
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.data.lumiere.TicketRepository
+import com.example.riseandroid.network.EventsApi
+import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
+import com.example.riseandroid.repository.EventRepo
 import com.example.riseandroid.repository.IAuthRepo
 import com.example.riseandroid.repository.MovieRepo
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.InputStream
-import java.security.cert.CertificateFactory
-import java.security.cert.X509Certificate
 
 
 interface AppContainer {
     val programRepository: ProgramRepository
-
     val movieRepo:MovieRepo
-
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val ticketRepository: TicketRepository
-
     val authRepo: IAuthRepo
-//    val accountRepository: AccountRepository
+    val eventRepo: EventRepo
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -47,6 +41,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
     private val movieDao = riseDatabase.movieDao()
+    private val eventDao = riseDatabase.eventDao()
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -79,6 +74,14 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         val movieDao = movieDao
         val movieApi = retrofitServiceBackend
         MovieRepo(movieDao, movieApi)
+    }
+
+    private val eventsApi: EventsApi by lazy {
+        retrofitBackend.create(EventsApi::class.java)
+    }
+
+    override val eventRepo: EventRepo by lazy {
+        EventRepo(eventDao, eventsApi)
     }
 
     override val moviesRepository: MoviesRepository by lazy {

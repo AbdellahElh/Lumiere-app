@@ -4,15 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.riseandroid.data.entitys.CinemaEntity
+import com.example.riseandroid.data.entitys.EventDao
+import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.MovieEntity
-import com.example.riseandroid.data.entitys.CinemaEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
 
-@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class], version = 1, exportSchema = false)
+@Database(entities = [MovieEntity::class, EventEntity::class, CinemaEntity::class, ShowtimeEntity::class], version = 3, exportSchema = false)
 abstract class RiseDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
+    abstract fun eventDao(): EventDao
 
     companion object {
         @Volatile

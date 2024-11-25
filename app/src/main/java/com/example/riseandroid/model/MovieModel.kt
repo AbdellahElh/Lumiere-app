@@ -11,11 +11,17 @@ data class MovieModel(
     val video: String?,
     val videoPlaceholderUrl: String?,
     val cast: List<String> = emptyList(),
-    val cinemas: List<Cinema> = emptyList()
+    val cinemas: List<MovieCinema> = emptyList()
 )
 
-data class Cinema(
+data class MovieCinema(
     val id:Int,
     val name: String,
     val showtimes: List<String> = emptyList()
+)
+
+data class ShowtimeModel(
+    val showTime: String,
+    val showDate: String,
+    val eventId: Int? = null
 )

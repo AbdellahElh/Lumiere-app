@@ -1,7 +1,6 @@
 package com.example.riseandroid.repository
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.CinemaEntity
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.MovieEntity
@@ -12,13 +11,9 @@ import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
@@ -73,19 +68,24 @@ class MovieRepo(
         }
     }
 
+    // MovieRepo.kt
+
     private suspend fun saveShowtimes(movieId: Int, cinemaId: Int, showtimes: List<String>) {
         val showtimeEntities = showtimes.map { showtime ->
-            val dateParts = showtime.substring(0, 10).split("-")
-            val showDateFormatted = "${dateParts[0]}-${dateParts[1]}-${dateParts[2]}"
+            val dateTimeParts = showtime.split("T")
+            val showDate = dateTimeParts[0]
+            val showTime = dateTimeParts[1].substring(0, 5) // Get HH:mm
 
             ShowtimeEntity(
-                movieId = movieId,
                 cinemaId = cinemaId,
-                showTime = showtime.substring(11, 16),
-                showDate = showDateFormatted
+                movieId = movieId,
+                eventId = null,
+                showTime = showTime,
+                showDate = showDate
             )
         }
         movieDao.insertShowtimes(showtimeEntities)
     }
+
 
 }
