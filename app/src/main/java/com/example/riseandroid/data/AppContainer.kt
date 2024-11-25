@@ -48,6 +48,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
     private val movieDao = riseDatabase.movieDao()
+    private val moviePosterDao = riseDatabase.moviePosterDao()
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -63,8 +64,15 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         .build()
 
 
+    private val moviesApi: MoviesApi by lazy {
+        retrofitBackend.create(MoviesApi::class.java)
+    }
+
     override val moviePosterRepo: MoviePosterRepo by lazy {
-        MoviePosterRepo(retrofitBackend.create(MoviesApi::class.java))
+        MoviePosterRepo(
+            moviesApi = moviesApi,
+            moviePosterDao = moviePosterDao
+        )
     }
 
     private val retrofitService: LumiereApiService by lazy {

@@ -1,7 +1,7 @@
 [versions]
-agp = "8.7.2"
+agp = "8.0.2"
 coilCompose = "2.7.0"
-kotlin = "2.0.0"
+kotlin = "1.8.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -21,9 +21,8 @@ navigationCompose = "2.8.3"
 lucideIcons = "1.0.0"
 navigationTesting = "2.8.2"
 firebaseCrashlyticsBuildtools = "3.0.2"
-auth0="2.+"
-jwtdecode="2.0.0"
-
+auth0 = "2.9.0"
+jwtdecode = "2.9.0"
 
 [libraries]
 androidx-navigation-compose-v253 = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
@@ -32,9 +31,9 @@ lucide-icons = { group = "com.composables", name = "icons-lucide", version.ref =
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
-androidx-room-compiler = { module = "androidx.room:room-compiler" , version.ref = "room"}
-androidx-room-ktx = { module = "androidx.room:room-ktx" , version.ref = "room" }
-androidx-room-runtime = { module = "androidx.room:room-runtime" , version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -56,10 +55,10 @@ retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 auth0-jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
-auth0-android ={ group="com.auth0.android", name = "auth0", version.ref = "auth0"}
+auth0-android = { group = "com.auth0.android", name = "auth0", version.ref = "auth0" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+android-application = { id = "com.android.application", version = "8.0.2" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.8.21" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "1.8.21" }
+ksp = { id = "com.google.devtools.ksp", version = "1.8.21-1.0.11" }

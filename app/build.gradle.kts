@@ -1,9 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
-    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+//    id("kotlin-kapt")
+    id("org.jetbrains.kotlin.kapt") // Correct plugin ID for kapt
+
 }
 
 android {
@@ -70,7 +72,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.espresso.core)
-    implementation(libs.androidx.espresso.core)
     implementation(libs.firebase.crashlytics.buildtools)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -84,6 +85,7 @@ dependencies {
     implementation (libs.androidx.navigation.compose.v253)
 
     implementation ("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-compiler:2.44")
 
     //Room
     implementation(libs.androidx.room.runtime)
