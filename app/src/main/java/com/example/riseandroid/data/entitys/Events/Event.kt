@@ -13,10 +13,17 @@ data class EventEntity(
     val price: String,
     val duration: Int,
     val director: String,
-    val releaseDate: String,
+    val releaseDate: String?,
     val videoPlaceholderUrl: String?,
     val cover: String?,
     val eventLink: String,
     val date: String?,
-    val location: String?
+    val location: String?,
+    val cinemasJson: String
+)
+
+data class Cinema(
+    val id: Int,
+    val name: String,
+    val showtimes: List<String>
 )

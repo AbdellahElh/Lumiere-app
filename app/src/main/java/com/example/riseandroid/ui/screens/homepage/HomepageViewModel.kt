@@ -64,6 +64,9 @@ class HomepageViewModel(
     private val _events = MutableStateFlow<List<EventModel>>(emptyList())
     val events = _events.asStateFlow()
 
+    private val _filteredEvents = MutableStateFlow<List<EventModel>>(emptyList())
+    val filteredEvents: StateFlow<List<EventModel>> = _filteredEvents.asStateFlow()
+
     fun updateFilters(date: String, cinemas: List<String>) {
         _selectedDate.value = date
         _selectedCinemas.value = cinemas
@@ -93,6 +96,13 @@ class HomepageViewModel(
                 eventRepo.getAllEventsList()
                     .collect { eventsList ->
                         _events.value = eventsList
+
+                        // Stel de standaard gefilterde events in op "Brugge"
+                        val defaultCinema = "Brugge"
+                        _filteredEvents.value = eventsList.filter { event ->
+                            event.cinemas.any { it.name.equals(defaultCinema, ignoreCase = true) }
+                        }
+
                         homepageUiState = HomepageUiState.Succes(
                             allMovies = allMovies,
                             recentMovies = recentMovies,
@@ -106,6 +116,16 @@ class HomepageViewModel(
             }
         }
     }
+
+    fun filterEventsByCinema(selectedCinema: String) {
+        viewModelScope.launch {
+            val filtered = _events.value.filter { event ->
+                event.cinemas.any { it.name.equals(selectedCinema, ignoreCase = true) }
+            }
+            _filteredEvents.value = filtered
+        }
+    }
+
 
 
     private fun getAllMoviesList() {

@@ -1,9 +1,14 @@
 package com.example.riseandroid.util
 
+import com.example.riseandroid.data.entitys.Cinema
 import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+
+val gson = Gson()
 
 fun MovieEntity.asExternalModel(): MovieModel {
     return MovieModel(
@@ -38,6 +43,9 @@ fun MovieModel.asEntity(): MovieEntity {
 }
 
 fun EventEntity.asExternalModel(): EventModel {
+    val cinemaType = object : TypeToken<List<Cinema>>() {}.type
+    val cinemaList: List<Cinema> = gson.fromJson(cinemasJson, cinemaType) ?: emptyList()
+
     return EventModel(
         id = id,
         title = title,
@@ -52,7 +60,8 @@ fun EventEntity.asExternalModel(): EventModel {
         videoPlaceholderUrl = videoPlaceholderUrl,
         releaseDate = releaseDate,
         date = date,
-        location = location
+        location = location ?: "Onbekende locatie",
+        cinemas = cinemaList // Populate with converted list
     )
 }
 
@@ -63,6 +72,9 @@ fun EventModel.asEntity(): EventEntity {
         val matchResult = regex.find(it)
         matchResult?.value?.toIntOrNull() ?: 0
     } ?: 0
+
+    // Convert List<Cinema> to JSON string
+    val cinemasJson = gson.toJson(cinemas)
 
     return EventEntity(
         id = id,
@@ -78,6 +90,7 @@ fun EventModel.asEntity(): EventEntity {
         cover = cover,
         eventLink = eventLink ?: "",
         date = date,
-        location = location
+        location = location,
+        cinemasJson = cinemasJson
     )
 }

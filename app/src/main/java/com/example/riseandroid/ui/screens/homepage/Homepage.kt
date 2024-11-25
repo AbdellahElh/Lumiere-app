@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -25,11 +24,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -117,10 +123,14 @@ fun ResultScreen(
     val layoutDirection = LocalLayoutDirection.current
     val posterImagePadding = dimensionResource(R.dimen.image_padding)
     var isFilms by remember { mutableStateOf(true) }
-    var expandedLocaties by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("Brugge") }
+    var selectedCinema by remember { mutableStateOf("Brugge") }
 
     val options = listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
+    val filteredEvents by homepageViewModel.filteredEvents.collectAsState()
+
+    LaunchedEffect(selectedCinema) {
+        homepageViewModel.filterEventsByCinema(selectedCinema)
+    }
 
     Surface(
         modifier = modifier
@@ -137,19 +147,17 @@ fun ResultScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         if (isFilms) {
-            // Movies Tab Content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // Header and Greeting
                 HeaderSection(
-                    selectedOptionText = selectedOptionText,
-                    expandedLocaties = expandedLocaties,
-                    onExpandedChange = { expandedLocaties = it },
+                    selectedOptionText = selectedCinema,
+                    expandedLocaties = false,
+                    onExpandedChange = { /* No-op for movies */ },
                     onLocationSelected = { newLocation ->
-                        selectedOptionText = newLocation
+                        selectedCinema = newLocation
                         homepageViewModel.updateMoviesLocation(newLocation)
                     }
                 )
@@ -160,17 +168,15 @@ fun ResultScreen(
 
                 Spacer(modifier = Modifier.height(50.dp))
 
-                // Recent Movies Section
                 MoviesSection(
                     recentMovieList = recentMovieList,
                     navController = navController,
                     homepageViewModel = homepageViewModel,
-                    selectedOptionText = selectedOptionText,
+                    selectedOptionText = selectedCinema,
                     options = options,
                     posterImagePadding = posterImagePadding
                 )
 
-                // All Movies Section
                 TitleText(
                     title = stringResource(R.string.alle_films_title),
                     modifier = Modifier.padding(16.dp)
@@ -187,40 +193,103 @@ fun ResultScreen(
                 )
             }
         } else {
-            // Events Tab Content
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                item {
-                    // Header and Greeting
-                    HeaderSection(
-                        selectedOptionText = selectedOptionText,
-                        expandedLocaties = expandedLocaties,
-                        onExpandedChange = { expandedLocaties = it },
-                        onLocationSelected = { newLocation ->
-                            selectedOptionText = newLocation
-                            homepageViewModel.updateMoviesLocation(newLocation)
-                        }
-                    )
+                HeaderSection(
+                    selectedOptionText = selectedCinema,
+                    expandedLocaties = false,
+                    onExpandedChange = { /* No-op for movies */ },
+                    onLocationSelected = { newLocation ->
+                        selectedCinema = newLocation
+                        homepageViewModel.updateMoviesLocation(newLocation)
+                    }
+                )
 
-                    Spacer(modifier = Modifier.height(33.dp))
+                Spacer(modifier = Modifier.height(33.dp))
 
-                    ToggleFilmOrEvent(isFilms) { isFilms = !isFilms }
+                ToggleFilmOrEvent(isFilms) { isFilms = !isFilms }
 
-                    Spacer(modifier = Modifier.height(50.dp))
+                TitleText(
+                    title = "Events",
+                    modifier = Modifier.padding(16.dp)
+                )
 
-                    TitleText(title = "Events", modifier = Modifier.padding(16.dp))
-                }
+                CinemaDropdownMenu(
+                    options = options,
+                    selectedOption = selectedCinema,
+                    onOptionSelected = { newCinema ->
+                        selectedCinema = newCinema
+                        homepageViewModel.filterEventsByCinema(newCinema)
+                    }
+                )
 
-                items(eventsList) { event ->
-                    EventItem(event = event, navController = navController)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    filteredEvents.forEach { event ->
+                        EventItem(event = event, navController = navController)
+                    }
                 }
             }
         }
     }
 }
+
+
+@Composable
+fun CinemaDropdownMenu(
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        OutlinedButton(
+            onClick = { expanded = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = selectedOption,
+                color = Color.White,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = "Open Dropdown",
+                tint = Color.White
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    },
+                    text = { Text(option, color = Color.Black) }
+                )
+            }
+        }
+    }
+}
+
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -412,21 +481,6 @@ fun EventItem(
             fontSize = 16.sp,
             color = Color.White
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        val formattedPrice = event.price?.let {
-            try {
-                val priceValue = it.toDouble()
-                String.format("€%.2f", priceValue)
-            } catch (e: NumberFormatException) {
-                it
-            }
-        } ?: "Onbekend"
-
-        Text(
-            text = "Prijs: $formattedPrice",
-            fontSize = 16.sp,
-            color = Color.White
-        )
     }
 }
 
@@ -438,12 +492,12 @@ fun LoadingScreen(
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize() // Ensure the box takes up the full screen
+            .fillMaxSize()
     ) {
         Image(
             modifier = Modifier
                 .size(200.dp)
-                .align(Alignment.Center) // Center the image in the Box
+                .align(Alignment.Center)
                 .testTag("LoadingImage"),
             painter = painterResource(R.drawable.loading_img),
             contentDescription = stringResource(R.string.loading)
