@@ -5,8 +5,6 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
-import com.example.riseandroid.R
-import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
@@ -16,6 +14,7 @@ import com.example.riseandroid.data.lumiere.NetworkTicketRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.data.lumiere.TicketRepository
 import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.SignUpApi
 import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
@@ -26,9 +25,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.InputStream
-import java.security.cert.CertificateFactory
-import java.security.cert.X509Certificate
 
 
 interface AppContainer {
@@ -80,6 +76,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         retrofitBackend.create(MoviesApi::class.java)
     }
 
+    private val retrofitServiceSignUpBackend: SignUpApi by lazy {
+        retrofitBackend.create(SignUpApi::class.java)
+    }
+
     private val retrofitTenturncardServiceBackend : TenturncardApi by lazy {
         retrofitBackend.create(TenturncardApi::class.java)
     }
@@ -124,7 +124,8 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             authentication = authentication,
             credentialsManager = credentialsManager,
             authApi = authApiService,
-            auth0 = auth0
+            auth0 = auth0,
+            signUpApi = retrofitServiceSignUpBackend
         )
     }
 
