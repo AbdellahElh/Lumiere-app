@@ -472,11 +472,6 @@ fun EventItem(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = event.date ?: "Onbekend",
-            fontSize = 16.sp,
-            color = Color.White
-        )
-        Text(
             text = event.location ?: "Onbekend",
             fontSize = 16.sp,
             color = Color.White

@@ -178,7 +178,8 @@ fun BottomNavGraph(
                 EventDetailScreen(
                     eventId = eventId,
                     navController = navController,
-                    viewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId))
+                    viewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId)),
+                    authViewModel = authViewModel
                 )
             }
         }

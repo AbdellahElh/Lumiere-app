@@ -1,14 +1,10 @@
 package com.example.riseandroid.ui.screens.eventDetail
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,13 +15,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,26 +42,65 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.EventModel
+import com.example.riseandroid.ui.screens.account.AuthState
+import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
+import com.example.riseandroid.ui.screens.movieDetail.NextStepButton
+import com.example.riseandroid.ui.screens.movieDetail.navigateBack
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailScreen(
     eventId: Int,
     navController: NavController,
     viewModel: EventDetailViewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId)),
+    authViewModel: AuthViewModel
 ) {
+    val context = LocalContext.current
+    val authState by authViewModel.authState.collectAsState()
+    val isUserLoggedIn = authState is AuthState.Authenticated
+
     when (val uiState = viewModel.eventDetailUiState) {
         is EventDetailUiState.Loading -> LoadingScreen()
         is EventDetailUiState.Error -> ErrorScreen()
         is EventDetailUiState.Success -> {
             val event = uiState.specificEvent
+            var showBottomSheet by remember { mutableStateOf(false) }
 
             EventDetailContent(
                 event = event,
-                navController = navController
+                navController = navController,
+                onReserveClick = {
+                    if (isUserLoggedIn) {
+                        showBottomSheet = true
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "U moet ingelogd zijn om door te gaan naar de volgende stap",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                isUserLoggedIn = isUserLoggedIn
             )
+
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = rememberModalBottomSheetState(),
+                    containerColor = Color(0xFFE5CB77)
+                ) {
+                    BottomSheetContentEvents(
+                        cinemas = event.cinemas,
+                        context = context,
+                        navController = navController,
+                        event = event,
+                        onDismiss = { showBottomSheet = false }
+                    )
+                }
+            }
         }
     }
 }
@@ -70,7 +110,12 @@ fun EventDetailScreen(
 fun EventDetailContent(
     event: EventModel,
     navController: NavController,
+    onReserveClick: () -> Unit,
+    isUserLoggedIn: Boolean,
+    onBackClick: () -> Unit = { navigateBack(navController) }
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -85,21 +130,25 @@ fun EventDetailContent(
                 Spacer(modifier = Modifier.height(14.dp))
                 EventDetailHeader(
                     navController = navController,
-                    onBackClick = { navigateBack(navController) }
+                    onBackClick = onBackClick
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 EventPoster(event)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventInfo(event)
                 Spacer(modifier = Modifier.height(10.dp))
-                EventDescription(event)
+                EventDescription(event, isExpanded) { isExpanded = !isExpanded }
                 Spacer(modifier = Modifier.height(35.dp))
-                VisitEventButton(event)
+                NextStepButton(
+                    isUserLoggedIn = isUserLoggedIn,
+                    onClick = onReserveClick,
+                )
                 Spacer(modifier = Modifier.height(18.dp))
             }
         }
     }
 }
+
 
 @Composable
 fun EventDetailHeader(navController: NavController, onBackClick: () -> Unit) {
@@ -150,7 +199,7 @@ fun EventPoster(event: EventModel) {
 @Composable
 fun EventInfo(event: EventModel) {
     Text(
-        text = event.title ?: "Onbekend evenement",
+        text = event.title,
         fontSize = 28.sp,
         fontWeight = FontWeight.Medium,
         color = Color.White
@@ -158,23 +207,23 @@ fun EventInfo(event: EventModel) {
 
     Spacer(modifier = Modifier.height(10.dp))
 
-    Text(
-        text = "Genre: ${event.genre}",
-        fontSize = 16.sp,
-        color = Color(0xFFBABFC9)
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "Genre: ${event.genre}",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Light,
+            color = Color(0xFFBABFC9)
+        )
+    }
 
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-        text = "Regisseur: ${event.director}",
-        fontSize = 14.sp,
-        color = Color(0xFFBABFC9)
-    )
+    Spacer(modifier = Modifier.height(14.dp))
 }
 
 @Composable
-fun EventDescription(event: EventModel) {
+fun EventDescription(event: EventModel, isExpanded: Boolean, onToggleExpand: () -> Unit) {
     Text(
         text = "Beschrijving",
         fontSize = 28.sp,
@@ -183,62 +232,29 @@ fun EventDescription(event: EventModel) {
         modifier = Modifier.padding(top = 14.dp)
     )
 
+    val displayedDescription =
+        if (isExpanded) event.description else event.description.take(100)
+
     Text(
-        text = event.description ?: "Geen beschrijving beschikbaar",
+        text = if (isExpanded) displayedDescription else "$displayedDescription...",
         fontSize = 15.sp,
         fontWeight = FontWeight.Light,
         color = Color(0xFF696D74),
         modifier = Modifier.padding(top = 16.dp)
     )
-}
 
-@Composable
-fun VisitEventButton(event: EventModel) {
-    val context = LocalContext.current
-    val eventLink = event.eventLink ?: "" // Stel een lege string in als default
-    Button(
-        onClick = {
-            if (eventLink.isNotEmpty()) {
-                visitEventLink(eventLink, context)
-            } else {
-                Toast.makeText(context, "Event link is niet beschikbaar", Toast.LENGTH_SHORT).show()
-            }
-        },
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFE5CB77),
-            contentColor = Color.White
-        ),
-        shape = RoundedCornerShape(12.dp),
-        contentPadding = PaddingValues(vertical = 15.dp)
-    ) {
+    if (event.description.length > 100) {
         Text(
-            text = "Bezoek Evenement",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
+            text = if (isExpanded) "Lees Minder" else "Lees Meer",
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Light,
+            color = Color(0xFFE5CB77),
+            modifier = Modifier
+                .clickable { onToggleExpand() }
         )
     }
 }
 
-
-fun visitEventLink(link: String, context: Context) {
-    try {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-        context.startActivity(intent)
-    } catch (e: Exception) {
-        Toast.makeText(context, "Kan de link niet openen", Toast.LENGTH_SHORT).show()
-    }
-}
-
-fun navigateBack(navController: NavController, targetRoute: String? = null) {
-    if (targetRoute != null) {
-        navController.navigate(targetRoute) {
-            popUpTo(navController.graph.startDestinationId) { inclusive = false }
-        }
-    } else {
-        navController.popBackStack()
-    }
-}
 
 
 

@@ -1,5 +1,6 @@
 package com.example.riseandroid.repository
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.example.riseandroid.data.entitys.EventDao
 import com.example.riseandroid.model.EventModel
@@ -7,6 +8,8 @@ import com.example.riseandroid.network.EventsApi
 import com.example.riseandroid.util.asEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 interface IEventRepo {
     suspend fun getAllEventsList(): Flow<List<EventModel>>
@@ -29,14 +32,12 @@ class EventRepo(
                     genre = apiEvent.genre ?: "Onbekend genre",
                     type = apiEvent.type ?: "Onbekend type",
                     description = apiEvent.description ?: "Geen beschrijving",
-                    price = apiEvent.price ?: "0.00",
                     duration = apiEvent.duration ?: "0 minuten",
                     director = apiEvent.director ?: "Onbekend",
                     releaseDate = apiEvent.releaseDate ?: "Onbekend",
                     videoPlaceholderUrl = apiEvent.videoPlaceholderUrl,
                     cover = apiEvent.cover,
-                    date = apiEvent.date,
-                    location = apiEvent.location ?: "Onbekende locatie",
+                    location = apiEvent.location ?: "Onbekend",
                     eventLink = apiEvent.eventLink ?: "",
                     cinemas = apiEvent.cinemas ?: emptyList()
                 )
@@ -58,9 +59,20 @@ class EventRepo(
         }
     }
 
+    @SuppressLint("NewApi")
     override suspend fun getSpecificEvent(eventId: Int): EventModel? {
         return try {
-            eventsApi.getSpecificEvent(eventId)
+            val eventFromApi = eventsApi.getSpecificEvent(eventId)
+            eventFromApi.copy(
+                cinemas = eventFromApi.cinemas.map { cinema ->
+                    cinema.copy(
+                        showtimes = cinema.showtimes.map { showtime ->
+                            LocalDateTime.parse(showtime, DateTimeFormatter.ISO_DATE_TIME)
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                        }
+                    )
+                }
+            )
         } catch (e: Exception) {
             Log.e("EventRepo", "Error fetching specific event", e)
             null

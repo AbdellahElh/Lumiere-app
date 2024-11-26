@@ -55,13 +55,11 @@ fun EventEntity.asExternalModel(): EventModel {
         duration = "$duration minuten",
         director = director,
         description = description,
-        price = price,
         eventLink = eventLink,
         videoPlaceholderUrl = videoPlaceholderUrl,
         releaseDate = releaseDate,
-        date = date,
-        location = location ?: "Onbekende locatie",
-        cinemas = cinemaList // Populate with converted list
+        cinemas = cinemaList,
+        location = location ?: ""
     )
 }
 
@@ -82,15 +80,13 @@ fun EventModel.asEntity(): EventEntity {
         genre = genre ?: "",
         type = type ?: "",
         description = description ?: "",
-        price = price ?: "",
         duration = durationInMinutes,
         director = director ?: "",
         releaseDate = releaseDate ?: "",
         videoPlaceholderUrl = videoPlaceholderUrl,
         cover = cover,
         eventLink = eventLink ?: "",
-        date = date,
-        location = location,
-        cinemasJson = cinemasJson
+        cinemasJson = cinemasJson,
+        location = location ?: ""
     )
 }
