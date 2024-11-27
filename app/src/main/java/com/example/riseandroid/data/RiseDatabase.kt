@@ -14,7 +14,7 @@ import com.example.riseandroid.data.entitys.*
         ShowtimeEntity::class,
         MoviePosterEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class RiseDatabase : RoomDatabase() {

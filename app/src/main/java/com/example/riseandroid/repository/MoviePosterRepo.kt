@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 
 interface IMoviePosterRepo {
     suspend fun getMoviePosters(): Flow<List<MoviePoster>>
+    suspend fun refreshMoviePosters()
 }
 
 class MoviePosterRepo(
@@ -25,21 +26,18 @@ class MoviePosterRepo(
     override suspend fun getMoviePosters(): Flow<List<MoviePoster>> {
         return moviePosterDao.getAllMoviePosters()
             .map { entities -> entities.map { it.asExternalModel() } }
-            .onStart {
-                withContext(Dispatchers.IO) {
-                    refreshMoviePosters()
-                }
-            }
     }
 
-    private suspend fun refreshMoviePosters() {
+    override suspend fun refreshMoviePosters() {
         try {
             val postersFromApi = moviesApi.getMoviePosters()
+            Log.d("MoviePosterRepo", "Fetched ${postersFromApi.size} posters from API")
             val posterEntities = postersFromApi.map { it.asEntity() }
             moviePosterDao.insertMoviePosters(posterEntities)
-            Log.d("MoviePosterRepo", "Movie posters refreshed from API")
+            Log.d("MoviePosterRepo", "Inserted ${posterEntities.size} posters into the database")
         } catch (e: Exception) {
-            Log.e("MoviePosterRepo", "Error refreshing movie posters: ${e.message}")
+            Log.e("MoviePosterRepo", "Error refreshing movie posters: ${e.message}", e)
         }
     }
 }
+

@@ -39,8 +39,8 @@ class HomepageViewModel(
     private val movieRepo: IMovieRepo,
     private val moviePosterRepo: IMoviePosterRepo
 ) : ViewModel() {
-    var homepageUiState: HomepageUiState by mutableStateOf(HomepageUiState.Loading)
-        private set
+    private val _homepageUiState = MutableStateFlow<HomepageUiState>(HomepageUiState.Loading)
+    val homepageUiState: StateFlow<HomepageUiState> = _homepageUiState.asStateFlow()
 
     private val _selectedDate = MutableStateFlow(getCurrentDate())
     val selectedDate = _selectedDate.asStateFlow()
@@ -61,42 +61,42 @@ class HomepageViewModel(
 
     private fun fetchData() {
         viewModelScope.launch {
-            homepageUiState = HomepageUiState.Loading
             try {
-                // Fetch all movies based on current filters
+                // Explicitly refresh movie posters
+                moviePosterRepo.refreshMoviePosters()
+
                 val cinemas = if (_selectedCinemas.value.isEmpty()) {
                     listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
                 } else {
                     _selectedCinemas.value
                 }
+
                 val allMoviesFlow = movieRepo.getAllMoviesList(_selectedDate.value, cinemas)
-                val allMovies = allMoviesFlow.first()
-
-                // Fetch movie posters
                 val moviePostersFlow = moviePosterRepo.getMoviePosters()
-                val moviePosters = moviePostersFlow.first()
-
-                // Fetch program films based on location
                 val programFilmsFlow = programRepository.getProgramsLocation(moviesLocation)
-                val programFilms = programFilmsFlow.first()
 
-                homepageUiState = HomepageUiState.Success(
-                    allMovies = allMovies,
-                    moviePosters = moviePosters,
-                    programFilms = programFilms
-                )
-            } catch (e: IOException) {
-                Log.e("HomepageViewModel", "Network error", e)
-                homepageUiState = HomepageUiState.Error
-            } catch (e: HttpException) {
-                Log.e("HomepageViewModel", "HTTP error", e)
-                homepageUiState = HomepageUiState.Error
+                combine(
+                    allMoviesFlow,
+                    moviePostersFlow,
+                    programFilmsFlow
+                ) { allMovies, moviePosters, programFilms ->
+                    HomepageUiState.Success(
+                        allMovies = allMovies,
+                        moviePosters = moviePosters,
+                        programFilms = programFilms
+                    )
+                }.collect { uiState ->
+                    _homepageUiState.value = uiState
+                }
+
             } catch (e: Exception) {
-                Log.e("HomepageViewModel", "Unknown error", e)
-                homepageUiState = HomepageUiState.Error
+                _homepageUiState.value = HomepageUiState.Error
+                Log.e("HomepageViewModel", "Error in fetchData", e)
             }
         }
     }
+
+
 
     fun updateFilters(date: String, cinemas: List<String>) {
         viewModelScope.launch {

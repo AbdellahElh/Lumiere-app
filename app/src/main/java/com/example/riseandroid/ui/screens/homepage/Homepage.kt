@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -78,22 +79,21 @@ fun Homepage(
     modifier: Modifier = Modifier,
     homepageViewModel: HomepageViewModel = viewModel(factory = HomepageViewModel.Factory),
 ) {
+    val homepageUiState by homepageViewModel.homepageUiState.collectAsState()
 
-    val homepageUiState = homepageViewModel.homepageUiState
-
-    when (homepageUiState) {
+    when (val uiState = homepageUiState) {
         is HomepageUiState.Success -> {
-
+            Log.d("Homepage", "Number of movie posters: ${uiState.moviePosters.size}")
             ResultScreen(
                 navController = navController,
-                programList = homepageUiState.programFilms,
-                moviePosters = homepageUiState.moviePosters,
+                programList = uiState.programFilms,
+                moviePosters = uiState.moviePosters,
                 modifier = modifier,
                 homepageViewModel = homepageViewModel
             )
         }
         is HomepageUiState.Loading -> LoadingScreen()
-        else -> ErrorScreen()
+        is HomepageUiState.Error -> ErrorScreen()
     }
 }
 
@@ -258,7 +258,7 @@ fun ResultScreen(
                     }
                 }
                 // **New Section: Movie Posters Ordered by Release Date**
-                TitleText(title = "Latest Movies", modifier = Modifier.padding(start = 16.dp, top = 16.dp))
+                TitleText(title = "", modifier = Modifier.padding(start = 16.dp, top = 16.dp))
 
                 LazyRow(
                     modifier = Modifier
