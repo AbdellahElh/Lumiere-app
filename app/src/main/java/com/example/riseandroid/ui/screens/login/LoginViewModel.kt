@@ -1,6 +1,7 @@
 package com.example.riseandroid.ui.screens.login
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -15,8 +16,12 @@ import com.example.riseandroid.ui.screens.account.AuthViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
@@ -29,15 +34,15 @@ class LoginViewModel(
     val uiState: StateFlow<LoginState> = _uiState.asStateFlow()
 
     private val _authResponse = MutableStateFlow<ApiResource<Credentials>>(ApiResource.Initial())
-    val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
+  //  val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
 
     // We voegen een nieuwe flow toe om de navigatie te beheren
     private val _navigateToAccount = MutableSharedFlow<Boolean>()
     val navigateToAccount: SharedFlow<Boolean> = _navigateToAccount
 
-    fun resetAuthResponse() {
-        _authResponse.value = ApiResource.Initial()
-    }
+//    fun resetAuthResponse() {
+//        _authResponse.value = ApiResource.Initial()
+//    }
 
     fun updateUserName(name: String) {
         resetError()
@@ -53,12 +58,41 @@ class LoginViewModel(
         _uiState.value = _uiState.value.copy(loginError = false)
     }
 
+    val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
+        .flatMapLatest { resource ->
+            flow {
+                Log.i("LoginViewModel", "Observed: ${resource.data}")
+
+
+                if (resource is ApiResource.Success && resource.data != null) {
+
+                    login(resource.data)
+
+                }
+
+                else if (resource is ApiResource.Error<*>) {
+                    Log.e("LoginViewModel", "Error during login: ${resource.message}")
+                    _uiState.value = _uiState.value.copy(loginError = true)
+                    emit(ApiResource.Error(resource.message ?: "Unknown error", resource.data))
+                }
+
+                else {
+                    emit(resource)
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ApiResource.Success(null)
+        )
+
+
     fun onSubmit() {
         viewModelScope.launch {
             authRepo.performLogin(userName = uiState.value.username, password = uiState.value.password)
                 .collect { apiResource ->
                     _authResponse.value = apiResource
-
                     if (apiResource is ApiResource.Success && apiResource.data != null) {
                         // Credentials ontvangen, update de authState
                         authViewModel.setAuthenticated(apiResource.data)

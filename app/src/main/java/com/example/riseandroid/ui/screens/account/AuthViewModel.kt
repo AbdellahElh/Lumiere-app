@@ -1,6 +1,7 @@
 package com.example.riseandroid.ui.screens.account
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -36,6 +37,7 @@ class AuthViewModel(val authRepo: IAuthRepo) : ViewModel() {
     fun setAuthenticated(credentials: Credentials) {
         _authState.value = AuthState.Authenticated(credentials)
         _email.value = credentials.user.email
+        _authToken.value=credentials.accessToken
     }
 
     // Reset signup state

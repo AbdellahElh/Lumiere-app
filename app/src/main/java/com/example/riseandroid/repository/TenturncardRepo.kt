@@ -1,5 +1,6 @@
 package com.example.riseandroid.repository
 
+import android.util.Log
 import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.model.Tenturncard
@@ -16,11 +17,10 @@ class TenturncardRepository(
 
      override suspend fun getTenturncards(authToken: String): List<Tenturncard> {
         return try {
-            // Fetch the auth token
-            val authToken = getAuthToken()
 
+            val authHeader = "Bearer $authToken"
             // Call the API with the token
-            val apiResponse = tenturncardApi.getTenturncards(authToken)
+            val apiResponse = tenturncardApi.getTenturncards(authHeader)
             val entities = apiResponse.map {
                 TenturncardEntity(
                     id = it.id,

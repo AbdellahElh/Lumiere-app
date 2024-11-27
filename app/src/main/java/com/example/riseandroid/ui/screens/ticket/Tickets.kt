@@ -83,10 +83,8 @@ fun TicketScreen(
     viewModel: TicketViewModel = viewModel(
         factory = TicketViewModel.provideFactory(userId)
     ),
-    authViewModel: AuthViewModel= viewModel(
-factory = AuthViewModel.Factory
-),
-    tenturncardRepository: TenturncardRepository
+
+  //  tenturncardRepository: TenturncardRepository
 ) {
     when (val uiState = viewModel.ticketUiState) {
         is TicketUiState.Loading -> LoadingScreen()
@@ -96,7 +94,7 @@ factory = AuthViewModel.Factory
             TicketsScreenContent(
                 TicketList = tickets.value,
 
-                tenturncardRepository = tenturncardRepository,
+
                 authToken = authToken!!
             )
         }
@@ -106,7 +104,6 @@ factory = AuthViewModel.Factory
 fun TicketsScreenContent(
     TicketList: List<Ticket>,
    authToken: String, // Accept AuthViewModel
-    tenturncardRepository: TenturncardRepository // Accept TenturncardRepository
 ) {
     var isTicket by remember { mutableStateOf(true) }
     BrightnessControl(isTicketScreen = true)
@@ -212,8 +209,7 @@ fun TicketsScreenContent(
                 } else {
                     // Call TenturncardScreen with the injected dependencies
                     TenturncardScreen(
-                      authToken = authToken,
-                        tenturncardRepository = tenturncardRepository
+                      authToken = authToken
                     )
                 }
             }

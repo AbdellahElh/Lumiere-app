@@ -19,23 +19,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
 
 @Composable
 fun TenturncardScreen(
     authToken: String, // Inject AuthViewModel
-    tenturncardRepository: TenturncardRepository // Inject TenturncardRepository
+    tenTurnCardViewModel: TenturncardViewModel = viewModel(factory = TenturncardViewModel.Factory),
 ) {
 
 
-    val viewModel: TenturncardViewModel = viewModel(
-        factory = TenturncardViewModel.Factory(tenturncardRepository)
-    )
-
-
     LaunchedEffect(authToken) {
-        viewModel.fetchTenturncards(authToken)
+        tenTurnCardViewModel.fetchTenturncards(authToken)
     }
-    val cards by viewModel.tenturncards.collectAsState()
+    val cards by tenTurnCardViewModel.tenturncards.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
