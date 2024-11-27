@@ -65,7 +65,10 @@ fun MoviesFilters(
             Spacer(modifier = Modifier.height(2.dp))
 
             Button(
-                onClick = {  homepageViewModel.applyFilters() },
+                onClick = {  homepageViewModel.updateFilters(
+                    date = selectedDate,
+                    cinemas = selectedCinemas
+                ) },
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .align(Alignment.End),

@@ -1,22 +1,28 @@
+// RiseDatabase.kt
 package com.example.riseandroid.data
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.riseandroid.data.entitys.MovieDao
-import com.example.riseandroid.data.entitys.MovieEntity
-import com.example.riseandroid.data.entitys.CinemaEntity
-import com.example.riseandroid.data.entitys.ShowtimeEntity
-import com.example.riseandroid.data.entitys.TenturncardDao
-import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.data.entitys.*
 
-@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class, TenturncardEntity::class], version = 2, exportSchema = false)
+@Database(
+    entities = [
+        MovieEntity::class,
+        CinemaEntity::class,
+        ShowtimeEntity::class,
+        MoviePosterEntity::class,
+        TenturncardEntity::class
+    ],
+    version = 3,
+    exportSchema = false
+)
 abstract class RiseDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
+    abstract fun moviePosterDao(): MoviePosterDao
     abstract fun tenturncardDao() : TenturncardDao
-
 
     companion object {
         @Volatile

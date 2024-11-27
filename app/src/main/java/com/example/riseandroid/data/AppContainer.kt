@@ -19,6 +19,7 @@ import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo
+import com.example.riseandroid.repository.MoviePosterRepo
 import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.repository.TenturncardRepository
 import okhttp3.OkHttpClient
@@ -31,7 +32,7 @@ interface AppContainer {
     val programRepository: ProgramRepository
 
     val movieRepo:MovieRepo
-
+    val moviePosterRepo: MoviePosterRepo
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val ticketRepository: TicketRepository
@@ -47,6 +48,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
     private val movieDao = riseDatabase.movieDao()
+    private val moviePosterDao = riseDatabase.moviePosterDao()
     private val tenturncardDao = riseDatabase.tenturncardDao()
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -61,6 +63,18 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         )
         .baseUrl(BASE_URL)
         .build()
+
+
+    private val moviesApi: MoviesApi by lazy {
+        retrofitBackend.create(MoviesApi::class.java)
+    }
+
+    override val moviePosterRepo: MoviePosterRepo by lazy {
+        MoviePosterRepo(
+            moviesApi = moviesApi,
+            moviePosterDao = moviePosterDao
+        )
+    }
 
     private val retrofitService: LumiereApiService by lazy {
         retrofit.create(LumiereApiService::class.java)
