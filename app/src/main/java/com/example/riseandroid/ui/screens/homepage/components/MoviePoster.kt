@@ -27,7 +27,7 @@ import com.example.riseandroid.model.MovieModel
 @Composable
 fun MoviePoster(movie: MovieModel, navController: NavHostController, modifier: Modifier = Modifier) {
     val imageUrl = movie.coverImageUrl
-    Log.d("MoviePoster",imageUrl ?: "No image URL available")
+
     Column(modifier = modifier.clickable {
         navController.navigate("movieDetail/${movie.id}")
     }.fillMaxWidth()

@@ -36,10 +36,6 @@ class MovieRepo(
     ): Flow<List<MovieModel>> {
         return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas)
             .map { entities -> entities.map(MovieEntity::asExternalModel) }
-            .onEach { movies ->
-                movies.forEach { movie ->
-                    Log.d("MoviesList", movie.toString())
-                }}
             .onStart {
                 withContext(Dispatchers.IO) {
                     refreshMovies(selectedDate, selectedCinemas)

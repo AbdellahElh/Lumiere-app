@@ -1,0 +1,10 @@
+package com.example.riseandroid.repository
+
+import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.model.Tenturncard
+import kotlinx.coroutines.flow.Flow
+
+interface ITenturncardRepository {
+    suspend fun getTenturncards(): List<Tenturncard>
+    suspend fun addTenturncard(activationCode : String): Flow<ApiResource<TenturncardEntity>>
+}
