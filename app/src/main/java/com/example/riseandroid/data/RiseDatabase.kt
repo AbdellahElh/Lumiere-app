@@ -12,7 +12,8 @@ import com.example.riseandroid.data.entitys.*
         MovieEntity::class,
         CinemaEntity::class,
         ShowtimeEntity::class,
-        MoviePosterEntity::class
+        MoviePosterEntity::class,
+        TenturncardEntity::class
     ],
     version = 3,
     exportSchema = false
