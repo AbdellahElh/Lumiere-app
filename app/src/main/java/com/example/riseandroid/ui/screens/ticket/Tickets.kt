@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.ticket
 
+import TenturncardScreen
 import android.app.Activity
 import android.graphics.Bitmap
 import android.view.WindowManager
@@ -58,7 +59,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.riseandroid.R
+import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.model.Ticket
+import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
@@ -69,44 +72,47 @@ import com.example.riseandroid.ui.screens.homepage.components.SlidingButton
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailContent
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailUiState
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
+
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 @Composable
 fun TicketScreen(
     userId: Long,
+    authToken: String,
     navController: NavController,
     viewModel: TicketViewModel = viewModel(
         factory = TicketViewModel.provideFactory(userId)
     ),
-
-    ) {
-
-
-
+    authViewModel: AuthViewModel= viewModel(
+factory = AuthViewModel.Factory
+),
+    tenturncardRepository: TenturncardRepository
+) {
     when (val uiState = viewModel.ticketUiState) {
         is TicketUiState.Loading -> LoadingScreen()
         is TicketUiState.Error -> ErrorScreen()
         is TicketUiState.Success -> {
             val tickets = uiState.ticketList.collectAsState(initial = emptyList())
             TicketsScreenContent(
-                TicketList = tickets.value
+                TicketList = tickets.value,
 
+                tenturncardRepository = tenturncardRepository,
+                authToken = authToken!!
             )
         }
     }
 }
 @Composable
-fun TicketsScreenContent(TicketList: List<Ticket>) {
-
-
-
+fun TicketsScreenContent(
+    TicketList: List<Ticket>,
+   authToken: String, // Accept AuthViewModel
+    tenturncardRepository: TenturncardRepository // Accept TenturncardRepository
+) {
     var isTicket by remember { mutableStateOf(true) }
     BrightnessControl(isTicketScreen = true)
     var isEmptyTickets = TicketList.isEmpty()
 
-
     Surface(
-
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
@@ -122,7 +128,6 @@ fun TicketsScreenContent(TicketList: List<Ticket>) {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Spacer(modifier = Modifier.weight(1f))
                     if (isTicket) {
                         Text(
@@ -140,7 +145,6 @@ fun TicketsScreenContent(TicketList: List<Ticket>) {
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
-
                 }
                 Spacer(modifier = Modifier.height(32.dp))
                 ToggleTicketsOrTenturncards(isTicket) { isTicket = !isTicket }
@@ -154,13 +158,13 @@ fun TicketsScreenContent(TicketList: List<Ticket>) {
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Kom naar de bioscoop, toon en scan de barcode naar de daarvoor bestemde ruimte. Blijf de gezondheidsprotocollen naleven.    ",
+                        text = "Kom naar de bioscoop, toon en scan de barcode naar de daarvoor bestemde ruimte. Blijf de gezondheidsprotocollen naleven.",
                         fontSize = 19.sp,
                         fontWeight = FontWeight.Light,
                         color = Color(0xFFB2B5BB)
                     )
                     Spacer(modifier = Modifier.height(40.dp))
-                    if(isEmptyTickets){
+                    if (isEmptyTickets) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -187,8 +191,7 @@ fun TicketsScreenContent(TicketList: List<Ticket>) {
                                 )
                             }
                         }
-
-                    }else{
+                    } else {
                         LazyRow(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(24.dp)
@@ -202,23 +205,22 @@ fun TicketsScreenContent(TicketList: List<Ticket>) {
                                     )
                                 }
                             }
-
                         }
                     }
 
                     Spacer(modifier = Modifier.height(44.dp))
-
-
                 } else {
-                    //Miel zen tienbeurtenkaarten
+                    // Call TenturncardScreen with the injected dependencies
+                    TenturncardScreen(
+                      authToken = authToken,
+                        tenturncardRepository = tenturncardRepository
+                    )
                 }
-
-
             }
         }
     }
-
 }
+
 @Composable
 fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket: Ticket) {
     Box(

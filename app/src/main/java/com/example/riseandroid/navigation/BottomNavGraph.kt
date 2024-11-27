@@ -57,6 +57,9 @@ fun BottomNavGraph(
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
+
+    val authToken by authViewModel.authToken.collectAsState()
+
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Home.route,
@@ -96,7 +99,12 @@ fun BottomNavGraph(
                     }
                 }
             } else {
-                TicketScreen(1, navController = navController)
+                TicketScreen(
+                    1, navController = navController, authToken = authToken ?: "",
+                    viewModel = TODO(),
+                    authViewModel = TODO(),
+                    tenturncardRepository = TODO()
+                )
             }
         }
         composable(route = BottomBarScreen.Account.route) {

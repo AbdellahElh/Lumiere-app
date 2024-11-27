@@ -1,77 +1,78 @@
-package com.example.riseandroid.ui
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.model.Tenturncard
-import com.example.riseandroid.viewmodel.TenturncardViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import com.example.riseandroid.ui.theme.RiseAndroidTheme
+import com.example.riseandroid.repository.TenturncardRepository
+import com.example.riseandroid.ui.screens.account.AuthViewModel
+
+@Composable
+fun TenturncardScreen(
+    authToken: String, // Inject AuthViewModel
+    tenturncardRepository: TenturncardRepository // Inject TenturncardRepository
+) {
 
 
-class TenturncardScreen : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            RiseAndroidTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    val viewModel = ViewModelProvider(this).get(TenturncardViewModel::class.java)
-                    val tenturncards by remember { mutableStateOf(viewModel.tenturncards) }
+    val viewModel: TenturncardViewModel = viewModel(
+        factory = TenturncardViewModel.Factory(tenturncardRepository)
+    )
 
 
-                    LaunchedEffect(Unit) {
-                        viewModel.fetchTenturncards()
-                    }
+    LaunchedEffect(authToken) {
+        viewModel.fetchTenturncards(authToken)
+    }
+    val cards by viewModel.tenturncards.collectAsState()
 
-
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(tenturncards) { card ->
-                            TenturncardCard(tenturncard = card)
-                        }
-                    }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (cards.isEmpty()) {
+            Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(16.dp)
+            ) {
+                items(cards) { card ->
+                    TenturnCardItem(card)
                 }
             }
         }
     }
 }
 @Composable
-fun TenturncardCard(tenturncard: Tenturncard) {
+fun TenturnCardItem(card: Tenturncard) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier.padding(8.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-           Text(
-                text = "Tienrittenkaart",
-
+        Box(
+            modifier = Modifier.padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Card ID: ${card.id}\nAmount Left: ${card.amountLeft}\nActivated: ${card.IsActivated}",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Vervaldatum: ${tenturncard.expirationDate}")
-            Text("Aankoopdatum: ${tenturncard.purchaseDate}")
-            Text("Beurten over: ${tenturncard.amountLeft} / 10")
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { /* Edit card */ }) {
-                    Text("Bewerken")
-                }
-                Button(onClick = { /* More info */ }) {
-                    Text("Meer info")
-                }
-            }
         }
     }
-
 }

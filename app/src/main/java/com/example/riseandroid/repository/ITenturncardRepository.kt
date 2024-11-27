@@ -5,6 +5,6 @@ import com.example.riseandroid.model.Tenturncard
 import kotlinx.coroutines.flow.Flow
 
 interface ITenturncardRepository {
-    suspend fun getTenturncards(): List<Tenturncard>
+    suspend fun getTenturncards(authToken: String): List<Tenturncard>
     suspend fun addTenturncard(activationCode : String): Flow<ApiResource<TenturncardEntity>>
 }

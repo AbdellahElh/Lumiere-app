@@ -1,27 +1,26 @@
 package com.example.riseandroid.repository
 
-import com.auth0.android.result.Credentials
 import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.network.TenturncardApi
-import com.example.riseandroid.ui.screens.account.AuthState
-import com.example.riseandroid.ui.screens.account.AuthViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import okhttp3.internal.userAgent
 
 class TenturncardRepository(
     private val tenturncardApi: TenturncardApi,
     private val tenturncardDao: TenturncardDao,
-    private val authrepo : IAuthRepo,
+    private val authrepo: IAuthRepo,
 ) : ITenturncardRepository {
-    override suspend fun getTenturncards(): List<Tenturncard> {
+
+     override suspend fun getTenturncards(authToken: String): List<Tenturncard> {
         return try {
-            val apiResponse = tenturncardApi.getTenturncards()
+            // Fetch the auth token
+            val authToken = getAuthToken()
+
+            // Call the API with the token
+            val apiResponse = tenturncardApi.getTenturncards(authToken)
             val entities = apiResponse.map {
                 TenturncardEntity(
                     id = it.id,
@@ -30,12 +29,15 @@ class TenturncardRepository(
                     expirationDate = it.expirationDate,
                     IsActivated = it.IsActivated,
                     ActivationCode = it.ActivationCode,
-                    UserTenturncardId = null,
+                    UserTenturncardId = null
                 )
             }
+
+            // Update the local database with the new data
             tenturncardDao.deleteAllTenturncards()
             tenturncardDao.insertTenturncards(entities)
 
+            // Map entities to the model for the UI
             entities.map { entity ->
                 Tenturncard(
                     id = entity.id,
@@ -43,11 +45,11 @@ class TenturncardRepository(
                     purchaseDate = entity.purchaseDate ?: "N/A",
                     expirationDate = entity.expirationDate ?: "N/A",
                     IsActivated = entity.IsActivated,
-                    ActivationCode = entity.ActivationCode,
+                    ActivationCode = entity.ActivationCode
                 )
             }
         } catch (e: Exception) {
-
+            // Fallback to local database if API call fails
             tenturncardDao.getAllTenturncards().map { entity ->
                 Tenturncard(
                     id = entity.id,
@@ -55,19 +57,29 @@ class TenturncardRepository(
                     purchaseDate = entity.purchaseDate ?: "N/A",
                     expirationDate = entity.expirationDate ?: "N/A",
                     IsActivated = entity.IsActivated,
-                    ActivationCode = entity.ActivationCode,
+                    ActivationCode = entity.ActivationCode
                 )
             }
         }
     }
-    override suspend fun addTenturncard(activationCode : String): Flow<ApiResource<TenturncardEntity>> = flow {
+
+    // Helper to get the auth token
+    private suspend fun getAuthToken(): String {
+        val flowResult = authrepo.getCredentials().firstOrNull()
+        val authToken = flowResult?.data?.accessToken // Access token from credentials
+        return authToken ?: throw IllegalStateException("No authentication token found. User must be logged in.")
+    }
+
+
+
+    override suspend fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
         emit(ApiResource.Loading())
         try {
-            //Send a request to the external api to add a new tenturncard to the user
+            // Send a request to the external API to add a new tenturncard to the user
             val response = tenturncardApi.addTenturncard(activationCode)
-            if (response.isSuccess){
-                //add the tenturncard to the offline database or local storage
-                var newTenturncard = TenturncardEntity(
+            if (response.isSuccess) {
+                // Add the tenturncard to the offline database or local storage
+                val newTenturncard = TenturncardEntity(
                     amountLeft = 10,
                     ActivationCode = activationCode,
                     UserTenturncardId = getLoggedInUserId(),
@@ -76,14 +88,14 @@ class TenturncardRepository(
                 )
                 tenturncardDao.addTenturncard(newTenturncard)
                 emit(ApiResource.Success(newTenturncard))
-            }
-            else {
+            } else {
                 emit(ApiResource.Error<TenturncardEntity>("Failed to add tenturncard"))
             }
-        }catch (e : Exception){
+        } catch (e: Exception) {
             emit(ApiResource.Error<TenturncardEntity>(message = e.message ?: "Failed to add tenturncard"))
         }
     }
+
 
     suspend fun getLoggedInUserId(): Int {
         val flowResult = authrepo.getLoggedInId().firstOrNull()
@@ -91,11 +103,4 @@ class TenturncardRepository(
         val accountId = flowResult?.data ?: throw IllegalStateException("De gebruiker moet ingelogd zijn")
         return accountId
     }
-    //Repo spreekt db aan om daar een flow aan te vragen
-    //DAO geeft flow objecten
-
-    //Repo spreekt de db aan via dao's (sync functies) om flow te verkrijgen
-    //Api om async tasks op te halen!!
-    // -> tutorial unit 6
-
 }

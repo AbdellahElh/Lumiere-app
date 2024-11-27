@@ -34,10 +34,13 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         try {
             val credentials = authentication.login(userName, password)
                 .setScope("openid profile email offline_access")
+                .setAudience("https://api.gent5.com")
+                .setRealm("Username-Password-Authentication")
+                .validateClaims()
                 .execute()
-            // Store the credentials securely using CredentialsManager
             credentialsManager.saveCredentials(credentials)
-            emit(ApiResource.Success<Credentials>(credentials))
+            Log.d("Auth0Repo", "Credentials opgeslagen: ${credentials.accessToken}")
+            emit(ApiResource.Success(credentials))
         } catch (e: Exception) {
             emit(ApiResource.Error<Credentials>(e.message ?: "Login failed"))
         }
