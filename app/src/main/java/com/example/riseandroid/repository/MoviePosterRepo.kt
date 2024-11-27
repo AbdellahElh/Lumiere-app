@@ -26,6 +26,7 @@ class MoviePosterRepo(
     override suspend fun getMoviePosters(): Flow<List<MoviePoster>> {
         return moviePosterDao.getAllMoviePosters()
             .map { entities -> entities.map { it.asExternalModel() } }
+
     }
 
     override suspend fun refreshMoviePosters() {

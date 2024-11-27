@@ -41,9 +41,11 @@ interface MovieDao {
         INNER JOIN cinemas ON showtimes.cinemaId = cinemas.id
         WHERE showtimes.showDate = :selectedDate
         AND cinemas.name IN (:selectedCinemas)
+        AND movies.title LIKE :searchTitle
     """)
     fun getFilteredMoviesByCinemaAndDate(
         selectedDate: String,
-        selectedCinemas: List<String>
+        selectedCinemas: List<String>,
+        searchTitle:String?
     ): Flow<List<MovieEntity>>
 }

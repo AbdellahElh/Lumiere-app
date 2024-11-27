@@ -10,7 +10,8 @@ interface MoviesApi {
     @GET("api/Movie")
     suspend fun getAllMovies(
         @Query("date") date: String,
-        @Query("cinema") cinemas: List<String>
+        @Query("cinema") cinemas: List<String>,
+        @Query("title") title:String?
     ):  List<MovieModel>
 
     @GET("api/Movie/posters")

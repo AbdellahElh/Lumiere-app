@@ -40,7 +40,8 @@ class FakeMovieRepo : IMovieRepo {
 
     override suspend fun getAllMoviesList(
         selectedDate: String,
-        selectedCinemas: List<String>
+        selectedCinemas: List<String>,
+        searchTitle: String?
     ): Flow<List<MovieModel>> {
         return flow {
             emit(fakeMovies)
