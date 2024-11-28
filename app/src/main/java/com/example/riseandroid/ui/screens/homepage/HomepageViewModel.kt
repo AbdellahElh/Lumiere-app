@@ -33,8 +33,8 @@ import java.util.Date
 import java.util.Locale
 
 sealed interface HomepageUiState {
-    data class Succes(val allMovies: StateFlow<List<MovieModel>>,
-                      val recentMovies: StateFlow<List<MoviePoster>>) : HomepageUiState
+    data class Success(val allMovies: StateFlow<List<MovieModel>>,
+                       val recentMovies: StateFlow<List<MoviePoster>>) : HomepageUiState
     object Error : HomepageUiState
     object Loading : HomepageUiState
 }
@@ -94,7 +94,7 @@ class HomepageViewModel(
             movieRepo.getAllMoviesList(selectedDate.value, cinemas,searchTitle.value)
                 .collect { movies ->
                     _allMovies.value = movies
-                    homepageUiState = HomepageUiState.Succes(
+                    homepageUiState = HomepageUiState.Success(
                         allMovies = _allMovies,
                         recentMovies = recentMovies,
                     )
@@ -110,7 +110,7 @@ class HomepageViewModel(
             moviePosterRepo.getMoviePosters()
                 .collect { movies ->
                     _recentMovies.value = movies
-                    homepageUiState = HomepageUiState.Succes(
+                    homepageUiState = HomepageUiState.Success(
                         allMovies = _allMovies,
                         recentMovies = recentMovies,
                     )
@@ -125,7 +125,7 @@ class HomepageViewModel(
             homepageUiState = HomepageUiState.Loading
             try {
                 getAllMoviesList()
-                homepageUiState = HomepageUiState.Succes(
+                homepageUiState = HomepageUiState.Success(
                     recentMovies = recentMovies,
                     allMovies = allMovies
                 )

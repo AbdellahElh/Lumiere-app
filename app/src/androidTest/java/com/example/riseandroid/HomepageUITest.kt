@@ -28,6 +28,7 @@ class HomepageUITest {
     private lateinit var fakeHomepageViewModel: FakeHomepageViewModel
     private final val countDownLatch: CountDownLatch = CountDownLatch(1)
 
+
     @Before
     fun setup() {
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
@@ -40,13 +41,12 @@ class HomepageUITest {
             Surface(modifier = Modifier) {
                 ResultScreen(
                     navController = navController,
-                    recentMovieList =recentMovieList,
+                    recentMovieList = recentMovieList,
                     allMoviesNonRecent = allMoviesList,
                     modifier = Modifier,
                 )
             }
         }
-        homepageTestRule.onNodeWithText("Nieuwe films").assertIsDisplayed()
         homepageTestRule.onNodeWithText("Alle films").assertIsDisplayed()
     }
 

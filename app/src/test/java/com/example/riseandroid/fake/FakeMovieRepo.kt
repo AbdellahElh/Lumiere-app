@@ -6,7 +6,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class FakeMovieRepo(private val movies: List<MovieModel>) : IMovieRepo {
-    override suspend fun getAllMoviesList(date: String, cinemas: List<String>): Flow<List<MovieModel>> {
+    override suspend fun getAllMoviesList(
+        date: String,
+        cinemas: List<String>,
+        searchTitle: String?
+    ): Flow<List<MovieModel>> {
         return flowOf(movies)
     }
 

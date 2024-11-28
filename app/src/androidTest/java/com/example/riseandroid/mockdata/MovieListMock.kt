@@ -68,6 +68,15 @@ class MovieListMock {
                 video = "",
                 videoPlaceholderUrl = ""
             ))
+    }
 
+    fun LoadNonRecentMoviesMock(): List<Program> {
+        val allPrograms = LoadProgramsMock()
+        // Define a cutoff date for "recent" movies
+        val cutoffDate = "2024-11-21"
+        // Filter programs to include only those with dates before the cutoff date
+        return allPrograms.filter { program ->
+            program.date < cutoffDate
+        }
     }
 }
