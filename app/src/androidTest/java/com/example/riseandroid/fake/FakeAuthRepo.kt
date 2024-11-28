@@ -23,10 +23,7 @@ class FakeAuthRepo : IAuthRepo {
     override val auth0: Auth0
         get() = throw UnsupportedOperationException("Auth0 is not used in FakeAuthRepo")
 
-    override suspend fun getCredentials(
-        userName: String,
-        password: String
-    ): Flow<ApiResource<Credentials>> {
+    override suspend fun getCredentials(): Flow<ApiResource<Credentials>> {
         return flow {
             emit(ApiResource.Success(fakeCredentials))
         }
@@ -54,5 +51,16 @@ class FakeAuthRepo : IAuthRepo {
             delay(500)
             emit(ApiResource.Success(null))
         }
+    }
+
+    override suspend fun performLogin(
+        userName: String,
+        password: String
+    ): Flow<ApiResource<Credentials>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getLoggedInId(): Flow<ApiResource<Int>> {
+        TODO("Not yet implemented")
     }
 }

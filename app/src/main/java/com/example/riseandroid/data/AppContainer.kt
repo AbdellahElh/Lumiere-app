@@ -5,8 +5,6 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
-import com.example.riseandroid.R
-import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.network.LumiereApiService
@@ -16,26 +14,25 @@ import com.example.riseandroid.data.lumiere.NetworkTicketRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.data.lumiere.TicketRepository
 import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.SignUpApi
 import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo
+import com.example.riseandroid.repository.MoviePosterRepo
 import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.repository.TenturncardRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.InputStream
-import java.security.cert.CertificateFactory
-import java.security.cert.X509Certificate
 
 
 interface AppContainer {
     val programRepository: ProgramRepository
 
     val movieRepo:MovieRepo
-
+    val moviePosterRepo: MoviePosterRepo
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val ticketRepository: TicketRepository
@@ -51,6 +48,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
     private val movieDao = riseDatabase.movieDao()
+    private val moviePosterDao = riseDatabase.moviePosterDao()
     private val tenturncardDao = riseDatabase.tenturncardDao()
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -66,6 +64,18 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         .baseUrl(BASE_URL)
         .build()
 
+
+    private val moviesApi: MoviesApi by lazy {
+        retrofitBackend.create(MoviesApi::class.java)
+    }
+
+    override val moviePosterRepo: MoviePosterRepo by lazy {
+        MoviePosterRepo(
+            moviesApi = moviesApi,
+            moviePosterDao = moviePosterDao
+        )
+    }
+
     private val retrofitService: LumiereApiService by lazy {
         retrofit.create(LumiereApiService::class.java)
     }
@@ -78,6 +88,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val retrofitServiceBackend: MoviesApi by lazy {
         retrofitBackend.create(MoviesApi::class.java)
+    }
+
+    private val retrofitServiceSignUpBackend: SignUpApi by lazy {
+        retrofitBackend.create(SignUpApi::class.java)
     }
 
     private val retrofitTenturncardServiceBackend : TenturncardApi by lazy {
@@ -124,7 +138,8 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             authentication = authentication,
             credentialsManager = credentialsManager,
             authApi = authApiService,
-            auth0 = auth0
+            auth0 = auth0,
+            signUpApi = retrofitServiceSignUpBackend
         )
     }
 

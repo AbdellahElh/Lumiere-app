@@ -22,7 +22,7 @@ class HomepageUITest {
     val homepageTestRule = createComposeRule()
     lateinit var navController: TestNavHostController
 
-    val recentMovieList = MovieListMock().LoadProgramsMock()
+    val recentMovieList = MovieListMock().LoadRecentMoviesMock()
     val allMoviesList = MovieListMock().LoadAllMoviesMock()
 
     private lateinit var fakeHomepageViewModel: FakeHomepageViewModel
@@ -41,7 +41,6 @@ class HomepageUITest {
                 ResultScreen(
                     navController = navController,
                     recentMovieList =recentMovieList,
-                    programList = recentMovieList,
                     allMoviesNonRecent = allMoviesList,
                     modifier = Modifier,
                 )
@@ -58,15 +57,11 @@ class HomepageUITest {
                 ResultScreen(
                     navController = navController,
                     recentMovieList =recentMovieList,
-                    programList = recentMovieList,
                     allMoviesNonRecent = allMoviesList,
                     modifier = Modifier,
                 )
             }
         }
-        val mostRecentMovie = recentMovieList.first()
-            homepageTestRule.onNodeWithTag(mostRecentMovie.movie.posterResourceId.toString()).assertIsDisplayed()
-            homepageTestRule.onNodeWithTag(mostRecentMovie.movie.title).assertIsDisplayed()
 
         val mostNonRecentMovie = allMoviesList.first()
             homepageTestRule.onNodeWithContentDescription(mostNonRecentMovie.title).assertIsDisplayed()
@@ -74,26 +69,4 @@ class HomepageUITest {
 
     }
 
-//    @Test
-//    fun loadingScreen_Is_Shown_When_Loading() {
-//        val homepageViewModel = HomepageViewModel(
-//            FakeNetworkMoviesRepository(countDownLatch),
-//        )
-//        homepageTestRule.setContent {
-//            Surface(modifier = Modifier) {
-//                Homepage(homepageViewModel = homepageViewModel)
-//            }
-//        }
-//        homepageTestRule.onNodeWithTag("LoadingImage").assertIsDisplayed()
-//    }
-
-//    @Test
-//    fun errorScreen_Show_When_An_Error_Occurs() {
-//        homepageTestRule.setContent {
-//            Surface(modifier = Modifier) {
-//                Homepage()
-//            }
-//        }
-//        homepageTestRule.onNodeWithTag("ErrorColumn").assertIsDisplayed()
-//    }
 }

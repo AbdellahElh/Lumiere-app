@@ -38,6 +38,9 @@ class MovieFiltersUITest {
         composeTestRule.onNodeWithContentDescription("Selecteer datum").assertIsDisplayed()
         composeTestRule.onNodeWithText("Selecteer Cinema").assertIsDisplayed()
         composeTestRule.onNodeWithText("Toepassen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("MovieTitleInput").assertIsDisplayed()
+
+
     }
 
     @Test
@@ -62,8 +65,15 @@ class MovieFiltersUITest {
         composeTestRule.onNodeWithContentDescription("SelectedAntwerpen")
             .assertExists()
 
+
+        composeTestRule.onNodeWithTag("MovieTitleInput").assertTextContains("Film titel...")
+        composeTestRule.onNodeWithTag("MovieTitleInput").performClick()
+        composeTestRule.onNodeWithTag("MovieTitleInput").performTextInput("Inception")
+        composeTestRule.onNodeWithTag("MovieTitleInput").assertTextEquals("Inception")
+
         composeTestRule.onNodeWithText("Toepassen").assertIsDisplayed()
         composeTestRule.onNodeWithText("Toepassen").performClick()
+
 
     }
 

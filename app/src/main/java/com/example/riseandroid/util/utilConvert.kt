@@ -1,11 +1,12 @@
 package com.example.riseandroid.util
 
 import com.example.riseandroid.data.entitys.MovieEntity
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.data.entitys.MoviePosterEntity
 import com.example.riseandroid.model.MoviePoster
-import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.model.Tenturncard
+
 
 fun MovieEntity.asExternalModel(): MovieModel {
     return MovieModel(
@@ -53,6 +54,7 @@ fun MoviePoster.asEntity(): MoviePosterEntity {
         cover = cover,
         releaseDate = releaseDate
     )
+
 }
 
 fun TenturncardEntity.asExternalModel(): Tenturncard {
