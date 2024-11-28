@@ -14,7 +14,7 @@ import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.watchlist.WatchlistDao
 import com.example.riseandroid.data.entitys.watchlist.WatchlistEntity
 
-@Database(entities = [MovieEntity::class, EventEntity::class, CinemaEntity::class, ShowtimeEntity::class,  WatchlistEntity::class, MovieWatchlistEntity::class], version = 6, exportSchema = false)
+@Database(entities = [MovieEntity::class, EventEntity::class, CinemaEntity::class, ShowtimeEntity::class,  WatchlistEntity::class, MovieWatchlistEntity::class], version = 7, exportSchema = false)
 
 abstract class RiseDatabase : RoomDatabase() {
 

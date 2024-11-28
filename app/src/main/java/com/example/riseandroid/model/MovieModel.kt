@@ -17,7 +17,7 @@ data class MovieModel(
     val cinemas: List<Cinema> = emptyList()
 )
 
-data class MovieCinema(
+data class Cinema(
     val id:Int,
     val name: String,
     val showtimes: List<String> = emptyList()

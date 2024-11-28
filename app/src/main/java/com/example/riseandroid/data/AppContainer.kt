@@ -14,8 +14,8 @@ import com.example.riseandroid.data.lumiere.NetworkProgramRepository
 import com.example.riseandroid.data.lumiere.NetworkTicketRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.data.lumiere.TicketRepository
-import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.EventsApi
+import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.network.auth0.Auth0Api
@@ -38,8 +38,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 interface AppContainer {
     val programRepository: ProgramRepository
-
-    val movieRepo:MovieRepo
 
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
