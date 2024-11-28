@@ -1,6 +1,7 @@
 package com.example.riseandroid.ui.screens.login
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,12 +51,14 @@ import com.auth0.android.result.Credentials
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 
+
 @Composable
 fun LoginScreen(
     navController: NavHostController,
     login: (Credentials) -> Unit,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel
+
 ) {
     val extras = MutableCreationExtras().apply {
         set(LoginViewModel.LOGIN_KEY, login)
@@ -71,8 +74,9 @@ fun LoginScreen(
     val loginState by viewModel.uiState.collectAsState()
     val apiResponseState by viewModel.authResponse.collectAsState()
 
-    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
+
         viewModel.navigateToAccount.collect { shouldNavigate ->
             if (shouldNavigate) {
                 navController.navigate("account")

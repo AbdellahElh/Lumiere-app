@@ -1,77 +1,146 @@
-package com.example.riseandroid.ui
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.riseandroid.model.Tenturncard
-import com.example.riseandroid.viewmodel.TenturncardViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import com.example.riseandroid.ui.theme.RiseAndroidTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.util.TableInfo
+import com.example.riseandroid.model.Tenturncard
+import com.example.riseandroid.repository.TenturncardRepository
+import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+
+@Composable
+fun TenturncardScreen(
+    authToken: String,
+    tenTurnCardViewModel: TenturncardViewModel = viewModel(factory = TenturncardViewModel.Factory),
+) {
 
 
-class TenturncardScreen : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            RiseAndroidTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    val viewModel = ViewModelProvider(this).get(TenturncardViewModel::class.java)
-                    val tenturncards by remember { mutableStateOf(viewModel.tenturncards) }
+    LaunchedEffect(authToken) {
+        tenTurnCardViewModel.fetchTenturncards(authToken)
+    }
+    val cards by tenTurnCardViewModel.tenturncards.collectAsState()
 
-
-                    LaunchedEffect(Unit) {
-                        viewModel.fetchTenturncards()
-                    }
-
-
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(tenturncards) { card ->
-                            TenturncardCard(tenturncard = card)
-                        }
-                    }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (cards.isEmpty()) {
+            Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
+        } else {
+            LazyRow(
+                modifier = Modifier.fillMaxSize().padding(16.dp)
+            ) {
+                items(cards) { card ->
+                    TenturnCardItem(card)
                 }
             }
         }
     }
 }
+fun formatDate(dateString: String): String {
+    val dateParts = dateString.substring(0, 10).split("-")
+    val showDateFormatted = "${dateParts[0]}-${dateParts[1]}-${dateParts[2]}"
+    return showDateFormatted
+}
+
 @Composable
-fun TenturncardCard(tenturncard: Tenturncard) {
+fun TenturnCardItem(card: Tenturncard) {
     Card(
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .height(350.dp)
+            .width(250.dp)
 
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-           Text(
-                text = "Tienrittenkaart",
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize()
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
 
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Vervaldatum: ${tenturncard.expirationDate}")
-            Text("Aankoopdatum: ${tenturncard.purchaseDate}")
-            Text("Beurten over: ${tenturncard.amountLeft} / 10")
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { /* Edit card */ }) {
-                    Text("Bewerken")
-                }
-                Button(onClick = { /* More info */ }) {
-                    Text("Meer info")
-                }
+                Text(
+                    text = "Tienrittenkaart",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "Vervaldatum:",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = formatDate(card.expirationDate),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "Aankoopdatum:",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = formatDate(card.purchaseDate),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "Beurten over:",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = "${card.amountLeft}",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+
+
+            Button(
+                onClick = { /* Voeg functionaliteit toe voor bewerken */ },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text(
+                    text = "Bewerken",
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     }
-
 }

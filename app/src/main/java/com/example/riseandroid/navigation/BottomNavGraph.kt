@@ -1,5 +1,6 @@
 package com.example.riseandroid.navigation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +50,7 @@ fun BottomNavGraph(
     navController: NavHostController,
     account: Auth0,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel,
+    authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory),
     forgotPasswordViewModel: ForgotPasswordViewModel,
     allMovies: List<Movie>,
     watchlistViewModel: WatchlistViewModel,
@@ -57,6 +58,8 @@ fun BottomNavGraph(
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
+
+    val authToken by authViewModel.authToken.collectAsState()
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Home.route,
@@ -66,9 +69,7 @@ fun BottomNavGraph(
         composable(route = BottomBarScreen.Home.route) {
             Homepage(navController = navController) // WEIZIGEN
         }
-        composable(route = BottomBarScreen.ScanCode.route) {
-            ScanCodeScreen(navController = navController)
-        }
+
         composable(route = BottomBarScreen.Tickets.route) {
             if (!isUserLoggedIn) {
                 Dialog(
@@ -96,7 +97,8 @@ fun BottomNavGraph(
                     }
                 }
             } else {
-                TicketScreen(1, navController = navController)
+                TicketScreen(
+                    1, navController = navController, authToken = authToken ?: "")
             }
         }
         composable(route = BottomBarScreen.Account.route) {
@@ -173,6 +175,5 @@ fun BottomNavGraph(
         }
     }
 }
-
 
 
