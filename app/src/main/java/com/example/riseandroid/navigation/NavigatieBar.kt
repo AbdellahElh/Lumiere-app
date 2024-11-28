@@ -59,7 +59,7 @@ fun NavHostWrapper(
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
         BottomBarScreen.Home,
-        BottomBarScreen.ScanCode,
+
         BottomBarScreen.Tickets,
         BottomBarScreen.Account
     )

@@ -12,6 +12,7 @@ import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.model.Tenturncard
+import com.example.riseandroid.repository.ITenturncardRepository
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.homepage.HomepageUiState
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
@@ -29,7 +30,7 @@ sealed interface TenturncardUiState {
 }
 
 class TenturncardViewModel(
-    private val tenturncardRepository: TenturncardRepository
+    private val tenturncardRepository: ITenturncardRepository
 
 ) : ViewModel() {
     var tenturncardUiState: TenturncardUiState by mutableStateOf(TenturncardUiState.Loading)

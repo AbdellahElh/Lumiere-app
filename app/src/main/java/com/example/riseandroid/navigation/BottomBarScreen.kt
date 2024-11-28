@@ -18,11 +18,7 @@ sealed class BottomBarScreen(
 
     )
 
-    object ScanCode : BottomBarScreen(
-        route = "qrScan",
-        title = "Scan",
-        icon = Lucide.ScanQrCode
-    )
+
     object Tickets : BottomBarScreen(
         route = "tickets",
         title = "Tickets",

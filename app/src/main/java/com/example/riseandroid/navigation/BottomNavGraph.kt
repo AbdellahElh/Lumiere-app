@@ -69,9 +69,7 @@ fun BottomNavGraph(
         composable(route = BottomBarScreen.Home.route) {
             Homepage(navController = navController) // WEIZIGEN
         }
-        composable(route = BottomBarScreen.ScanCode.route) {
-            ScanCodeScreen(navController = navController)
-        }
+
         composable(route = BottomBarScreen.Tickets.route) {
             if (!isUserLoggedIn) {
                 Dialog(
