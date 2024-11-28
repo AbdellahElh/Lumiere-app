@@ -72,7 +72,10 @@ fun MovieDetailScreen(
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
     val context = LocalContext.current
-    val isInWatchlist = watchlistViewModel.isInWatchlist(movieId)
+
+    val isInWatchlist = remember(watchlistState) {
+        watchlistState.any { it.id == movieId }
+    }
 
     when (val uiState = viewModel.movieDetailUiState) {
         is MovieDetailUiState.Loading -> LoadingScreen()
@@ -108,6 +111,7 @@ fun MovieDetailScreen(
         }
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

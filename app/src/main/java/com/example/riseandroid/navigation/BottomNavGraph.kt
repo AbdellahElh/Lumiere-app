@@ -24,8 +24,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.auth0.android.Auth0
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -45,11 +43,9 @@ import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 @Composable
 fun BottomNavGraph(
     navController: NavHostController,
-    account: Auth0,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     forgotPasswordViewModel: ForgotPasswordViewModel,
-    allMovies: List<MovieModel>,
     watchlistViewModel: WatchlistViewModel,
 ) {
     val context = LocalContext.current
@@ -161,8 +157,6 @@ fun BottomNavGraph(
 
         composable("watchlist") {
             WatchlistScreen(
-                viewModel = watchlistViewModel,
-                allMovies = allMovies,
                 onMovieClick = { movieId ->
                     navController.navigate("movieDetail/$movieId")
                 },

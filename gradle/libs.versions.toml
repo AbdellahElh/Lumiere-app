@@ -23,6 +23,7 @@ navigationTesting = "2.8.2"
 firebaseCrashlyticsBuildtools = "3.0.2"
 auth0="2.+"
 jwtdecode="2.0.0"
+coreTesting = "2.1.0"
 
 
 [libraries]
@@ -57,6 +58,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 auth0-jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
 auth0-android ={ group="com.auth0.android", name = "auth0", version.ref = "auth0"}
+androidx-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "coreTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

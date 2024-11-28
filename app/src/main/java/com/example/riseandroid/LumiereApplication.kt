@@ -7,15 +7,20 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.room.Room
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.riseandroid.data.AppContainer
 import com.example.riseandroid.data.DefaultAppContainer
+import com.example.riseandroid.data.RiseDatabase
+import com.example.riseandroid.data.entitys.watchlist.UserManager
+import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.notifications.NotificationReceiver
 import com.example.riseandroid.repository.Auth0Repo
+import com.example.riseandroid.repository.WatchlistRepo
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -23,31 +28,15 @@ import java.util.Calendar
 
 
 class LumiereApplication : Application() {
+    val userManager = UserManager()
     lateinit var container: AppContainer
-    lateinit var authViewModel: AuthViewModel
 
     override fun onCreate() {
         super.onCreate()
 
-        val authRepo = Auth0Repo(
-            authentication = AuthenticationAPIClient(Auth0(this)),
-            credentialsManager = CredentialsManager(
-                AuthenticationAPIClient(Auth0(this)),
-                SharedPreferencesStorage(this)
-            ),
-            authApi = Retrofit.Builder()
-                .baseUrl("https://dev-viwl48rh7lran3ul.us.auth0.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(Auth0Api::class.java),
-            auth0 = Auth0(this)
-        )
-
-        authViewModel = AuthViewModel(authRepo)
-
         container = DefaultAppContainer(
             context = this,
-            authViewModel = authViewModel
+            userManager = userManager
         )
     }
 
@@ -99,6 +88,7 @@ class LumiereApplication : Application() {
         }
     }
 }
+
 
 
 

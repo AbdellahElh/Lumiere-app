@@ -2,10 +2,12 @@ package com.example.riseandroid.data
 
 import android.content.Context
 import android.util.Log
+import androidx.room.Room
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkProgramRepository
@@ -16,6 +18,7 @@ import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.network.auth0.Auth0Api
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo
 import com.example.riseandroid.repository.IWatchlistRepo
@@ -23,6 +26,8 @@ import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.repository.WatchlistRepo
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
@@ -38,18 +43,50 @@ interface AppContainer {
     val movieRepo: MovieRepo
     val watchlistRepo: IWatchlistRepo
     val userId: Int
+    val userManager: UserManager
+    val authViewModel: AuthViewModel
 }
 
 class DefaultAppContainer(
     private val context: Context,
-    private val authViewModel: AuthViewModel
+    override val userManager: UserManager
 ) : AppContainer {
     private val BASE_URL = "https://dev-viwl48rh7lran3ul.us.auth0.com"
-    private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
+    private val BASE_URL_BACKEND = "https://10.0.2.2:5001"
 
-    private val riseDatabase = RiseDatabase.getDatabase(context)
+    private val database = Room.databaseBuilder(
+        context.applicationContext,
+        RiseDatabase::class.java,
+        "rise_database"
+    ).build()
+
+    private val riseDatabase = database
     private val movieDao = riseDatabase.movieDao()
     private val watchlistDao = riseDatabase.watchlistDao()
+
+    private val auth0 = Auth0(context)
+
+    private val authenticationApiClient = AuthenticationAPIClient(auth0)
+
+    private val credentialsManager = CredentialsManager(
+        authenticationApiClient,
+        SharedPreferencesStorage(context)
+    )
+
+    private val authApi: Auth0Api = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(Auth0Api::class.java)
+
+    override val authApiService: Auth0Api = authApi
+
+    override val authRepo: IAuthRepo = Auth0Repo(
+        authentication = authenticationApiClient,
+        credentialsManager = credentialsManager,
+        authApi = authApi,
+        auth0 = auth0
+    )
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -58,35 +95,29 @@ class DefaultAppContainer(
     private val httpClient: OkHttpClient = SslHelper.createOkHttpClient(context, loggingInterceptor)
         .newBuilder()
         .addInterceptor { chain ->
-            val state = authViewModel.authState.value
-            val token = when (state) {
-                is AuthState.Authenticated -> state.credentials.accessToken
-                else -> null
+            val requestBuilder = chain.request().newBuilder()
+            val credentials = runBlocking {
+                when (val result = authRepo.getCredentials().last()) {
+                    is ApiResource.Success -> result.data
+                    else -> null
+                }
             }
 
-            if (token.isNullOrEmpty()) {
+            if (credentials?.accessToken.isNullOrEmpty()) {
                 Log.w("HttpClient", "Geen geldig token beschikbaar. Verzoek zonder token.")
             } else {
-                Log.d("HttpClient", "Token gevonden: $token")
+                Log.d("HttpClient", "Token gevonden: ${credentials?.accessToken}")
+                requestBuilder.addHeader("Authorization", "Bearer ${credentials?.accessToken}")
             }
 
-            val request = chain.request().newBuilder().apply {
-                if (!token.isNullOrEmpty()) {
-                    addHeader("Authorization", "Bearer $token")
-                }
-            }.build()
-
-            chain.proceed(request)
+            chain.proceed(requestBuilder.build())
         }
         .build()
-
-
-
 
     private val retrofitBackend: Retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .client(httpClient)
-        .baseUrl(BASE_URL_BACKEND)
+        .baseUrl("$BASE_URL_BACKEND/")
         .build()
 
     private val retrofitServiceBackend: MoviesApi by lazy {
@@ -97,46 +128,35 @@ class DefaultAppContainer(
         MovieRepo(movieDao, retrofitServiceBackend)
     }
 
-    private val retrofit: Retrofit = Retrofit.Builder()
+    private val watchlistApi: WatchlistApi = Retrofit.Builder()
+        .baseUrl("$BASE_URL_BACKEND/")
         .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(BASE_URL)
+        .client(httpClient)
         .build()
-
-    override val authRepo: IAuthRepo by lazy {
-        Auth0Repo(
-            authentication = AuthenticationAPIClient(Auth0(context)),
-            credentialsManager = CredentialsManager(
-                AuthenticationAPIClient(Auth0(context)),
-                SharedPreferencesStorage(context)
-            ),
-            authApi = Retrofit.Builder()
-                .baseUrl("https://dev-viwl48rh7lran3ul.us.auth0.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(Auth0Api::class.java),
-            auth0 = Auth0(context)
-        )
-    }
+        .create(WatchlistApi::class.java)
 
     override val watchlistRepo: IWatchlistRepo by lazy {
-        WatchlistRepo(watchlistDao, retrofitBackend.create(WatchlistApi::class.java))
+        WatchlistRepo(watchlistDao, watchlistApi)
     }
 
     override val moviesRepository: MoviesRepository by lazy {
-        NetworkMoviesRepository(retrofit.create(LumiereApiService::class.java))
+        NetworkMoviesRepository(retrofitBackend.create(LumiereApiService::class.java))
     }
 
     override val programRepository: ProgramRepository by lazy {
-        NetworkProgramRepository(retrofit.create(LumiereApiService::class.java))
+        NetworkProgramRepository(retrofitBackend.create(LumiereApiService::class.java))
     }
 
     override val ticketRepository: TicketRepository by lazy {
-        NetworkTicketRepository(retrofit.create(LumiereApiService::class.java))
+        NetworkTicketRepository(retrofitBackend.create(LumiereApiService::class.java))
     }
 
-    override val authApiService: Auth0Api by lazy {
-        retrofit.create(Auth0Api::class.java)
-    }
+
+    override val authViewModel: AuthViewModel = AuthViewModel(
+        authRepo = authRepo,
+        watchlistRepo = watchlistRepo,
+        userManager = userManager
+    )
 
     override val userId: Int
         get() {
@@ -164,7 +184,6 @@ class DefaultAppContainer(
             }
         }
 
-
     private fun decodeJWT(jwt: String): JSONObject? {
         return try {
             val parts = jwt.split(".")
@@ -176,3 +195,4 @@ class DefaultAppContainer(
         }
     }
 }
+

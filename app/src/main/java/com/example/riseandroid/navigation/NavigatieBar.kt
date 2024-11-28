@@ -9,7 +9,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +23,6 @@ import com.auth0.android.Auth0
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
-import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModel
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModelFactory
 
@@ -39,24 +37,19 @@ fun NavHostWrapper(
 ) {
     val context = LocalContext.current
     val application = context.applicationContext as LumiereApplication
-    val movieRepo = application.container.movieRepo
-    val moviesViewModel = MoviesViewModel(movieRepo = movieRepo)
     val watchlistViewModel: WatchlistViewModel = viewModel(
         factory = WatchlistViewModelFactory(
             watchlistRepo = application.container.watchlistRepo,
-            userId = application.container.userId
+            userManager = application.userManager
         )
     )
 
-    val allMovies by moviesViewModel.allMovies.collectAsState()
 
     BottomNavGraph(
         navController = navController,
-        account = account,
         modifier = Modifier.padding(paddingValues),
         authViewModel = authViewModel,
         forgotPasswordViewModel = forgotPasswordViewModel,
-        allMovies = allMovies,
         watchlistViewModel = watchlistViewModel
     )
 }

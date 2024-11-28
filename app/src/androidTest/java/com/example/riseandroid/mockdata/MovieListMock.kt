@@ -58,24 +58,30 @@ class MovieListMock {
             cast = emptyList(),
             coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
             genre = "",
-            duration = "",
+            duration = 100,
             director = "",
             description = "",
-            video = "",
-            videoPlaceholderUrl = ""
+            videoPlaceholderUrl = "",
+            releaseDate = "12-12-2021",
+            bannerImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+            posterImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+            movieLink = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg"
         ),
             MovieModel(
                 id = 2,
                 title = "FakeMovie2",
                 cinemas = emptyList(),
                 cast = emptyList(),
-                coverImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+                coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
                 genre = "",
-                duration = "",
+                duration = 100,
                 director = "",
                 description = "",
-                video = "",
-                videoPlaceholderUrl = ""
+                videoPlaceholderUrl = "",
+                releaseDate = "12-12-2021",
+                bannerImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+                posterImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+                movieLink = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg"
             ))
 
     }

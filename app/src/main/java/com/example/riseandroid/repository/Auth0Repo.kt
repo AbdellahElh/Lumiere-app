@@ -32,27 +32,27 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         try {
             val credentials = authentication.login(userName, password)
                 .setScope("openid profile email offline_access")
-                //.setAudience("https://api.gent5.com/")
+                .setAudience("https://api.gent5.com")
+                .setRealm("Username-Password-Authentication")
+                .validateClaims()
                 .execute()
             credentialsManager.saveCredentials(credentials)
-            emit(ApiResource.Success<Credentials>(credentials))
+            Log.d("Auth0Repo", "Credentials opgeslagen: ${credentials.accessToken}")
+            emit(ApiResource.Success(credentials))
         } catch (e: Exception) {
             emit(ApiResource.Error<Credentials>(e.message ?: "Login failed"))
         }
     }.flowOn(Dispatchers.IO)
 
+
     override suspend fun getCredentials(): Flow<ApiResource<Credentials>> = flow {
-        emit(ApiResource.Loading<Credentials>())
         try {
             val credentials = credentialsManager.awaitCredentials()
-            if (credentials != null){
-                emit(ApiResource.Success<Credentials>(credentials))
-            }
-            else {
-                emit(ApiResource.Error<Credentials>("No credentials found"))
-            }
-        }catch (e : Exception){
-            emit(ApiResource.Error<Credentials>(e.message ?: "Failed to get credentials"))
+            Log.d("Auth0Repo", "Opgehaalde credentials: ${credentials.accessToken}")
+            emit(ApiResource.Success(credentials))
+        } catch (e: Exception) {
+            Log.e("Auth0Repo", "Fout bij ophalen credentials: ${e.message}")
+            emit(ApiResource.Error<Credentials>(e.message ?: "Geen credentials beschikbaar"))
         }
     }.flowOn(Dispatchers.IO)
 

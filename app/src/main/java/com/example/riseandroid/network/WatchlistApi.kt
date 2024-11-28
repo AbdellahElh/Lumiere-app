@@ -19,3 +19,5 @@ interface WatchlistApi {
     suspend fun removeFromWatchlist(@Path("movieId") movieId: Int)
 }
 
+
+

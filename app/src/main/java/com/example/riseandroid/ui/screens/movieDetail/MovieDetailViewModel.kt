@@ -41,7 +41,7 @@ class MovieDetailViewModel(
     private val _programList = MutableStateFlow<List<Program>>(emptyList())
     val programList: StateFlow<List<Program>> = _programList.asStateFlow()
 
-    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList()) // Gebruik MovieModel
+    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
     val allMovies: StateFlow<List<MovieModel>> = _allMovies.asStateFlow()
 
     init {

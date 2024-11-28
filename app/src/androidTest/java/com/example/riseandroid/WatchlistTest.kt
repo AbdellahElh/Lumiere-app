@@ -1,100 +1,256 @@
+// File: src/test/java/com/example/riseandroid/WatchlistTest.kt
+
 package com.example.riseandroid
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.navigation.compose.rememberNavController
-import com.example.riseandroid.model.Movie
-import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.riseandroid.data.entitys.watchlist.UserManager
+import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
-import kotlinx.coroutines.runBlocking
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.HttpException
+import java.io.IOException
 
-class WatchlistScreenTest {
+@ExperimentalCoroutinesApi
+class WatchlistTest {
+
+    // Rule for LiveData
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val instantExecutorRule = InstantTaskExecutorRule()
 
-    @Test
-    fun displays_empty_watchlist_message_when_no_movies_are_in_watchlist() {
-        // Arrange
-        val viewModel = WatchlistViewModel()
-        composeTestRule.setContent {
-            WatchlistScreen(
-                viewModel = viewModel,
-                allMovies = emptyList(), // Geen films in de lijst
-                onMovieClick = {},
-                navController = rememberNavController()
-            )
-        }
+    // Test Dispatcher
+    private val testDispatcher = UnconfinedTestDispatcher()
 
-        // Assert
-        composeTestRule.onNodeWithText("Your watchlist is empty.").assertIsDisplayed()
+    // Mocks and Fakes
+    private lateinit var watchlistRepo: IWatchlistRepo
+    private lateinit var userManager: UserManager
+    private lateinit var watchlistViewModel: WatchlistViewModel
+
+    // Fake Data
+    private val fakeMovie = MovieModel(
+        id = 1,
+        title = "Fake Movie",
+        cinemas = emptyList(),
+        cast = emptyList(),
+        coverImageUrl = "",
+        genre = "",
+        duration = 100,
+        director = "",
+        description = "",
+        videoPlaceholderUrl = "",
+        releaseDate = "12-12-2021",
+        bannerImageUrl = "",
+        posterImageUrl = "",
+        movieLink = ""
+    )
+
+    private val fakeMovie2 = MovieModel(
+        id = 2,
+        title = "Fake Movie 2",
+        cinemas = emptyList(),
+        cast = emptyList(),
+        coverImageUrl = "",
+        genre = "",
+        duration = 120,
+        director = "",
+        description = "",
+        videoPlaceholderUrl = "",
+        releaseDate = "01-01-2022",
+        bannerImageUrl = "",
+        posterImageUrl = "",
+        movieLink = ""
+    )
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+        watchlistRepo = mockk()
+        userManager = UserManager()
+        watchlistViewModel = WatchlistViewModel(watchlistRepo, userManager)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
-    fun displays_watchlist_movies_when_movies_are_in_watchlist(): Unit = runBlocking {
-        // Arrange
-        val viewModel = WatchlistViewModel()
-        val movie = Movie(
-            movieId = 1L,
-            title = "Test Movie",
-            posterResourceId = R.drawable.test_movie_poster, // Zorg dat dit een geldige resource is
-            description = "This is a test description.",
-            genre = "Action",
-            length = "120 min",
-            director = "John Doe"
-        )
+    fun testAddingMovieToWatchlist() = runTest {
+        // Given
+        val userId = 1
+        userManager.setUserId(userId)
 
-        // Voeg de film toe aan de watchlist
-        viewModel.toggleMovieInWatchlist(movie.movieId)
+        coEvery { watchlistRepo.addToWatchlist(fakeMovie, userId) } just runs
+        coEvery { watchlistRepo.getMoviesInWatchlist(userId) } returns flowOf(listOf(fakeMovie))
 
-        composeTestRule.setContent {
-            WatchlistScreen(
-                viewModel = viewModel,
-                allMovies = listOf(movie), // Bevat één film
-                onMovieClick = {},
-                navController = rememberNavController()
-            )
-        }
+        // When
+        watchlistViewModel.toggleMovieInWatchlist(fakeMovie)
 
-        // Assert
-        composeTestRule.onNodeWithText("Test Movie").assertIsDisplayed()
+        // Then
+        coVerify { watchlistRepo.addToWatchlist(fakeMovie, userId) }
+
+        val watchlist = watchlistViewModel.watchlist.first()
+        Assert.assertTrue(watchlist.contains(fakeMovie))
     }
 
     @Test
-    fun clicking_on_a_movie_item_calls_onMovieClick() {
-        // Arrange
-        val viewModel = WatchlistViewModel()
-        val movie = Movie(
-            movieId = 1L,
-            title = "Test Movie",
-            posterResourceId = R.drawable.test_movie_poster, // Zorg dat dit een geldige resource is
-            description = "This is a test description.",
-            genre = "Action",
-            length = "120 min",
-            director = "John Doe"
-        )
+    fun testRemovingMovieFromWatchlist() = runTest {
+        // Given
+        val userId = 1
+        userManager.setUserId(userId)
 
-        // Voeg de film toe aan de watchlist
-        viewModel.toggleMovieInWatchlist(movie.movieId)
+        // Initial state: Movie is in the watchlist
+        coEvery { watchlistRepo.getMoviesInWatchlist(userId) } returns flowOf(listOf(fakeMovie))
+        coEvery { watchlistRepo.removeFromWatchlist(fakeMovie.id, userId) } just runs
 
-        var clickedMovieId: Long? = null
-        composeTestRule.setContent {
-            WatchlistScreen(
-                viewModel = viewModel,
-                allMovies = listOf(movie),
-                onMovieClick = { clickedMovieId = it },
-                navController = rememberNavController()
-            )
+        // Load initial watchlist
+        watchlistViewModel.refreshWatchlist()
+
+        // When
+        watchlistViewModel.toggleMovieInWatchlist(fakeMovie)
+
+        // Then
+        coVerify { watchlistRepo.removeFromWatchlist(fakeMovie.id, userId) }
+
+        val watchlist = watchlistViewModel.watchlist.first()
+        Assert.assertFalse(watchlist.contains(fakeMovie))
+    }
+
+    @Test
+    fun testSynchronizingWatchlistWithBackend() = runTest {
+        // Given
+        val userId = 1
+        userManager.setUserId(userId)
+
+        coEvery { watchlistRepo.syncWatchlistWithBackend(userId) } just runs
+        coEvery { watchlistRepo.getMoviesInWatchlist(userId) } returns flowOf(listOf(fakeMovie, fakeMovie2))
+
+        // When
+        watchlistViewModel.refreshWatchlist()
+
+        // Then
+        coVerify { watchlistRepo.syncWatchlistWithBackend(userId) }
+
+        val watchlist = watchlistViewModel.watchlist.first()
+        Assert.assertEquals(2, watchlist.size)
+        Assert.assertTrue(watchlist.contains(fakeMovie))
+        Assert.assertTrue(watchlist.contains(fakeMovie2))
+    }
+
+    @Test
+    fun testHandlingErrorWhenRemovingMovieAlreadyDeletedOnBackend() = runTest {
+        // Given
+        val userId = 1
+        userManager.setUserId(userId)
+
+        val httpException = mockk<HttpException> {
+            every { code() } returns 404
         }
 
-        // Act
-        composeTestRule.onNodeWithText("Test Movie").performClick()
+        coEvery { watchlistRepo.removeFromWatchlist(fakeMovie.id, userId) } throws httpException
+        coEvery { watchlistRepo.getMoviesInWatchlist(userId) } returns flowOf(listOf(fakeMovie))
 
-        // Assert
-        assert(clickedMovieId == movie.movieId)
+        // Collect events
+        val events = mutableListOf<WatchlistViewModel.WatchlistEvent>()
+        val job = launch {
+            watchlistViewModel.eventFlow.toList(events)
+        }
+
+        // When
+        watchlistViewModel.toggleMovieInWatchlist(fakeMovie)
+
+        // Then
+        Assert.assertTrue(events.any { it is WatchlistViewModel.WatchlistEvent.ShowToast && it.message == "Film werd al verwijderd uit de watchlist" })
+
+        job.cancel()
+    }
+
+    @Test
+    fun testWatchlistIsEmptyWhenUserIsNotLoggedIn() = runTest {
+        // Given
+        userManager.clearUserId()
+
+        // When
+        val watchlist = watchlistViewModel.watchlist.first()
+
+        // Then
+        Assert.assertTrue(watchlist.isEmpty())
+    }
+
+    @Test
+    fun testAddingMovieWhenUserIsNotLoggedInDoesNothing() = runTest {
+        // Given
+        userManager.clearUserId()
+
+        // When
+        watchlistViewModel.toggleMovieInWatchlist(fakeMovie)
+
+        // Then
+        coVerify(exactly = 0) { watchlistRepo.addToWatchlist(any(), any()) }
+        val watchlist = watchlistViewModel.watchlist.first()
+        Assert.assertTrue(watchlist.isEmpty())
+    }
+
+    @Test
+    fun testHandlingNetworkErrorDuringSynchronization() = runTest {
+        // Given
+        val userId = 1
+        userManager.setUserId(userId)
+
+        coEvery { watchlistRepo.syncWatchlistWithBackend(userId) } throws IOException("Network Error")
+        coEvery { watchlistRepo.getMoviesInWatchlist(userId) } returns flowOf(emptyList())
+
+        // Collect events
+        val events = mutableListOf<WatchlistViewModel.WatchlistEvent>()
+        val job = launch {
+            watchlistViewModel.eventFlow.toList(events)
+        }
+
+        // When
+        watchlistViewModel.refreshWatchlist()
+
+        // Then
+        coVerify { watchlistRepo.syncWatchlistWithBackend(userId) }
+        Assert.assertTrue(events.any { it is WatchlistViewModel.WatchlistEvent.ShowToast && it.message.contains("Fout bij synchroniseren") })
+
+        job.cancel()
+    }
+
+    @Test
+    fun testIsInWatchlistReturnsCorrectValue() = runTest {
+        // Given
+        val userId = 1
+        userManager.setUserId(userId)
+
+        coEvery { watchlistRepo.getMoviesInWatchlist(userId) } returns flowOf(listOf(fakeMovie))
+
+        // When
+        watchlistViewModel.refreshWatchlist()
+        val isInWatchlist = watchlistViewModel.isInWatchlist(fakeMovie.id)
+        val isNotInWatchlist = watchlistViewModel.isInWatchlist(fakeMovie2.id)
+
+        // Then
+        Assert.assertTrue(isInWatchlist)
+        Assert.assertFalse(isNotInWatchlist)
     }
 }
-
