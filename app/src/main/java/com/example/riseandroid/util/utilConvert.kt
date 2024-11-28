@@ -2,6 +2,8 @@ package com.example.riseandroid.util
 
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.data.entitys.MoviePosterEntity
+import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Tenturncard
 
@@ -36,6 +38,23 @@ fun MovieModel.asEntity(): MovieEntity {
         movieLink = video ?: ""
     )
 }
+
+fun MoviePosterEntity.asExternalModel(): MoviePoster {
+    return MoviePoster(
+        id = id,
+        cover = cover,
+        releaseDate = releaseDate
+    )
+}
+
+fun MoviePoster.asEntity(): MoviePosterEntity {
+    return MoviePosterEntity(
+        id = id,
+        cover = cover,
+        releaseDate = releaseDate
+    )
+}
+
 fun TenturncardEntity.asExternalModel(): Tenturncard {
     return Tenturncard(
         id = id,
