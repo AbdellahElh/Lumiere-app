@@ -28,15 +28,15 @@ class MovieDetailUITest {
             }
         }
 
-        movieDetailTestRule.onNodeWithText(movie.title).assertIsDisplayed()
+        movieDetailTestRule.onNodeWithText(movie.movie.title).assertIsDisplayed()
 
-        movieDetailTestRule.onNodeWithText("Directeur: ${movie.director}").assertIsDisplayed()
+        movieDetailTestRule.onNodeWithText("Directeur: ${movie.movie.director}").assertIsDisplayed()
 
-        movie.genre?.let { movieDetailTestRule.onNodeWithText(it).assertIsDisplayed() }
+        movie.movie.genre?.let { movieDetailTestRule.onNodeWithText(it).assertIsDisplayed() }
 
-        movie.length?.let { movieDetailTestRule.onNodeWithText(it).assertIsDisplayed() }
+        movie.movie.length?.let { movieDetailTestRule.onNodeWithText(it).assertIsDisplayed() }
 
-        movieDetailTestRule.onNodeWithText(movie.description.take(100)).assertIsDisplayed()
+        movieDetailTestRule.onNodeWithText(movie.movie.description.take(100)).assertIsDisplayed()
 
         movieDetailTestRule.onNodeWithTag("BackButton").assertIsDisplayed()
     }
@@ -50,7 +50,7 @@ class MovieDetailUITest {
             }
         }
 
-        if (movie.description.length > 100) {
+        if (movie.movie.description.length > 100) {
             movieDetailTestRule.onNodeWithText("Lees Meer").assertIsDisplayed()
         }
     }

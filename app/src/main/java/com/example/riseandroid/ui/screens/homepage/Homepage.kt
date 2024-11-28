@@ -81,7 +81,7 @@ fun Homepage(
     val homepageUiState = homepageViewModel.homepageUiState
 
     when (homepageUiState) {
-        is HomepageUiState.Succes -> {
+        is HomepageUiState.Success -> {
             val recentMovies by homepageViewModel.recentMovies.collectAsState()
             val allMoviesNonRecent by homepageViewModel.allMovies.collectAsState()
 

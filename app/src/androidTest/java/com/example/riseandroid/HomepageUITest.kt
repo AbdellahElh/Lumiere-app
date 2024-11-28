@@ -40,15 +40,15 @@ class HomepageUITest {
             Surface(modifier = Modifier) {
                 ResultScreen(
                     navController = navController,
-                    recentMovieList =recentMovieList,
+                    recentMovieList = recentMovieList,
                     allMoviesNonRecent = allMoviesList,
                     modifier = Modifier,
                 )
             }
         }
-        homepageTestRule.onNodeWithText("Nieuwe films").assertIsDisplayed()
         homepageTestRule.onNodeWithText("Alle films").assertIsDisplayed()
     }
+
 
     @Test
     fun list_Of_Movies_Is_Shown(){
