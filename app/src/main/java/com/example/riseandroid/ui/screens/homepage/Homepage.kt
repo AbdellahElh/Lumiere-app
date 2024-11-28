@@ -1,7 +1,7 @@
 package com.example.riseandroid.ui.screens.homepage
 
+import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,27 +15,27 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,13 +53,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import com.example.riseandroid.R
+import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.ui.screens.homepage.components.ListAllMovies
@@ -83,14 +86,18 @@ fun Homepage(
             val recentMovies by homepageViewModel.recentMovies.collectAsState()
             val programList by homepageViewModel.programFilms.collectAsState()
             val allMoviesNonRecent by homepageViewModel.allMovies.collectAsState()
+            val eventsList by homepageViewModel.events.collectAsState()
+
+            Log.d("Homepage", "Events list size: ${eventsList.size}")
 
             ResultScreen(
                 navController = navController,
                 recentMovieList = recentMovies,
                 programList = programList,
+                allMoviesNonRecent = allMoviesNonRecent,
+                eventsList = eventsList,
                 modifier = modifier,
-                homepageViewModel = homepageViewModel,
-                allMoviesNonRecent=allMoviesNonRecent
+                homepageViewModel = homepageViewModel
             )
         }
         is HomepageUiState.Loading -> LoadingScreen()
@@ -106,26 +113,28 @@ fun ResultScreen(
     navController: NavHostController,
     recentMovieList: List<Program>,
     programList: List<Program>,
-    allMoviesNonRecent:List<MovieModel>,
+    allMoviesNonRecent: List<MovieModel>,
+    eventsList: List<EventModel>,
     modifier: Modifier = Modifier,
     homepageViewModel: HomepageViewModel = viewModel(
         factory = HomepageViewModel.Factory
     ),
-
-    ) {
+) {
     val layoutDirection = LocalLayoutDirection.current
     val posterImagePadding = dimensionResource(R.dimen.image_padding)
-    val scrollState = rememberScrollState()
     var isFilms by remember { mutableStateOf(true) }
-    var expandedLocaties by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("Brugge") }
+    var selectedCinema by remember { mutableStateOf("Brugge") }
 
     val options = listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
+    val filteredEvents by homepageViewModel.filteredEvents.collectAsState()
+
+    LaunchedEffect(selectedCinema) {
+        homepageViewModel.filterEventsByCinema(selectedCinema)
+    }
 
     Surface(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
             .padding(
                 start = WindowInsets.safeDrawing
                     .asPaddingValues()
@@ -136,146 +145,44 @@ fun ResultScreen(
             )
             .semantics { contentDescription = "Home Screen" },
         color = MaterialTheme.colorScheme.background
-
     ) {
-        Column() {
-            Row(
+        if (isFilms) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
-                Column {
-                    Text(
-                        text = "Welkom terug,",
-                        fontSize = 16.sp,
-                        color = Color(0xFFAFAFAF)
-                    )
-                    Text(
-                        text = "Dion",
-                        fontSize = 20.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-
-                Image(
-//                    painter = when (selectedOptionText) {
-//                        "Brugge" -> painterResource(id = R.drawable.lumiere_brugge)
-//                        "Antwerpen" -> painterResource(id = R.drawable.lumiere_antwerpen)
-//                        "Mechelen" -> painterResource(id = R.drawable.lumiere_mechelen)
-//                        "Cinema Cartoons" -> painterResource(id = R.drawable.lumiere_cinema_cartoons)
-//                        else -> painterResource(id = R.drawable.lumiere_logo)
-//                    },
-                    painter = painterResource(id = R.drawable.lumiere_logo),
-                    contentDescription = "logo",
-//                    contentScale = ContentScale.FillBounds,
-//                    modifier = Modifier
-//                        .width(180.dp)
-//                        .height(100.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(33.dp))
-            ToggleFilmOrEvent(isFilms) { isFilms = !isFilms }
-            Spacer(modifier = Modifier.height(50.dp))
-            if (isFilms){
-
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column {
-
-                        TitleText(
-                            title = stringResource(R.string.nieuwe_films_title),
-                            modifier = Modifier.offset(x = (-16).dp)
-                        )                    }
-
-                    Box(
-                        modifier = Modifier
-                            .border(
-                                1.dp,
-                                Color.White,
-                                RoundedCornerShape(10.dp)
-                            )
-
-
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = expandedLocaties,
-                            onExpandedChange = { expandedLocaties = !expandedLocaties }
-                        ) {
-                            TextField(
-                                value = selectedOptionText,
-                                onValueChange = { newLocation ->
-                                    selectedOptionText = newLocation
-                                    homepageViewModel.updateMoviesLocation(newLocation)
-                                },
-
-
-                                readOnly = true,
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLocaties)
-                                },
-                                modifier = Modifier
-
-                                    .menuAnchor()
-
-                                    .clickable { expandedLocaties = !expandedLocaties },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    containerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
-                                ),
-
-                                textStyle =  TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.White
-                                ),
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = expandedLocaties,
-                                onDismissRequest = { expandedLocaties = false }
-                            ) {
-                                options.forEach { film ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = film) },
-                                        onClick = {
-                                            selectedOptionText = film
-                                            expandedLocaties = false
-                                            homepageViewModel.updateMoviesLocation(film)
-
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                HeaderSection(
+                    selectedOptionText = selectedCinema,
+                    expandedLocaties = false,
+                    onExpandedChange = { /* No-op for movies */ },
+                    onLocationSelected = { newLocation ->
+                        selectedCinema = newLocation
+                        homepageViewModel.updateMoviesLocation(newLocation)
                     }
-
-
-                }
-                MovieList(
-                    movieList = recentMovieList,
-                    navController = navController,
-                    modifier = Modifier
-                        .padding(posterImagePadding)
-                        .height(400.dp)
                 )
 
-                TitleText(title = stringResource(R.string.alle_films_title), modifier = Modifier)
+                Spacer(modifier = Modifier.height(33.dp))
 
-                MoviesFilters(homepageViewModel=homepageViewModel)
+                ToggleFilmOrEvent(isFilms) { isFilms = !isFilms }
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                MoviesSection(
+                    recentMovieList = recentMovieList,
+                    navController = navController,
+                    homepageViewModel = homepageViewModel,
+                    selectedOptionText = selectedCinema,
+                    options = options,
+                    posterImagePadding = posterImagePadding
+                )
+
+                TitleText(
+                    title = stringResource(R.string.alle_films_title),
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                MoviesFilters(homepageViewModel = homepageViewModel)
 
                 ListAllMovies(
                     allMoviesNonRecent = allMoviesNonRecent,
@@ -285,93 +192,294 @@ fun ResultScreen(
                         .height(400.dp)
                 )
             }
-            else{
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                HeaderSection(
+                    selectedOptionText = selectedCinema,
+                    expandedLocaties = false,
+                    onExpandedChange = { /* No-op for movies */ },
+                    onLocationSelected = { newLocation ->
+                        selectedCinema = newLocation
+                        homepageViewModel.updateMoviesLocation(newLocation)
+                    }
+                )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.Top
+                Spacer(modifier = Modifier.height(33.dp))
+
+                ToggleFilmOrEvent(isFilms) { isFilms = !isFilms }
+
+                TitleText(
+                    title = "Events",
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                CinemaDropdownMenu(
+                    options = options,
+                    selectedOption = selectedCinema,
+                    onOptionSelected = { newCinema ->
+                        selectedCinema = newCinema
+                        homepageViewModel.filterEventsByCinema(newCinema)
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Column {
-
-                        TitleText(title = "Programma",modifier = Modifier.offset(x = (-16).dp))
+                    filteredEvents.forEach { event ->
+                        EventItem(event = event, navController = navController)
                     }
-                    Spacer(modifier = Modifier.width(32.dp))
-                    Box(
-                        modifier = Modifier
-                            .border(
-                                1.dp,
-                                Color.White,
-                                RoundedCornerShape(10.dp)
-                            )
-                            .wrapContentSize()
-
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = expandedLocaties,
-                            onExpandedChange = { expandedLocaties = !expandedLocaties }
-                        ) {
-                            TextField(
-                                value = selectedOptionText,
-                                onValueChange = { newLocation ->
-                                    selectedOptionText = newLocation
-                                    homepageViewModel.updateMoviesLocation(newLocation)
-                                },
-
-
-                                readOnly = true,
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLocaties)
-                                },
-                                modifier = Modifier
-                                    .wrapContentSize()
-
-                                    .menuAnchor()
-
-                                    .clickable { expandedLocaties = !expandedLocaties },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    containerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
-                                ),
-
-                                textStyle =  TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.White
-                                ),
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = expandedLocaties,
-                                onDismissRequest = { expandedLocaties = false }
-                            ) {
-                                options.forEach { film ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = film) },
-                                        onClick = {
-                                            selectedOptionText = film
-                                            expandedLocaties = false
-                                            homepageViewModel.updateMoviesLocation(film)
-
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-
                 }
-                MovieScheduleList(programList = programList, navController)
-
             }
-
         }
     }
 }
+
+
+@Composable
+fun CinemaDropdownMenu(
+    options: List<String>,
+    selectedOption: String,
+    onOptionSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        OutlinedButton(
+            onClick = { expanded = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = selectedOption,
+                color = Color.White,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = "Open Dropdown",
+                tint = Color.White
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    },
+                    text = { Text(option, color = Color.Black) }
+                )
+            }
+        }
+    }
+}
+
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HeaderSection(
+    selectedOptionText: String,
+    expandedLocaties: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onLocationSelected: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = "Welkom terug,",
+                fontSize = 16.sp,
+                color = Color(0xFFAFAFAF)
+            )
+            Text(
+                text = "Dion",
+                fontSize = 20.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Image(
+            painter = painterResource(id = R.drawable.lumiere_logo),
+            contentDescription = "logo",
+        )
+    }
+
+    // Location Dropdown
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 16.dp),
+//        horizontalArrangement = Arrangement.Start,
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .border(
+//                    1.dp,
+//                    Color.White,
+//                    RoundedCornerShape(10.dp)
+//                )
+//        ) {
+//            ExposedDropdownMenuBox(
+//                expanded = expandedLocaties,
+//                onExpandedChange = onExpandedChange
+//            ) {
+//                TextField(
+//                    value = selectedOptionText,
+//                    onValueChange = {},
+//                    readOnly = true,
+//                    trailingIcon = {
+//                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLocaties)
+//                    },
+//                    modifier = Modifier
+//                        .menuAnchor()
+//                        .clickable { onExpandedChange(!expandedLocaties) },
+//                    colors = TextFieldDefaults.textFieldColors(
+//                        containerColor = Color.Transparent,
+//                        focusedIndicatorColor = Color.Transparent,
+//                        unfocusedIndicatorColor = Color.Transparent
+//                    ),
+//                    textStyle = TextStyle(
+//                        fontSize = 14.sp,
+//                        fontWeight = FontWeight.Medium,
+//                        color = Color.White
+//                    ),
+//                )
+//
+//                ExposedDropdownMenu(
+//                    expanded = expandedLocaties,
+//                    onDismissRequest = { onExpandedChange(false) }
+//                ) {
+//                    val options = listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
+//                    options.forEach { location ->
+//                        DropdownMenuItem(
+//                            text = { Text(text = location) },
+//                            onClick = {
+//                                onLocationSelected(location)
+//                                onExpandedChange(false)
+//                            }
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+}
+
+@Composable
+fun MoviesSection(
+    recentMovieList: List<Program>,
+    navController: NavHostController,
+    homepageViewModel: HomepageViewModel,
+    selectedOptionText: String,
+    options: List<String>,
+    posterImagePadding: Dp
+) {
+    TitleText(
+        title = stringResource(R.string.nieuwe_films_title),
+        modifier = Modifier.padding(16.dp)
+    )
+
+    MovieList(
+        movieList = recentMovieList,
+        navController = navController,
+        modifier = Modifier
+            .padding(posterImagePadding)
+            .height(400.dp)
+    )
+}
+
+@Composable
+fun EventList(
+    eventsList: List<EventModel>,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(eventsList) { event ->
+            EventItem(event = event, navController = navController)
+        }
+    }
+}
+
+@Composable
+fun EventItem(
+    event: EventModel,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    Log.d("EventItem", "Event: ${event.title}, coverImageUrl: ${event.cover}")
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { navController.navigate("eventDetail/${event.id}") }
+            .padding(16.dp)
+    ) {
+        if (!event.cover.isNullOrEmpty()) {
+            Image(
+                painter = rememberAsyncImagePainter(event.cover),
+                contentDescription = event.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(10.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = event.title ?: "Geen titel",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = event.description ?: "Geen beschrijving",
+            fontSize = 16.sp,
+            color = Color.White,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = event.location ?: "Onbekend",
+            fontSize = 16.sp,
+            color = Color.White
+        )
+    }
+}
+
+
 
 @Composable
 fun LoadingScreen(
@@ -379,12 +487,12 @@ fun LoadingScreen(
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize() // Ensure the box takes up the full screen
+            .fillMaxSize()
     ) {
         Image(
             modifier = Modifier
                 .size(200.dp)
-                .align(Alignment.Center) // Center the image in the Box
+                .align(Alignment.Center)
                 .testTag("LoadingImage"),
             painter = painterResource(R.drawable.loading_img),
             contentDescription = stringResource(R.string.loading)
@@ -414,7 +522,7 @@ fun ToggleFilmOrEvent(isFilms: Boolean, onToggle: () -> Unit) {
             isSelected = isFilms,
             onToggle = onToggle,
             leftText = "Films",
-            rightText = "Programma"
+            rightText = "Events"
         )
     }
 }

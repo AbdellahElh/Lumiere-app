@@ -153,7 +153,10 @@ fun MovieDetailContent(
                 Spacer(modifier = Modifier.height(10.dp))
                 MovieDescription(movie, isExpanded) { isExpanded = !isExpanded }
                 Spacer(modifier = Modifier.height(35.dp))
-                NextStepButton(onClick = { showBottomSheet = true })
+                NextStepButton(
+                    isUserLoggedIn = isUserLoggedIn,
+                    onClick = { showBottomSheet = true }
+                )
                 Spacer(modifier = Modifier.height(18.dp))
             }
         }
@@ -363,9 +366,21 @@ fun MovieDescription(movie: MovieModel, isExpanded: Boolean, onToggleExpand: () 
 }
 
 @Composable
-fun NextStepButton(onClick: () -> Unit) {
+fun NextStepButton(isUserLoggedIn: Boolean, onClick: () -> Unit) {
+    val context = LocalContext.current
+
     Button(
-        onClick = onClick,
+        onClick = {
+            if (isUserLoggedIn) {
+                onClick()
+            } else {
+                Toast.makeText(
+                    context,
+                    "U moet ingelogd zijn om door te gaan naar de volgende stap",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        },
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFE5CB77),

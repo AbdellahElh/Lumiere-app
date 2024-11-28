@@ -24,9 +24,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.auth0.android.Auth0
+import com.example.riseandroid.model.Movie
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.eventDetail.EventDetailScreen
+import com.example.riseandroid.ui.screens.eventDetail.EventDetailViewModel
 import com.example.riseandroid.ui.screens.homepage.Homepage
 import com.example.riseandroid.ui.screens.login.ForgotPasswordScreen
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
@@ -162,6 +166,18 @@ fun BottomNavGraph(
                 },
                 navController = navController
             )
+        }
+
+        composable("eventDetail/{eventId}") { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId")?.toIntOrNull()
+            if (eventId != null) {
+                EventDetailScreen(
+                    eventId = eventId,
+                    navController = navController,
+                    viewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId)),
+                    authViewModel = authViewModel
+                )
+            }
         }
     }
 }

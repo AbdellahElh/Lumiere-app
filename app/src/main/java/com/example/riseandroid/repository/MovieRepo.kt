@@ -73,19 +73,24 @@ class MovieRepo(
         }
     }
 
+    // MovieRepo.kt
+
     private suspend fun saveShowtimes(movieId: Int, cinemaId: Int, showtimes: List<String>) {
         val showtimeEntities = showtimes.map { showtime ->
-            val dateParts = showtime.substring(0, 10).split("-")
-            val showDateFormatted = "${dateParts[0]}-${dateParts[1]}-${dateParts[2]}"
+            val dateTimeParts = showtime.split("T")
+            val showDate = dateTimeParts[0]
+            val showTime = dateTimeParts[1].substring(0, 5) // Get HH:mm
 
             ShowtimeEntity(
-                movieId = movieId,
                 cinemaId = cinemaId,
-                showTime = showtime.substring(11, 16),
-                showDate = showDateFormatted
+                movieId = movieId,
+                eventId = null,
+                showTime = showTime,
+                showDate = showDate
             )
         }
         movieDao.insertShowtimes(showtimeEntities)
     }
+
 
 }

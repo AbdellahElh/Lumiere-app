@@ -15,11 +15,13 @@ import com.example.riseandroid.data.lumiere.NetworkTicketRepository
 import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.data.lumiere.TicketRepository
 import com.example.riseandroid.network.LumiereApiService
+import com.example.riseandroid.network.EventsApi
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.Auth0Repo
+import com.example.riseandroid.repository.EventRepo
 import com.example.riseandroid.repository.IAuthRepo
 import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.repository.MovieRepo
@@ -36,6 +38,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 interface AppContainer {
     val programRepository: ProgramRepository
+
+    val movieRepo:MovieRepo
+
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val ticketRepository: TicketRepository
@@ -45,6 +50,7 @@ interface AppContainer {
     val userId: Int
     val userManager: UserManager
     val authViewModel: AuthViewModel
+    val eventRepo: EventRepo
 }
 
 class DefaultAppContainer(
@@ -62,6 +68,7 @@ class DefaultAppContainer(
 
     private val riseDatabase = database
     private val movieDao = riseDatabase.movieDao()
+    private val eventDao = riseDatabase.eventDao()
     private val watchlistDao = riseDatabase.watchlistDao()
 
     private val auth0 = Auth0(context)
@@ -137,6 +144,14 @@ class DefaultAppContainer(
 
     override val watchlistRepo: IWatchlistRepo by lazy {
         WatchlistRepo(watchlistDao, watchlistApi)
+    }
+
+    private val eventsApi: EventsApi by lazy {
+        retrofitBackend.create(EventsApi::class.java)
+    }
+
+    override val eventRepo: EventRepo by lazy {
+        EventRepo(eventDao, eventsApi)
     }
 
     override val moviesRepository: MoviesRepository by lazy {

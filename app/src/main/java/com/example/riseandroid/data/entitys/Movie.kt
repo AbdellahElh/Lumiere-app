@@ -30,14 +30,16 @@ data class CinemaEntity(
     tableName = "showtimes",
     foreignKeys = [
         ForeignKey(entity = MovieEntity::class, parentColumns = ["id"], childColumns = ["movieId"]),
+        ForeignKey(entity = EventEntity::class, parentColumns = ["id"], childColumns = ["eventId"]),
         ForeignKey(entity = CinemaEntity::class, parentColumns = ["id"], childColumns = ["cinemaId"])
     ],
-    indices = [Index("movieId"), Index("cinemaId")]
+    indices = [Index("movieId"), Index("eventId"), Index("cinemaId")]
 )
 data class ShowtimeEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val cinemaId: Int,
-    val movieId: Int,
+    val movieId: Int?,
+    val eventId: Int?,
     val showTime: String,
-    val showDate:String
+    val showDate: String
 )
