@@ -56,10 +56,9 @@ class TenturncardRepository(
         }
     }
 
-    // Helper to get the auth token
     private suspend fun getAuthToken(): String {
         val flowResult = authrepo.getCredentials().firstOrNull()
-        val authToken = flowResult?.data?.accessToken // Access token from credentials
+        val authToken = flowResult?.data?.accessToken
         return authToken ?: throw IllegalStateException("No authentication token found. User must be logged in.")
     }
 
@@ -68,10 +67,10 @@ class TenturncardRepository(
     override suspend fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
         emit(ApiResource.Loading())
         try {
-            // Send a request to the external API to add a new tenturncard to the user
+
             val response = tenturncardApi.addTenturncard(activationCode)
             if (response.isSuccess) {
-                // Add the tenturncard to the offline database or local storage
+
                 val newTenturncard = TenturncardEntity(
                     amountLeft = 10,
                     ActivationCode = activationCode,
@@ -92,7 +91,6 @@ class TenturncardRepository(
 
     suspend fun getLoggedInUserId(): Int {
         val flowResult = authrepo.getLoggedInId().firstOrNull()
-        // If the flow result is null or the data is null, throw an exception
         val accountId = flowResult?.data ?: throw IllegalStateException("De gebruiker moet ingelogd zijn")
         return accountId
     }

@@ -12,6 +12,6 @@ data class TenturncardEntity(
     val expirationDate: String?,
     val ActivationCode: String,
     val IsActivated: Boolean = false,
-    //define a one-to-many relation with user - tenturncard
+
     val UserTenturncardId : Int? = 1,
 )

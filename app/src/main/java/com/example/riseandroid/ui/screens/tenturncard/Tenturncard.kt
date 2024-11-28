@@ -34,7 +34,7 @@ import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
 
 @Composable
 fun TenturncardScreen(
-    authToken: String, // Inject AuthViewModel
+    authToken: String,
     tenTurnCardViewModel: TenturncardViewModel = viewModel(factory = TenturncardViewModel.Factory),
 ) {
 
@@ -87,7 +87,7 @@ fun TenturnCardItem(card: Tenturncard) {
                 .fillMaxSize()
             ,
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween // Plaatst de tekst bovenaan en de knop onderaan
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
 
                 Text(
@@ -130,7 +130,7 @@ fun TenturnCardItem(card: Tenturncard) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
-            // Button onderaan
+
             Button(
                 onClick = { /* Voeg functionaliteit toe voor bewerken */ },
                 modifier = Modifier.fillMaxWidth(),

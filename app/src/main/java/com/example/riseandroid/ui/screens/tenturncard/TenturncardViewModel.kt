@@ -54,7 +54,7 @@ class TenturncardViewModel(
 
 
             } catch (e: Exception) {
-                // Handle error appropriately, e.g., log or show a message
+
                 _tenturncards.value = emptyList()
             }
         }
