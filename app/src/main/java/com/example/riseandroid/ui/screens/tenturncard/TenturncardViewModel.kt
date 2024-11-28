@@ -12,6 +12,7 @@ import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.model.Tenturncard
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.ITenturncardRepository
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.homepage.HomepageUiState
@@ -25,7 +26,7 @@ sealed interface TenturncardUiState {
     data class Succes(val allTenturncards: StateFlow<List<Tenturncard>>,
 
     ) : TenturncardUiState
-    object Error : TenturncardUiState
+    data class Error(val message: String?) : TenturncardUiState
     object Loading : TenturncardUiState
 }
 
@@ -56,6 +57,44 @@ class TenturncardViewModel(
             } catch (e: Exception) {
 
                 _tenturncards.value = emptyList()
+            }
+        }
+    }
+
+    private val _inputText = MutableStateFlow("")
+    val inputText: StateFlow<String> = _inputText
+
+    fun updateInputText(newText: String) {
+        _inputText.value = newText
+    }
+
+    fun submitActivationCode(activationCode: String) {
+        viewModelScope.launch {
+            tenturncardUiState = TenturncardUiState.Loading
+            try {
+                tenturncardRepository.addTenturncard(activationCode)
+                    .collect { resource ->
+                        when (resource) {
+                            is ApiResource.Loading -> {
+                                tenturncardUiState = TenturncardUiState.Loading
+                            }
+                            is ApiResource.Success -> {
+                                // Emit success state
+                                tenturncardUiState = TenturncardUiState.Succes(
+                                    allTenturncards = tenturncards
+                                )
+                                updateInputText("Tienbeurtenkaart succesvol toegevoegd")
+                            }
+                            is ApiResource.Error -> {
+                                tenturncardUiState = TenturncardUiState.Error(resource.message)
+                                updateInputText("Er ging iets fout")
+                            }
+
+                            is ApiResource.Initial -> TODO()
+                        }
+                    }
+            } catch (e: Exception) {
+                tenturncardUiState = TenturncardUiState.Error(e.message)
             }
         }
     }

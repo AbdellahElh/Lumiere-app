@@ -1,3 +1,5 @@
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -22,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +35,7 @@ import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+import java.util.prefs.NodeChangeEvent
 
 @Composable
 fun TenturncardScreen(
@@ -43,19 +48,30 @@ fun TenturncardScreen(
         tenTurnCardViewModel.fetchTenturncards(authToken)
     }
     val cards by tenTurnCardViewModel.tenturncards.collectAsState()
+    val inputText by tenTurnCardViewModel.inputText.collectAsState()
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        if (cards.isEmpty()) {
-            Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
-        } else {
-            LazyRow(
-                modifier = Modifier.fillMaxSize().padding(16.dp)
-            ) {
-                items(cards) { card ->
-                    TenturnCardItem(card)
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            inputActivationCodeField(
+                inputText = inputText,
+                onValueChange = { tenTurnCardViewModel.updateInputText(it) },
+                onSubmit = { tenTurnCardViewModel.submitActivationCode(inputText) }
+            )
+            if (cards.isEmpty()) {
+                Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
+            } else {
+                LazyRow(
+                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                ) {
+                    items(cards) { card ->
+                        TenturnCardItem(card)
+                    }
                 }
             }
         }
@@ -65,6 +81,50 @@ fun formatDate(dateString: String): String {
     val dateParts = dateString.substring(0, 10).split("-")
     val showDateFormatted = "${dateParts[0]}-${dateParts[1]}-${dateParts[2]}"
     return showDateFormatted
+}
+
+@Composable
+fun inputActivationCodeField(
+    inputText: String,
+    onValueChange: (String) -> Unit,
+    onSubmit: () -> Unit
+    )
+{
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp) // Padding around the entire column
+    ) {
+        // Input field
+        BasicTextField(
+            value = inputText,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .background(color = Color.White),
+            decorationBox = { innerTextField ->
+                Box(Modifier.padding(8.dp)) {
+                    if (inputText.isEmpty()) {
+                        Text(text = "Voer een activatie code in")
+                    }
+                    innerTextField()
+                }
+            }
+        )
+
+        // Add spacing between the text field and the button
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Submit button
+        Button(
+            onClick = onSubmit,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text("Activeer tienbeurtenkaart")
+        }
+    }
 }
 
 @Composable
