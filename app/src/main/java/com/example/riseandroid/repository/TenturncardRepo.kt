@@ -1,13 +1,22 @@
 package com.example.riseandroid.repository
 
 import android.util.Log
+import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.network.TenturncardApi
+import com.example.riseandroid.util.asEntity
+import com.example.riseandroid.util.asExternalModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
 
 class TenturncardRepository(
     private val tenturncardApi: TenturncardApi,
@@ -15,51 +24,35 @@ class TenturncardRepository(
     private val authrepo: IAuthRepo,
 ) : ITenturncardRepository {
 
-     override suspend fun getTenturncards(authToken: String): List<Tenturncard> {
-        return try {
-
-            val authHeader = "Bearer $authToken"
-            // Call the API with the token
-            val apiResponse = tenturncardApi.getTenturncards(authHeader)
-            val entities = apiResponse.map {
-                TenturncardEntity(
-                    id = it.id,
-                    amountLeft = it.amountLeft,
-                    purchaseDate = it.purchaseDate,
-                    expirationDate = it.expirationDate,
-                    IsActivated = it.IsActivated,
-                    ActivationCode = it.ActivationCode,
-                    UserTenturncardId = null
-                )
+    override suspend fun getTenturncards(authToken: String):  Flow<List<Tenturncard>> {
+        val authHeader = "Bearer $authToken"
+        return tenturncardDao.getAllTenturncards()
+            .map { entities -> entities.map(TenturncardEntity::asExternalModel) }
+            .onEach { cards ->
+                cards.forEach { cards ->
+                    Log.d("MoviesList", cards.toString())
+                }}
+            .onStart {
+                withContext(Dispatchers.IO) {
+                    refreshTenturncards(authHeader)
+                }
             }
 
-            // Update the local database with the new data
+
+    }
+
+    private suspend fun refreshTenturncards(authToken: String) {
+        try {
+
+            val cardsFromApi = tenturncardApi.getTenturncards(
+                authToken = authToken
+            )
+            val cardsAsEntities = cardsFromApi.map { it.asEntity() }
             tenturncardDao.deleteAllTenturncards()
-            tenturncardDao.insertTenturncards(entities)
+            tenturncardDao.insertTenturncards(cardsAsEntities)
 
-            // Map entities to the model for the UI
-            entities.map { entity ->
-                Tenturncard(
-                    id = entity.id,
-                    amountLeft = entity.amountLeft,
-                    purchaseDate = entity.purchaseDate ?: "N/A",
-                    expirationDate = entity.expirationDate ?: "N/A",
-                    IsActivated = entity.IsActivated,
-                    ActivationCode = entity.ActivationCode
-                )
-            }
         } catch (e: Exception) {
-            // Fallback to local database if API call fails
-            tenturncardDao.getAllTenturncards().map { entity ->
-                Tenturncard(
-                    id = entity.id,
-                    amountLeft = entity.amountLeft,
-                    purchaseDate = entity.purchaseDate ?: "N/A",
-                    expirationDate = entity.expirationDate ?: "N/A",
-                    IsActivated = entity.IsActivated,
-                    ActivationCode = entity.ActivationCode
-                )
-            }
+            Log.e("TenturncardRepo", "Error refreshing cards")
         }
     }
 

@@ -34,15 +34,15 @@ class LoginViewModel(
     val uiState: StateFlow<LoginState> = _uiState.asStateFlow()
 
     private val _authResponse = MutableStateFlow<ApiResource<Credentials>>(ApiResource.Initial())
-  //  val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
+    val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
 
     // We voegen een nieuwe flow toe om de navigatie te beheren
     private val _navigateToAccount = MutableSharedFlow<Boolean>()
     val navigateToAccount: SharedFlow<Boolean> = _navigateToAccount
 
-//    fun resetAuthResponse() {
-//        _authResponse.value = ApiResource.Initial()
-//    }
+    fun resetAuthResponse() {
+        _authResponse.value = ApiResource.Initial()
+    }
 
     fun updateUserName(name: String) {
         resetError()
@@ -57,35 +57,6 @@ class LoginViewModel(
     private fun resetError() {
         _uiState.value = _uiState.value.copy(loginError = false)
     }
-
-    val authResponse: StateFlow<ApiResource<Credentials>> = _authResponse
-        .flatMapLatest { resource ->
-            flow {
-                Log.i("LoginViewModel", "Observed: ${resource.data}")
-
-
-                if (resource is ApiResource.Success && resource.data != null) {
-
-                    login(resource.data)
-
-                }
-
-                else if (resource is ApiResource.Error<*>) {
-                    Log.e("LoginViewModel", "Error during login: ${resource.message}")
-                    _uiState.value = _uiState.value.copy(loginError = true)
-                    emit(ApiResource.Error(resource.message ?: "Unknown error", resource.data))
-                }
-
-                else {
-                    emit(resource)
-                }
-            }
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ApiResource.Success(null)
-        )
 
 
     fun onSubmit() {

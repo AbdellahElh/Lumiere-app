@@ -163,7 +163,7 @@ fun TicketsScreenContent(
                     Spacer(modifier = Modifier.height(40.dp))
                     if (isEmptyTickets) {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillParentMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -207,7 +207,7 @@ fun TicketsScreenContent(
 
                     Spacer(modifier = Modifier.height(44.dp))
                 } else {
-                    // Call TenturncardScreen with the injected dependencies
+
                     TenturncardScreen(
                       authToken = authToken
                     )

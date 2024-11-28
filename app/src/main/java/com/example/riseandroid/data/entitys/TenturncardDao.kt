@@ -1,13 +1,14 @@
 package com.example.riseandroid.data.entitys
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TenturncardDao {
 
 
-    @Query("SELECT * FROM tenturncards")
-    suspend fun getAllTenturncards(): List<TenturncardEntity>
+    @Query("SELECT * FROM tenturncards ORDER BY amountLeft DESC")
+    fun getAllTenturncards(): Flow<List<TenturncardEntity>>
 
 
     @Query("SELECT * FROM tenturncards WHERE id = :id")

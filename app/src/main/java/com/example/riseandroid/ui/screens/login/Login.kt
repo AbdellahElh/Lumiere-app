@@ -76,12 +76,7 @@ fun LoginScreen(
 
 
     LaunchedEffect(Unit) {
-        if (apiResponseState is ApiResource.Success) {
-            val credentials = apiResponseState.data
-            if (credentials != null) {
-                authViewModel.setAuthenticated(credentials)
-                navController.navigate("account")}
-        }
+
         viewModel.navigateToAccount.collect { shouldNavigate ->
             if (shouldNavigate) {
                 navController.navigate("account")
