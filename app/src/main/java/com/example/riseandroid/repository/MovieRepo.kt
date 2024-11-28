@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
     suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
+    suspend fun getMovieById(id: Int): MovieModel
 }
 
 class MovieRepo(
@@ -45,6 +46,35 @@ class MovieRepo(
                     refreshMovies(selectedDate, selectedCinemas, searchTitle)
                 }
             }
+
+    }
+
+    override suspend fun getMovieById(id: Int): MovieModel {
+        val movieEntity = movieDao.getMovieById(id)
+        if (movieEntity != null) {
+            return movieEntity.asExternalModel()
+        }
+        try {
+            val movieFromApi = movieApi.getMovieById(id)
+            movieDao.insertMovie(movieFromApi.asEntity())
+
+            return movieFromApi
+        } catch (e: Exception) {
+            Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
+            return MovieModel(
+                id = 0,
+                title = "",
+                coverImageUrl = "",
+                genre = "",
+                duration = "",
+                director = "",
+                description = "",
+                video = "",
+                videoPlaceholderUrl = "",
+                cast = emptyList(),
+                cinemas = emptyList()
+            )
+        }
 
     }
 

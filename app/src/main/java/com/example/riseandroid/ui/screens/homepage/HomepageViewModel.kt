@@ -50,9 +50,6 @@ class HomepageViewModel(
 
     private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
     val allMovies = _allMovies.asStateFlow()
-//
-//    private val _programFilms = MutableStateFlow<List<Program>>(emptyList())
-//    val programFilms = _programFilms.asStateFlow()
 
     private val _selectedDate = MutableStateFlow(getCurrentDate())
     val selectedDate= _selectedDate.asStateFlow()
@@ -78,7 +75,7 @@ class HomepageViewModel(
     init {
 
         getAllMoviesList()
-        getNonRecentMovieList()
+        getRecentMovieList()
     }
 
     private fun getAllMoviesList() {
@@ -103,7 +100,7 @@ class HomepageViewModel(
         }
     }
 
-    private fun getNonRecentMovieList(){
+    private fun getRecentMovieList(){
         viewModelScope.launch {
             homepageUiState = HomepageUiState.Loading
             moviePosterRepo.refreshMoviePosters()

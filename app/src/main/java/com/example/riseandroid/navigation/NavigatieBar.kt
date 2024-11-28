@@ -24,8 +24,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.auth0.android.Auth0
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
-import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModel
-import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModelFactory
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 
@@ -38,10 +36,8 @@ fun NavHostWrapper(
     forgotPasswordViewModel: ForgotPasswordViewModel,
 ) {
     val context = LocalContext.current
-    val moviesViewModel: MoviesViewModel = viewModel(factory = MoviesViewModelFactory(context.applicationContext as Application))
-    val watchlistViewModel: WatchlistViewModel = viewModel()
+   val watchlistViewModel: WatchlistViewModel = viewModel()
 
-    val allMovies by moviesViewModel.allMovies.collectAsState()
 
     BottomNavGraph(
         navController = navController,
@@ -49,7 +45,7 @@ fun NavHostWrapper(
         modifier = Modifier.padding(paddingValues),
         authViewModel = authViewModel,
         forgotPasswordViewModel = forgotPasswordViewModel,
-        allMovies = allMovies,
+
         watchlistViewModel = watchlistViewModel
     )
 }

@@ -45,8 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -60,7 +62,7 @@ fun MovieDetailScreen(
     movieId: Long,
     navController: NavController,
     viewModel: MovieDetailViewModel = viewModel(
-        factory = MovieDetailViewModel.provideFactory(movieId)
+        factory = MovieDetailViewModel.provideFactory(movieId.toInt())
     ),
     watchlistViewModel: WatchlistViewModel,
     authViewModel: AuthViewModel,
@@ -107,10 +109,11 @@ fun MovieDetailScreen(
 }
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailContent(
-    movie: Movie,
+    movie: MovieModel,
     programList: List<Program>,
     navController: NavController,
     isInWatchlist: Boolean,
@@ -157,7 +160,7 @@ fun MovieDetailContent(
                 sheetState = rememberModalBottomSheetState(),
                 containerColor = Color(0xFFE5CB77)
             ) {
-                BottomSheetContent(programList, context, navController, movie) { showBottomSheet = false }
+                // BottomSheetContent(programList, context, navController, movie) { showBottomSheet = false }
             }
         }
     }
@@ -249,7 +252,7 @@ fun MovieDetailHeader(
 
 
 @Composable
-fun MoviePoster(movie: Movie) {
+fun MoviePoster(movie: MovieModel) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -257,7 +260,7 @@ fun MoviePoster(movie: Movie) {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(movie.posterResourceId),
+            painter = rememberAsyncImagePainter(movie.coverImageUrl),
             contentDescription = "Movie Poster",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -268,8 +271,9 @@ fun MoviePoster(movie: Movie) {
     }
 }
 
+
 @Composable
-fun MovieInfo(movie: Movie) {
+fun MovieInfo(movie: MovieModel) {
     Text(
         text = movie.title,
         fontSize = 28.sp,
@@ -284,7 +288,7 @@ fun MovieInfo(movie: Movie) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Directeur: ${movie.director}",
+            text = "Directeur: ${movie.director.orEmpty()}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
             color = Color(0xFFBABFC9)
@@ -297,7 +301,7 @@ fun MovieInfo(movie: Movie) {
             .padding(vertical = 14.dp),
     ) {
         Text(
-            text = "${movie.genre}",
+            text = "${movie.genre.orEmpty()}",
             fontSize = 16.sp,
             color = Color(0xFFB2B5BB),
             modifier = Modifier
@@ -308,7 +312,7 @@ fun MovieInfo(movie: Movie) {
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = "${movie.length}",
+            text = "${movie.duration.orEmpty()}",
             fontSize = 14.sp,
             color = Color(0xFFB2B5BB),
             modifier = Modifier
@@ -320,7 +324,7 @@ fun MovieInfo(movie: Movie) {
 }
 
 @Composable
-fun MovieDescription(movie: Movie, isExpanded: Boolean, onToggleExpand: () -> Unit) {
+fun MovieDescription(movie: MovieModel, isExpanded: Boolean, onToggleExpand: () -> Unit) {
     Text(
         text = "Beschrijving",
         fontSize = 28.sp,
@@ -330,7 +334,7 @@ fun MovieDescription(movie: Movie, isExpanded: Boolean, onToggleExpand: () -> Un
     )
 
     val displayedDescription =
-        if (isExpanded) movie.description else movie.description.take(100)
+        if (isExpanded) movie.description.orEmpty() else movie.description.orEmpty().take(100)
 
     Text(
         text = if (isExpanded) displayedDescription else "$displayedDescription...",
@@ -340,7 +344,7 @@ fun MovieDescription(movie: Movie, isExpanded: Boolean, onToggleExpand: () -> Un
         modifier = Modifier.padding(top = 16.dp)
     )
 
-    if (movie.description.length > 100) {
+    if (movie.description.orEmpty().length > 100) {
         Text(
             text = if (isExpanded) "Lees Minder" else "Lees Meer",
             fontSize = 15.sp,
@@ -376,7 +380,6 @@ fun NextStepButton(onClick: () -> Unit) {
 fun navigateBack(navController: NavController) {
     navController.popBackStack()
 }
-
 
 
 

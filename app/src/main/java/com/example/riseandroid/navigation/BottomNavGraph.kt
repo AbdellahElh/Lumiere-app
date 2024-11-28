@@ -52,7 +52,7 @@ fun BottomNavGraph(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory),
     forgotPasswordViewModel: ForgotPasswordViewModel,
-    allMovies: List<Movie>,
+
     watchlistViewModel: WatchlistViewModel,
 ) {
     val context = LocalContext.current
@@ -153,26 +153,15 @@ fun BottomNavGraph(
                 MovieDetailScreen(
                     movieId = movieId,
                     navController = navController,
-                    viewModel = viewModel<MovieDetailViewModel>(factory = MovieDetailViewModel.provideFactory(movieId)),
+                    viewModel = viewModel<MovieDetailViewModel>(factory = MovieDetailViewModel.provideFactory(movieId.toInt())),
                     watchlistViewModel = watchlistViewModel,
                     authViewModel = authViewModel
                 )
             }
         }
 
-        composable("watchlist/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email")
-            if (email != null) {
-                WatchlistScreen(
-                    viewModel = watchlistViewModel,
-                    allMovies = allMovies,
-                    onMovieClick = { movieId ->
-                        navController.navigate("movieDetail/$movieId")
-                    },
-                    navController = navController
-                )
-            }
-        }
+
+
     }
 }
 
