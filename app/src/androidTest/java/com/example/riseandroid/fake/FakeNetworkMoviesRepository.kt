@@ -16,21 +16,23 @@ class FakeNetworkMoviesRepository(
             countDownLatch.await()
             println("delay test")
         }
-        val movies = MovieListMock().LoadRecentMoviesMock()
+        val movies = MovieListMock().LoadMoviesMock()
         return listOf(movies).asFlow()
     }
 
     override suspend fun getNonRecentMovies(): Flow<List<Movie>> {
-        val movies = MovieListMock().LoadNonRecentMoviesMock()
+        val movies = MovieListMock().LoadMoviesMock()
         return listOf(movies).asFlow()
     }
     override suspend fun getSpecificMovie(movieId: Long): Movie? {
-        val movie = MovieListMock().LoadNonRecentMoviesMock().find { it.movieId == movieId }
+        val movie = MovieListMock().LoadMoviesMock().find { it.movieId == movieId }
         return movie
     }
 
+
     override suspend fun getAllMovies(): Flow<List<Movie>> {
-        val movies = MovieListMock().LoadRecentMoviesMock()
+        val movies = MovieListMock().LoadMoviesMock()
         return listOf(movies).asFlow()
     }
+
 }

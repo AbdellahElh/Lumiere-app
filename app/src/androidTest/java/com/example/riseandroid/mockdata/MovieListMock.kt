@@ -79,4 +79,28 @@ class MovieListMock {
             program.date < cutoffDate
         }
     }
+
+    fun LoadMoviesMock(): List<Movie> {
+        return listOf(
+            Movie(
+                movieId = 1L,
+                title = "Test Movie 1",
+                posterResourceId = R.drawable.screenshot_2024_10_08_105150,
+                description = "An action-packed adventure.",
+                genre = "Action",
+                length = "120 min",
+                director = "John Doe"
+            ),
+            Movie(
+                movieId = 2L,
+                title = "Test Movie 2",
+                posterResourceId = R.drawable.screenshot_2024_10_10_102504,
+                description = "A hilarious journey.",
+                genre = "Comedy",
+                length = "90 min",
+                director = "Jane Smith"
+            )
+        )
+    }
+
 }
