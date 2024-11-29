@@ -64,11 +64,14 @@ class TenturncardRepository(
 
 
 
-    override suspend fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
+    override suspend fun addTenturncard(
+        authToken: String,
+        activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
+
         emit(ApiResource.Loading())
         try {
 
-            val response = tenturncardApi.addTenturncard(activationCode)
+            val response = tenturncardApi.addTenturncard(authToken ,activationCode)
             if (response.isSuccess) {
 
                 val newTenturncard = TenturncardEntity(

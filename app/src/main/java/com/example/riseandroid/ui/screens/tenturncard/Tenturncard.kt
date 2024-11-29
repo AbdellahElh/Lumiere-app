@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,7 +62,7 @@ fun TenturncardScreen(
             inputActivationCodeField(
                 inputText = inputText,
                 onValueChange = { tenTurnCardViewModel.updateInputText(it) },
-                onSubmit = { tenTurnCardViewModel.submitActivationCode(inputText) }
+                onSubmit = { tenTurnCardViewModel.submitActivationCode(authToken, inputText) }
             )
             if (cards.isEmpty()) {
                 Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
@@ -102,7 +103,8 @@ fun inputActivationCodeField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-                .background(color = Color.White),
+                .background(color = Color.White)
+                .testTag("codeInputField"),
             decorationBox = { innerTextField ->
                 Box(Modifier.padding(8.dp)) {
                     if (inputText.isEmpty()) {
@@ -121,6 +123,7 @@ fun inputActivationCodeField(
             onClick = onSubmit,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .testTag("addBtn")
         ) {
             Text("Activeer tienbeurtenkaart")
         }

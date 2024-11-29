@@ -68,11 +68,13 @@ class TenturncardViewModel(
         _inputText.value = newText
     }
 
-    fun submitActivationCode(activationCode: String) {
+    fun submitActivationCode(
+        authToken: String,
+        activationCode: String) {
         viewModelScope.launch {
             tenturncardUiState = TenturncardUiState.Loading
             try {
-                tenturncardRepository.addTenturncard(activationCode)
+                tenturncardRepository.addTenturncard(authToken,activationCode)
                     .collect { resource ->
                         when (resource) {
                             is ApiResource.Loading -> {
@@ -90,11 +92,14 @@ class TenturncardViewModel(
                                 updateInputText("Er ging iets fout")
                             }
 
-                            is ApiResource.Initial -> TODO()
+                            is ApiResource.Initial -> {
+                                updateInputText("Je request is in behandeling")
+                            }
                         }
                     }
             } catch (e: Exception) {
                 tenturncardUiState = TenturncardUiState.Error(e.message)
+                updateInputText("Er ging iets fout")
             }
         }
     }
