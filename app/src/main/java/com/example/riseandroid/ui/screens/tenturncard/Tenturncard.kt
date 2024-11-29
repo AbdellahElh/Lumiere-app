@@ -62,7 +62,7 @@ fun TenturncardScreen(
             inputActivationCodeField(
                 inputText = inputText,
                 onValueChange = { tenTurnCardViewModel.updateInputText(it) },
-                onSubmit = { tenTurnCardViewModel.submitActivationCode(authToken, inputText) }
+                onSubmit = { tenTurnCardViewModel.submitActivationCode(inputText) }
             )
             if (cards.isEmpty()) {
                 Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
@@ -125,7 +125,7 @@ fun inputActivationCodeField(
                 .align(Alignment.CenterHorizontally)
                 .testTag("addBtn")
         ) {
-            Text("Activeer tienbeurtenkaart")
+            Text("Voeg een tienbeurtenkaart toe")
         }
     }
 }

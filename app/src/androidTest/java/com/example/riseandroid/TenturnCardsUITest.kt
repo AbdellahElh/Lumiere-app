@@ -57,7 +57,6 @@ class TenturnCardsUITest {
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("succesCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
 
-        //todo -> update to work with flow and also test if loading is displayed when doing thread.sleep
         composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Tienbeurtenkaart succesvol toegevoegd")
     }
 
@@ -69,7 +68,6 @@ class TenturnCardsUITest {
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("errorCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
 
-        //todo -> update to work with flow and also test if loading is displayed when doing thread.sleep
         composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Er ging iets fout")
     }
 

@@ -64,14 +64,12 @@ class TenturncardRepository(
 
 
 
-    override suspend fun addTenturncard(
-        authToken: String,
-        activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
+    override suspend fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
 
         emit(ApiResource.Loading())
         try {
 
-            val response = tenturncardApi.addTenturncard(authToken ,activationCode)
+            val response = tenturncardApi.addTenturncard(activationCode)
             if (response.isSuccess) {
 
                 val newTenturncard = TenturncardEntity(
@@ -84,10 +82,10 @@ class TenturncardRepository(
                 tenturncardDao.addTenturncard(newTenturncard)
                 emit(ApiResource.Success(newTenturncard))
             } else {
-                emit(ApiResource.Error<TenturncardEntity>("Failed to add tenturncard"))
+                emit(ApiResource.Error<TenturncardEntity>("Toevoegen gefaald"))
             }
         } catch (e: Exception) {
-            emit(ApiResource.Error<TenturncardEntity>(message = e.message ?: "Failed to add tenturncard"))
+            emit(ApiResource.Error<TenturncardEntity>(message = e.message ?: "Er was een onverwachte fout"))
         }
     }
 

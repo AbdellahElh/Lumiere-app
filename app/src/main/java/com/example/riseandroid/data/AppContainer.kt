@@ -1,6 +1,7 @@
 package com.example.riseandroid.data
 
 import android.content.Context
+import android.util.Log
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
@@ -17,11 +18,15 @@ import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.SignUpApi
 import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.network.auth0.Auth0Api
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.IAuthRepo
 import com.example.riseandroid.repository.MoviePosterRepo
 import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.repository.TenturncardRepository
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -54,8 +59,28 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    private val httpClient: OkHttpClient = SslHelper.createOkHttpClient(context, loggingInterceptor)
 
+    private val httpClient: OkHttpClient = SslHelper.createOkHttpClient(context, loggingInterceptor)
+        .newBuilder()
+        .addInterceptor { chain ->
+            val requestBuilder = chain.request().newBuilder()
+            val credentials = runBlocking {
+                when (val result = authRepo.getCredentials().last()) {
+                    is ApiResource.Success -> result.data
+                    else -> null
+                }
+            }
+
+            if (credentials?.accessToken.isNullOrEmpty()) {
+                Log.w("HttpClient", "Geen geldig token beschikbaar. Verzoek zonder token.")
+            } else {
+                Log.d("HttpClient", "Token gevonden: ${credentials?.accessToken}")
+                requestBuilder.addHeader("Authorization", "Bearer ${credentials?.accessToken}")
+            }
+
+            chain.proceed(requestBuilder.build())
+        }
+        .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(
