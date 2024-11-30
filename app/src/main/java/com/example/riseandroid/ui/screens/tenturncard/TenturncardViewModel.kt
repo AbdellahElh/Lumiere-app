@@ -70,10 +70,11 @@ class TenturncardViewModel(
 
     fun submitActivationCode(
         activationCode: String) {
+        var activationCodeTrimmed = activationCode.trim()
         viewModelScope.launch {
             tenturncardUiState = TenturncardUiState.Loading
             try {
-                tenturncardRepository.addTenturncard(activationCode)
+                tenturncardRepository.addTenturncard(activationCodeTrimmed)
                     .collect { resource ->
                         when (resource) {
                             is ApiResource.Loading -> {
