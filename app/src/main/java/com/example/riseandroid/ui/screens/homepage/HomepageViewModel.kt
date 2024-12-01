@@ -1,7 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage
 
 import android.util.Log
-import retrofit2.HttpException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,21 +11,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.data.entitys.MovieDao
-import com.example.riseandroid.data.lumiere.ProgramRepository
+import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
-import com.example.riseandroid.model.Program
-import com.example.riseandroid.repository.ApiResource
+import com.example.riseandroid.repository.IEventRepo
 import com.example.riseandroid.repository.IMoviePosterRepo
 import com.example.riseandroid.repository.IMovieRepo
-import com.example.riseandroid.repository.NetworkResult
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -34,14 +29,16 @@ import java.util.Locale
 
 sealed interface HomepageUiState {
     data class Succes(val allMovies: StateFlow<List<MovieModel>>,
-                      val recentMovies: StateFlow<List<MoviePoster>>) : HomepageUiState
+                      val recentMovies: StateFlow<List<MoviePoster>>,
+                      val events: StateFlow<List<EventModel>>) : HomepageUiState
     object Error : HomepageUiState
     object Loading : HomepageUiState
 }
 
 class HomepageViewModel(
     private val movieRepo: IMovieRepo,
-    private val moviePosterRepo: IMoviePosterRepo
+    private val moviePosterRepo: IMoviePosterRepo,
+    private val eventRepo: IEventRepo
 ) : ViewModel() {
     var homepageUiState: HomepageUiState by mutableStateOf(HomepageUiState.Loading)
         private set
@@ -63,6 +60,14 @@ class HomepageViewModel(
     private val _selectedCinemas = MutableStateFlow<List<String>>(emptyList())
     val options = listOf<String>("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
     val selectedCinemas= _selectedCinemas.asStateFlow()
+    private val _selectedCinema = MutableStateFlow("Brugge")
+    val selectedCinema: StateFlow<String> = _selectedCinema.asStateFlow()
+
+    private val _events = MutableStateFlow<List<EventModel>>(emptyList())
+    val events = _events.asStateFlow()
+
+    private val _filteredEvents = MutableStateFlow<List<EventModel>>(emptyList())
+    val filteredEvents: StateFlow<List<EventModel>> = _filteredEvents.asStateFlow()
 
     fun updateFilters(date: String, cinemas: List<String>,searchTitle:String) {
         _selectedDate.value = date
@@ -76,9 +81,9 @@ class HomepageViewModel(
     }
 
     init {
-
         getAllMoviesList()
         getNonRecentMovieList()
+        getEvents()
     }
 
     private fun getAllMoviesList() {
@@ -97,6 +102,7 @@ class HomepageViewModel(
                     homepageUiState = HomepageUiState.Succes(
                         allMovies = _allMovies,
                         recentMovies = recentMovies,
+                        events = events,
                     )
 
                 }
@@ -113,6 +119,7 @@ class HomepageViewModel(
                     homepageUiState = HomepageUiState.Succes(
                         allMovies = _allMovies,
                         recentMovies = recentMovies,
+                        events = events,
                     )
 
                 }
@@ -127,7 +134,8 @@ class HomepageViewModel(
                 getAllMoviesList()
                 homepageUiState = HomepageUiState.Succes(
                     recentMovies = recentMovies,
-                    allMovies = allMovies
+                    allMovies = allMovies,
+                    events = events
                 )
             } catch (e: IOException) {
                 homepageUiState = HomepageUiState.Error
@@ -137,6 +145,43 @@ class HomepageViewModel(
         }
     }
 
+    private fun getEvents() {
+        viewModelScope.launch {
+            try {
+                homepageUiState = HomepageUiState.Loading
+                eventRepo.refreshEvents()
+                eventRepo.getAllEventsList().collect { eventsList ->
+                    _events.value = eventsList
+                    _filteredEvents.value = eventsList.filter { event ->
+                        event.cinemas.any { it.name.equals("Brugge", ignoreCase = true) }
+                    }
+                    homepageUiState = HomepageUiState.Succes(
+                        allMovies = allMovies,
+                        recentMovies = recentMovies,
+                        events = events
+                    )
+                }
+            } catch (e: Exception) {
+                homepageUiState = HomepageUiState.Error
+                Log.e("HomepageViewModel", "Error fetching events", e)
+            }
+        }
+    }
+
+
+    fun filterEventsByCinema(selectedCinema: String) {
+        viewModelScope.launch {
+            val filtered = _events.value.filter { event ->
+                event.cinemas.any { it.name.equals(selectedCinema, ignoreCase = true) }
+            }
+            _filteredEvents.value = filtered
+        }
+    }
+
+    fun updateSelectedCinema(newCinema: String) {
+        _selectedCinema.value = newCinema
+        filterEventsByCinema(newCinema)
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -145,8 +190,12 @@ class HomepageViewModel(
                 val application = (this[APPLICATION_KEY] as LumiereApplication)
                 val movieRepo=application.container.movieRepo
                 val moviePosterRepo = application.container.moviePosterRepo
-                HomepageViewModel(movieRepo=movieRepo,
-                    moviePosterRepo = moviePosterRepo)
+                val eventRepo = application.container.eventRepo
+                HomepageViewModel(
+                    movieRepo = movieRepo,
+                    moviePosterRepo = moviePosterRepo,
+                    eventRepo = eventRepo
+                )
             }
         }
     }
