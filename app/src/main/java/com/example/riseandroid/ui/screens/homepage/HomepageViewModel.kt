@@ -93,29 +93,25 @@ class HomepageViewModel(
             try {
                 homepageUiState = HomepageUiState.Loading
                 eventRepo.refreshEvents()
-                eventRepo.getAllEventsList()
-                    .collect { eventsList ->
-                        _events.value = eventsList
-
-                        // Stel de standaard gefilterde events in op "Brugge"
-                        val defaultCinema = "Brugge"
-                        _filteredEvents.value = eventsList.filter { event ->
-                            event.cinemas.any { it.name.equals(defaultCinema, ignoreCase = true) }
-                        }
-
-                        homepageUiState = HomepageUiState.Succes(
-                            allMovies = allMovies,
-                            recentMovies = recentMovies,
-                            programFilms = programFilms,
-                            events = events
-                        )
+                eventRepo.getAllEventsList().collect { eventsList ->
+                    _events.value = eventsList
+                    _filteredEvents.value = eventsList.filter { event ->
+                        event.cinemas.any { it.name.equals("Brugge", ignoreCase = true) }
                     }
+                    homepageUiState = HomepageUiState.Succes(
+                        allMovies = allMovies,
+                        recentMovies = recentMovies,
+                        programFilms = programFilms,
+                        events = events
+                    )
+                }
             } catch (e: Exception) {
                 homepageUiState = HomepageUiState.Error
                 Log.e("HomepageViewModel", "Error fetching events", e)
             }
         }
     }
+
 
     fun filterEventsByCinema(selectedCinema: String) {
         viewModelScope.launch {

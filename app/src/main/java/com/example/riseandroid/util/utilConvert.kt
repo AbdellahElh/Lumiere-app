@@ -3,6 +3,7 @@ package com.example.riseandroid.util
 import com.example.riseandroid.data.entitys.Cinema
 import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieEntity
+import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
 import com.google.gson.Gson
@@ -88,5 +89,23 @@ fun EventModel.asEntity(): EventEntity {
         eventLink = eventLink ?: "",
         cinemasJson = cinemasJson,
         location = location ?: ""
+    )
+}
+
+fun EventResponse.toDomainModel(): EventModel {
+    return EventModel(
+        id = id,
+        title = title ?: "Geen titel",
+        genre = genre ?: "Onbekend genre",
+        type = type ?: "Onbekend type",
+        description = description ?: "Geen beschrijving",
+        duration = duration ?: "0 minuten",
+        director = director ?: "Onbekend",
+        releaseDate = releaseDate,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        cover = cover,
+        location = location ?: "Onbekend",
+        eventLink = eventLink ?: "",
+        cinemas = cinemas ?: emptyList()
     )
 }
