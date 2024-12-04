@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
 class WatchlistViewModel : ViewModel() {
-    private val _watchlist = MutableStateFlow<Set<Long>>(emptySet())
-    val watchlist: StateFlow<Set<Long>> = _watchlist
+    private val _watchlist = MutableStateFlow<Set<Int>>(emptySet())
+    val watchlist: StateFlow<Set<Int>> = _watchlist
 
-    fun toggleMovieInWatchlist(movieId: Long) {
+    fun toggleMovieInWatchlist(movieId: Int) {
         _watchlist.update { currentList ->
             if (currentList.contains(movieId)) {
                 currentList - movieId
@@ -20,7 +20,7 @@ class WatchlistViewModel : ViewModel() {
     }
 
 
-    fun isInWatchlist(movieId: Long): Boolean {
+    fun isInWatchlist(movieId: Int): Boolean {
         return _watchlist.value.contains(movieId)
     }
 }

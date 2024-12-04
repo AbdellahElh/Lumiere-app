@@ -1,14 +1,12 @@
 // HomepageViewModelTest.kt
 package com.example.riseandroid
 
+import com.example.riseandroid.fake.FakeEventRepo
 import com.example.riseandroid.fake.FakeMoviePosterRepo
 import com.example.riseandroid.fake.FakeMovieRepo
-import com.example.riseandroid.fake.FakeProgramRepository
-import com.example.riseandroid.model.Cinema
-import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
-import com.example.riseandroid.model.Program
 import com.example.riseandroid.rules.MainDispatcherRule
 import com.example.riseandroid.ui.screens.homepage.HomepageUiState
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
@@ -26,8 +24,7 @@ class HomepageViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun homepageViewModel_getMoviePosters_verifyHomepageUiStateSuccess() = runTest {
-        // Arrange: Set up the fake movie posters and repository
+    fun homepageViewModel_getMoviesAndEvents_verifyHomepageUiStateSuccess() = runTest {
         val fakeMoviePosters = listOf(
             MoviePoster(
                 id = 1,
@@ -37,81 +34,61 @@ class HomepageViewModelTest {
         )
 
         val fakeMovies = listOf(
-            Movie(
-                movieId = 1L,
+            MovieModel(
+                id = 1,
+                eventId = 1,
                 title = "Test Movie 1",
-                posterResourceId = R.drawable.screenshot_2024_10_08_105150,
-                description = "An action-packed adventure.",
+                coverImageUrl = "https://example.com/poster1.jpg",
                 genre = "Action",
-                length = "120 min",
-                director = "John Doe"
-            ),
-            Movie(
-                movieId = 2L,
-                title = "Test Movie 2",
-                posterResourceId = R.drawable.screenshot_2024_10_10_102504,
-                description = "A hilarious journey.",
-                genre = "Comedy",
-                length = "90 min",
-                director = "Jane Smith"
+                duration = "120 min",
+                director = "John Doe",
+                description = "An action-packed adventure.",
+                video = null,
+                videoPlaceholderUrl = null,
+                cast = listOf("Actor 1", "Actor 2"),
+                cinemas = emptyList()
             )
         )
 
-         val fakeMovieModels = listOf(
-             MovieModel(
-                 id = 1,
-                 title = "Test Movie",
-                 coverImageUrl = "https://m.media-amazon.com/images/I/613ypTLZHsL._AC_UF1000,1000_QL80_.jpg",
-                 genre = "Action",
-                 duration = "120 min",
-                 director = "John Doe",
-                 description = "An action-packed adventure.",
-                 video = null,
-                 videoPlaceholderUrl = null,
-                 cast = listOf("Actor 1", "Actor 2"),
-                 cinemas = listOf(
-                     Cinema(
-                         id = 1,
-                         name = "Brugge Cinema",
-                         showtimes = listOf("2023-10-01T18:00:00", "2023-10-01T20:00:00")
-                     )
-                 )
-             )
-         )
-
-         val fakePrograms = listOf(
-             Program(
-                 date = "2023-10-01",
-                 movie = fakeMovies[0],
-                 hours = "18:00",
-                 location = "Brugge"
-             )
-         )
-
-        val fakeMoviePosterRepo = FakeMoviePosterRepo(fakeMoviePosters)
-         val fakeMovieRepo = FakeMovieRepo(fakeMovieModels)
-         val fakeProgramRepository = FakeProgramRepository(fakePrograms)
-
-        // Act: Create the ViewModel with the fake movie poster repository
-        val homepageViewModel = HomepageViewModel(
-             programRepository = fakeProgramRepository,
-             movieRepo = fakeMovieRepo,
-            moviePosterRepo = fakeMoviePosterRepo
+        val fakeEvents = listOf(
+            EventModel(
+                id = 1,
+                title = "Test Event 1",
+                cover = "https://example.com/event1.jpg",
+                genre = "Comedy",
+                type = "Live Performance",
+                duration = "120 min",
+                director = "Jane Smith",
+                description = "A fun and exciting live event.",
+                eventLink = "https://example.com/event1",
+                videoPlaceholderUrl = null,
+                releaseDate = "2023-10-01",
+                cinemas = emptyList(),
+                location = "Brugge"
+            )
         )
 
-        // Advance the coroutine until all tasks are completed
+        val fakeMoviePosterRepo = FakeMoviePosterRepo(fakeMoviePosters)
+        val fakeMovieRepo = FakeMovieRepo(fakeMovies)
+        val fakeEventRepo = FakeEventRepo(fakeEvents)
+
+        val homepageViewModel = HomepageViewModel(
+            movieRepo = fakeMovieRepo,
+            moviePosterRepo = fakeMoviePosterRepo,
+            eventRepo = fakeEventRepo
+        )
+
         advanceUntilIdle()
 
-        // Assert: Verify the UI state is Success and contains the expected movie posters
-        val actualState = homepageViewModel.homepageUiState.value
+        val actualState = homepageViewModel.homepageUiState
 
-        if (actualState is HomepageUiState.Success) {
-            Assert.assertEquals(fakeMoviePosters, actualState.moviePosters)
-            // Assert.assertEquals(fakeMovies, actualState.allMovies)
-            // Assert.assertEquals(fakePrograms, actualState.programFilms)
+        if (actualState is HomepageUiState.Succes) {
+            Assert.assertEquals(fakeMoviePosters, actualState.recentMovies.value)
+            Assert.assertEquals(fakeMovies, actualState.allMovies.value)
+            Assert.assertEquals(fakeEvents, actualState.events.value)
         } else {
-            Assert.fail("Expected HomepageUiState.Success but got $actualState")
+            Assert.fail("Expected HomepageUiState.Succes but got $actualState")
         }
     }
-
 }
+

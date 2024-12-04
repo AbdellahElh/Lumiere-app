@@ -1,6 +1,5 @@
 package com.example.riseandroid.navigation
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,17 +30,16 @@ import com.example.riseandroid.model.Movie
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.eventDetail.EventDetailScreen
+import com.example.riseandroid.ui.screens.eventDetail.EventDetailViewModel
 import com.example.riseandroid.ui.screens.homepage.Homepage
 import com.example.riseandroid.ui.screens.login.ForgotPasswordScreen
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.login.LoginScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
-import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
-import com.example.riseandroid.ui.screens.ticket.TicketScreen
-import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 
@@ -67,7 +65,7 @@ fun BottomNavGraph(
     ) {
 
         composable(route = BottomBarScreen.Home.route) {
-            Homepage(navController = navController) // WEIZIGEN
+            Homepage(navController = navController, selectedTab = 0)
         }
 
         composable(route = BottomBarScreen.Tickets.route) {
@@ -148,7 +146,7 @@ fun BottomNavGraph(
         }
 
         composable("movieDetail/{movieId}") { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getString("movieId")?.toLongOrNull()
+            val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
             if (movieId != null) {
                 MovieDetailScreen(
                     movieId = movieId,
@@ -160,18 +158,29 @@ fun BottomNavGraph(
             }
         }
 
-        composable("watchlist/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email")
-            if (email != null) {
-                WatchlistScreen(
-                    viewModel = watchlistViewModel,
-                    allMovies = allMovies,
-                    onMovieClick = { movieId ->
-                        navController.navigate("movieDetail/$movieId")
-                    },
-                    navController = navController
+
+        composable("eventDetail/{eventId}") { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId")?.toIntOrNull()
+            if (eventId != null) {
+                EventDetailScreen(
+                    eventId = eventId,
+                    navController = navController,
+                    viewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId)),
+                    authViewModel = authViewModel,
+                    onBackToEvents = {
+                        navController.navigate("homepage?selectedTab=2") {
+                            popUpTo(BottomBarScreen.Home.route) { inclusive = true }
+                        }
+                    }
                 )
             }
+        }
+
+        composable("homepage?selectedTab={selectedTab}",
+            arguments = listOf(navArgument("selectedTab") { defaultValue = 0 })
+        ) { backStackEntry ->
+            val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
+            Homepage(navController = navController, selectedTab = selectedTab)
         }
     }
 }

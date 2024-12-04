@@ -2,6 +2,7 @@ package com.example.riseandroid.model
 
 data class MovieModel(
     val id: Int,
+    val eventId: Int?,
     val title: String,
     val coverImageUrl: String?,
     val genre: String?,

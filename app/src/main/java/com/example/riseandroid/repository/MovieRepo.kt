@@ -1,8 +1,6 @@
 package com.example.riseandroid.repository
 
-import android.icu.text.CaseMap.Title
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.CinemaEntity
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.MovieEntity
@@ -13,17 +11,13 @@ import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
     suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
+    suspend fun getMovieById(id: Int): MovieModel
 }
 
 class MovieRepo(
@@ -46,6 +40,35 @@ class MovieRepo(
                 }
             }
 
+    }
+
+    override suspend fun getMovieById(id: Int): MovieModel {
+        val movieEntity = movieDao.getMovieById(id)
+        if (movieEntity != null) {
+            return movieEntity.asExternalModel()
+        }
+        try {
+            val movieFromApi = movieApi.getMovieById(id)
+            movieDao.insertMovie(movieFromApi.asEntity())
+
+            return movieFromApi
+        } catch (e: Exception) {
+            Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
+            return MovieModel(
+                id = 0,
+                eventId = 0,
+                title = "",
+                coverImageUrl = "",
+                genre = "",
+                duration = "",
+                director = "",
+                description = "",
+                video = "",
+                videoPlaceholderUrl = "",
+                cast = emptyList(),
+                cinemas = emptyList()
+            )
+        }
     }
 
     suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>,searchTitle:String?) {
@@ -94,3 +117,4 @@ class MovieRepo(
     }
 
 }
+

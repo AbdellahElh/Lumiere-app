@@ -1,11 +1,8 @@
 package com.example.riseandroid.ui.screens.movieDetail.components
 
-import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.DatePicker
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,7 +27,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.model.Movie
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.Program
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -55,7 +51,7 @@ fun BottomSheetContent(
     programList: List<Program>,
     context: Context,
     navController: NavController,
-    movie: Movie,
+    movie: MovieModel,
     onDismiss: () -> Unit
 ) {
     val cinemaLocations = programList.groupBy { it.location }.keys.toList()
@@ -331,7 +327,7 @@ fun onCheckout(
     selectedCinema: String,
     date: String,
     selectedHour: String,
-    movie: Movie,
+    movie: MovieModel,
     navController: NavController,
     context: Context
 ) {
@@ -360,13 +356,13 @@ fun onCheckout(
             val currentTime = Calendar.getInstance()
 
             if (notificationTime.before(currentTime)) {
-                println("Triggering immediate notification for movieId: ${movie.movieId}")
+                println("Triggering immediate notification for movieId: ${movie.id}")
                 // If the show is less than 2 days away, trigger the notification immediately
-                LumiereApplication().displayImmediateNotification(context, movie.movieId, movie.title, selectedCinema, formattedDate)
+                LumiereApplication().displayImmediateNotification(context, movie.id, movie.title, selectedCinema, formattedDate)
             } else {
-                println("Scheduling notification for movieId: ${movie.movieId} at ${notificationTime.time}")
+                println("Scheduling notification for movieId: ${movie.id} at ${notificationTime.time}")
                 // Schedule the notification for 2 days before the show date
-                LumiereApplication().scheduleNotification(context, movie.movieId, movie.title, selectedCinema, formattedDate, notificationTime)
+                LumiereApplication().scheduleNotification(context, movie.id, movie.title, selectedCinema, formattedDate, notificationTime)
             }
         }
     } else {
@@ -375,10 +371,10 @@ fun onCheckout(
 
     // Redirect to the corresponding URL for ticket purchase
     val url = when (selectedCinema) {
-        "Brugge" -> "https://tickets.lumierecinema.be/lumiere/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
-        "Antwerpen" -> "https://tickets.lumiere-antwerpen.be/lumiereantwerpen/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
-        "Mechelen" -> "https://tickets.lumieremechelen.be/lumieremechelen/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
-        "Cinema Cartoons" -> "https://tickets.cinemacartoons.be/cartoons/nl/flow_configs/webshop/steps/start/show/${movie.movieId}"
+        "Brugge" -> "https://tickets.lumierecinema.be/lumiere/nl/flow_configs/webshop/steps/start/show/${movie.id}"
+        "Antwerpen" -> "https://tickets.lumiere-antwerpen.be/lumiereantwerpen/nl/flow_configs/webshop/steps/start/show/${movie.id}"
+        "Mechelen" -> "https://tickets.lumieremechelen.be/lumieremechelen/nl/flow_configs/webshop/steps/start/show/${movie.id}"
+        "Cinema Cartoons" -> "https://tickets.cinemacartoons.be/cartoons/nl/flow_configs/webshop/steps/start/show/${movie.id}"
         else -> ""
     }
 

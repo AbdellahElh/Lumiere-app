@@ -5,7 +5,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.riseandroid.data.entitys.*
+import com.example.riseandroid.data.entitys.CinemaEntity
+import com.example.riseandroid.data.entitys.EventDao
+import com.example.riseandroid.data.entitys.EventEntity
+import com.example.riseandroid.data.entitys.MovieDao
+import com.example.riseandroid.data.entitys.MovieEntity
+import com.example.riseandroid.data.entitys.MoviePosterDao
+import com.example.riseandroid.data.entitys.MoviePosterEntity
+import com.example.riseandroid.data.entitys.ShowtimeEntity
+import com.example.riseandroid.data.entitys.TenturncardDao
+import com.example.riseandroid.data.entitys.TenturncardEntity
 
 @Database(
     entities = [
@@ -13,9 +22,10 @@ import com.example.riseandroid.data.entitys.*
         CinemaEntity::class,
         ShowtimeEntity::class,
         MoviePosterEntity::class,
-        TenturncardEntity::class
+        TenturncardEntity::class,
+        EventEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class RiseDatabase : RoomDatabase() {
@@ -23,6 +33,7 @@ abstract class RiseDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDao
     abstract fun moviePosterDao(): MoviePosterDao
     abstract fun tenturncardDao() : TenturncardDao
+    abstract fun eventDao(): EventDao
 
     companion object {
         @Volatile
