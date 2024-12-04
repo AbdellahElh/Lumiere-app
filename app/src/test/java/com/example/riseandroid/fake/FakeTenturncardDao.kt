@@ -2,9 +2,10 @@ package com.example.riseandroid.fake
 
 import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.entitys.TenturncardEntity
+import kotlinx.coroutines.flow.Flow
 
 class FakeTenturncardDao : TenturncardDao {
-    override suspend fun getAllTenturncards(): List<TenturncardEntity> {
+    override fun getAllTenturncards(): Flow<List<TenturncardEntity>> {
         TODO("Not yet implemented")
     }
 

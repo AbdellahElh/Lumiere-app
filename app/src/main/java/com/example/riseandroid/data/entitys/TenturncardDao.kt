@@ -8,7 +8,7 @@ interface TenturncardDao {
 
 
     @Query("SELECT * FROM tenturncards ORDER BY amountLeft DESC")
-    suspend fun getAllTenturncards(): Flow<List<TenturncardEntity>>
+    fun getAllTenturncards(): Flow<List<TenturncardEntity>>
 
 
     @Query("SELECT * FROM tenturncards WHERE id = :id")

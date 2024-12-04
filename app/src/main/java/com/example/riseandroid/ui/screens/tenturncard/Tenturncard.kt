@@ -40,16 +40,15 @@ import java.util.prefs.NodeChangeEvent
 
 @Composable
 fun TenturncardScreen(
-    authToken: String,
     tenTurnCardViewModel: TenturncardViewModel = viewModel(factory = TenturncardViewModel.Factory),
 ) {
 
-
-    LaunchedEffect(authToken) {
-        tenTurnCardViewModel.fetchTenturncards(authToken)
-    }
     val cards by tenTurnCardViewModel.tenturncards.collectAsState()
     val inputText by tenTurnCardViewModel.inputText.collectAsState()
+
+//    LaunchedEffect(cards) {
+//        tenTurnCardViewModel.fetchTenturncards()
+//    }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,

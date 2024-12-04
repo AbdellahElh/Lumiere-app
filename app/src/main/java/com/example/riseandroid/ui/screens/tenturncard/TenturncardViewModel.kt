@@ -40,11 +40,10 @@ class TenturncardViewModel(
     private val _tenturncards = MutableStateFlow<List<Tenturncard>>(emptyList())
     val tenturncards = _tenturncards.asStateFlow()
 
-    fun fetchTenturncards(authToken: String) {
+    fun fetchTenturncards() {
         viewModelScope.launch {
             try {
-                Log.d("viewmodeltenturncard",authToken)
-                val cards = tenturncardRepository.getTenturncards(authToken)
+                val cards = tenturncardRepository.getTenturncards()
                     .collect { cards ->
                         _tenturncards.value = cards
                         tenturncardUiState  = TenturncardUiState.Succes(
@@ -81,7 +80,6 @@ class TenturncardViewModel(
                                 tenturncardUiState = TenturncardUiState.Loading
                             }
                             is ApiResource.Success -> {
-                                // Emit success state
                                 tenturncardUiState = TenturncardUiState.Succes(
                                     allTenturncards = tenturncards
                                 )
@@ -89,7 +87,12 @@ class TenturncardViewModel(
                             }
                             is ApiResource.Error -> {
                                 tenturncardUiState = TenturncardUiState.Error(resource.message)
-                                updateInputText("Er ging iets fout")
+                                if(resource.message?.contains("404") == true) {
+                                    updateInputText("Deze kaart bestaat niet")
+                                }
+                                else {
+                                    updateInputText("Deze kaart behoort al tot iemand")
+                                }
                             }
 
                             is ApiResource.Initial -> {
@@ -99,7 +102,7 @@ class TenturncardViewModel(
                     }
             } catch (e: Exception) {
                 tenturncardUiState = TenturncardUiState.Error(e.message)
-                updateInputText("Er was een onverwachte fout")
+                updateInputText("Er was een onverwachte fout in de viewmodel")
             }
         }
     }

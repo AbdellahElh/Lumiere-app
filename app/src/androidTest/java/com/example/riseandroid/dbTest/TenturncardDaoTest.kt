@@ -22,6 +22,7 @@ class TenturncardDaoTest {
     private lateinit var risedb : RiseDatabase
 
     private var toAddTenturncard = TenturncardEntity(
+        id = 1,
         amountLeft = 10,
         ActivationCode = "activationCode",
         UserTenturncardId = 1,
@@ -52,6 +53,6 @@ class TenturncardDaoTest {
     fun daoAdd_addTenturncardToDb() = runBlocking {
         tenturncardDao.addTenturncard(toAddTenturncard)
         val allTenturncards = tenturncardDao.getAllTenturncards().first()
-        assertEquals(allTenturncards, toAddTenturncard)
+        assertEquals(allTenturncards.first(), toAddTenturncard)
     }
 }
