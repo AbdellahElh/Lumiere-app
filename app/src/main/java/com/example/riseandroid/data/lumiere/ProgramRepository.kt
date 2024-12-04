@@ -12,7 +12,7 @@ interface ProgramRepository {
     suspend fun getPrograms() : Flow<List<Program>>
     suspend fun getProgramsLocation(location: String) : Flow<List<Program>>
     suspend fun getMoviesLocation(location: String) : Flow<List<Program>>
-    suspend fun getProgramsForMovie(movieId: Int): Flow<List<Program>>
+    suspend fun getProgramsForMovie(movieId: Long): Flow<List<Program>>
 }
 
 class NetworkProgramRepository(private val lumiereApiService: LumiereApiService) : ProgramRepository {
@@ -36,10 +36,10 @@ class NetworkProgramRepository(private val lumiereApiService: LumiereApiService)
             )
         }
     }
-    override suspend fun getProgramsForMovie(movieId: Int): Flow<List<Program>> {
+    override suspend fun getProgramsForMovie(movieId: Long): Flow<List<Program>> {
         val programs = Datasource().LoadPrograms()
         return flow {
-            emit(programs.filter { it.movie.movieId.toInt() == movieId })
+            emit(programs.filter { it.movie.movieId == movieId })
         }
     }
 

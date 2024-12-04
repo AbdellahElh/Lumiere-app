@@ -338,19 +338,17 @@ fun MovieDescription(movie: MovieModel, isExpanded: Boolean, onToggleExpand: () 
     )
 
     val displayedDescription =
-        if (isExpanded) movie.description else movie.description?.take(100)
+        if (isExpanded) movie.description.orEmpty() else movie.description.orEmpty().take(100)
 
-    (if (isExpanded) displayedDescription else "$displayedDescription...")?.let {
-        Text(
-        text = it,
+    Text(
+        text = if (isExpanded) displayedDescription else "$displayedDescription...",
         fontSize = 15.sp,
         fontWeight = FontWeight.Light,
         color = Color(0xFF696D74),
         modifier = Modifier.padding(top = 16.dp)
     )
-    }
 
-    if (movie.description?.length!! > 100) {
+    if (movie.description.orEmpty().length > 100) {
         Text(
             text = if (isExpanded) "Lees Minder" else "Lees Meer",
             fontSize = 15.sp,

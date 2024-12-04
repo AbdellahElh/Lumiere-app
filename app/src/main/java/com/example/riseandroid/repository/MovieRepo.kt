@@ -12,13 +12,12 @@ import com.example.riseandroid.util.asExternalModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
-    suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>): Flow<List<MovieModel>>
-    suspend fun getSpecificMovie(movieId: Int): MovieModel
+    suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
+    suspend fun getMovieById(id: Int): MovieModel
 }
 
 class MovieRepo(
@@ -28,29 +27,58 @@ class MovieRepo(
 
     override suspend fun getAllMoviesList(
         selectedDate: String,
-        selectedCinemas: List<String>
+        selectedCinemas: List<String>,
+        searchTitle: String?
     ): Flow<List<MovieModel>> {
-        return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas)
+        val searchTitleWithPercent = if (searchTitle.isNullOrEmpty()) "%" else "%$searchTitle%"
+
+        return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas,searchTitleWithPercent)
             .map { entities -> entities.map(MovieEntity::asExternalModel) }
-            .onEach { movies ->
-                movies.forEach { movie ->
-                    Log.d("MoviesList", movie.toString())
-                }}
             .onStart {
                 withContext(Dispatchers.IO) {
-                    refreshMovies(selectedDate, selectedCinemas)
+                    refreshMovies(selectedDate, selectedCinemas, searchTitle)
                 }
             }
 
     }
 
-    override suspend fun getSpecificMovie(movieId: Int): MovieModel {
-        return movieApi.getMovieById(movieId.toInt())
+    override suspend fun getMovieById(id: Int): MovieModel {
+        val movieEntity = movieDao.getMovieById(id)
+        if (movieEntity != null) {
+            return movieEntity.asExternalModel()
+        }
+        try {
+            val movieFromApi = movieApi.getMovieById(id)
+            movieDao.insertMovie(movieFromApi.asEntity())
+
+            return movieFromApi
+        } catch (e: Exception) {
+            Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
+            return MovieModel(
+                id = 0,
+                eventId = 0,
+                title = "",
+                coverImageUrl = "",
+                genre = "",
+                duration = "",
+                director = "",
+                description = "",
+                video = "",
+                videoPlaceholderUrl = "",
+                cast = emptyList(),
+                cinemas = emptyList()
+            )
+        }
     }
 
-    suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>) {
+    suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>,searchTitle:String?) {
         try {
-            val moviesFromApi = movieApi.getAllMovies(date = selectedDate, cinemas = selectedCinemas)
+            val search = if (searchTitle.isNullOrEmpty()) null else searchTitle
+            val moviesFromApi = movieApi.getAllMovies(
+                date = selectedDate,
+                cinemas = selectedCinemas,
+                title = search
+            )
             val moviesAsEntities = moviesFromApi.map { it.asEntity() }
             movieDao.insertMovies(moviesAsEntities)
             for (movie in moviesFromApi) {
@@ -89,3 +117,4 @@ class MovieRepo(
     }
 
 }
+

@@ -5,18 +5,27 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.riseandroid.data.entitys.CinemaEntity
+import com.example.riseandroid.data.entitys.EventDao
+import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.MovieEntity
+import com.example.riseandroid.data.entitys.MoviePosterDao
+import com.example.riseandroid.data.entitys.MoviePosterEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
+import com.example.riseandroid.data.entitys.TenturncardDao
+import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.watchlist.WatchlistDao
 import com.example.riseandroid.data.entitys.watchlist.WatchlistEntity
 
-@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class, WatchlistEntity::class, MovieWatchlistEntity::class], version = 6, exportSchema = false)
+@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class, WatchlistEntity::class, MovieWatchlistEntity::class, MoviePosterEntity::class, TenturncardEntity::class, EventEntity::class], version = 6, exportSchema = false)
 abstract class RiseDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
     abstract fun watchlistDao(): WatchlistDao
+    abstract fun moviePosterDao(): MoviePosterDao
+    abstract fun tenturncardDao() : TenturncardDao
+    abstract fun eventDao(): EventDao
 
     companion object {
         @Volatile

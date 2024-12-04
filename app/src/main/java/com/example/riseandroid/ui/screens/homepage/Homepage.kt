@@ -1,8 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,37 +13,23 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
@@ -53,7 +37,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,36 +44,37 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.riseandroid.R
 import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.model.Program
+import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.ui.screens.homepage.components.CinemaDropdownMenu
+import com.example.riseandroid.ui.screens.homepage.components.EventItem
 import com.example.riseandroid.ui.screens.homepage.components.ListAllMovies
+import com.example.riseandroid.ui.screens.homepage.components.MoviePosterItem
 import com.example.riseandroid.ui.screens.homepage.components.MoviesFilters
 import com.example.riseandroid.ui.screens.homepage.components.SlidingButton
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.riseandroid.ui.screens.homepage.components.SlidingButtonForHomepage
 
 
 @Composable
 fun Homepage(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    selectedTab: Int = 0,
     homepageViewModel: HomepageViewModel = viewModel(factory = HomepageViewModel.Factory),
 ) {
-
     val homepageUiState = homepageViewModel.homepageUiState
 
     when (homepageUiState) {
         is HomepageUiState.Succes -> {
             val recentMovies by homepageViewModel.recentMovies.collectAsState()
-            val programList by homepageViewModel.programFilms.collectAsState()
             val allMoviesNonRecent by homepageViewModel.allMovies.collectAsState()
 
             ResultScreen(
                 navController = navController,
                 recentMovieList = recentMovies,
-                programList = programList,
                 modifier = modifier,
                 homepageViewModel = homepageViewModel,
-                allMoviesNonRecent=allMoviesNonRecent
+                allMoviesNonRecent = allMoviesNonRecent,
+                selectedTab = selectedTab,
             )
         }
         is HomepageUiState.Loading -> LoadingScreen()
@@ -100,32 +84,23 @@ fun Homepage(
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultScreen(
     navController: NavHostController,
-    recentMovieList: List<Program>,
-    programList: List<Program>,
-    allMoviesNonRecent:List<MovieModel>,
+    recentMovieList: List<MoviePoster>,
+    allMoviesNonRecent: List<MovieModel>,
     modifier: Modifier = Modifier,
     homepageViewModel: HomepageViewModel = viewModel(
         factory = HomepageViewModel.Factory
     ),
-
-    ) {
+    selectedTab: Int,
+) {
     val layoutDirection = LocalLayoutDirection.current
     val posterImagePadding = dimensionResource(R.dimen.image_padding)
-    val scrollState = rememberScrollState()
-    var isFilms by remember { mutableStateOf(true) }
-    var expandedLocaties by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf("Brugge") }
-
-    val options = listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
 
     Surface(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)
             .padding(
                 start = WindowInsets.safeDrawing
                     .asPaddingValues()
@@ -136,242 +111,138 @@ fun ResultScreen(
             )
             .semantics { contentDescription = "Home Screen" },
         color = MaterialTheme.colorScheme.background
-
     ) {
-        Column() {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "Welkom terug,",
-                        fontSize = 16.sp,
-                        color = Color(0xFFAFAFAF)
-                    )
-                    Text(
-                        text = "Dion",
-                        fontSize = 20.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Header()
 
-                Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            SlidingButtonForHomepage(
+                selectedIndex = selectedTab,
+                onToggle = { newTab ->
+                    navController.navigate("homepage?selectedTab=$newTab") {
+                        popUpTo("homepage") { inclusive = true }
+                    }
+                },
+                options = listOf("Films", "Programma", "Events")
+            )
 
-                Image(
-//                    painter = when (selectedOptionText) {
-//                        "Brugge" -> painterResource(id = R.drawable.lumiere_brugge)
-//                        "Antwerpen" -> painterResource(id = R.drawable.lumiere_antwerpen)
-//                        "Mechelen" -> painterResource(id = R.drawable.lumiere_mechelen)
-//                        "Cinema Cartoons" -> painterResource(id = R.drawable.lumiere_cinema_cartoons)
-//                        else -> painterResource(id = R.drawable.lumiere_logo)
-//                    },
-                    painter = painterResource(id = R.drawable.lumiere_logo),
-                    contentDescription = "logo",
-//                    contentScale = ContentScale.FillBounds,
-//                    modifier = Modifier
-//                        .width(180.dp)
-//                        .height(100.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(33.dp))
-            ToggleFilmOrEvent(isFilms) { isFilms = !isFilms }
-            Spacer(modifier = Modifier.height(50.dp))
-            if (isFilms){
+            Spacer(modifier = Modifier.height(16.dp))
 
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column {
-
-                        TitleText(
-                            title = stringResource(R.string.nieuwe_films_title),
-                            modifier = Modifier.offset(x = (-16).dp)
-                        )                    }
-
-                    Box(
+            when (selectedTab) {
+                0 -> { // Films Tab
+                    Column(
                         modifier = Modifier
-                            .border(
-                                1.dp,
-                                Color.White,
-                                RoundedCornerShape(10.dp)
-                            )
-
-
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
                     ) {
-                        ExposedDropdownMenuBox(
-                            expanded = expandedLocaties,
-                            onExpandedChange = { expandedLocaties = !expandedLocaties }
+                        LazyRow(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
                         ) {
-                            TextField(
-                                value = selectedOptionText,
-                                onValueChange = { newLocation ->
-                                    selectedOptionText = newLocation
-                                    homepageViewModel.updateMoviesLocation(newLocation)
-                                },
-
-
-                                readOnly = true,
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLocaties)
-                                },
-                                modifier = Modifier
-
-                                    .menuAnchor()
-
-                                    .clickable { expandedLocaties = !expandedLocaties },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    containerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
-                                ),
-
-                                textStyle =  TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.White
-                                ),
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = expandedLocaties,
-                                onDismissRequest = { expandedLocaties = false }
-                            ) {
-                                options.forEach { film ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = film) },
-                                        onClick = {
-                                            selectedOptionText = film
-                                            expandedLocaties = false
-                                            homepageViewModel.updateMoviesLocation(film)
-
-                                        }
-                                    )
-                                }
+                            items(recentMovieList) { poster ->
+                                MoviePosterItem(
+                                    moviePoster = poster,
+                                    navController = navController,
+                                    modifier = Modifier.width(150.dp)
+                                )
                             }
                         }
+
+                        TitleText(title = stringResource(R.string.alle_films_title))
+
+                        MoviesFilters(homepageViewModel = homepageViewModel)
+
+                        ListAllMovies(
+                            allMoviesNonRecent = allMoviesNonRecent,
+                            navController = navController,
+                            modifier = Modifier
+                                .padding(posterImagePadding)
+                                .height(400.dp)
+                        )
                     }
-
-
                 }
-                MovieList(
-                    movieList = recentMovieList,
-                    navController = navController,
-                    modifier = Modifier
-                        .padding(posterImagePadding)
-                        .height(400.dp)
-                )
 
-                TitleText(title = stringResource(R.string.alle_films_title), modifier = Modifier)
-
-                MoviesFilters(homepageViewModel=homepageViewModel)
-
-                ListAllMovies(
-                    allMoviesNonRecent = allMoviesNonRecent,
-                    navController = navController,
-                    modifier = Modifier
-                        .padding(posterImagePadding)
-                        .height(400.dp)
-                )
-            }
-            else{
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column {
-
-                        TitleText(title = "Programma",modifier = Modifier.offset(x = (-16).dp))
-                    }
-                    Spacer(modifier = Modifier.width(32.dp))
-                    Box(
+                1 -> { // Programma Tab
+                    Column(
                         modifier = Modifier
-                            .border(
-                                1.dp,
-                                Color.White,
-                                RoundedCornerShape(10.dp)
-                            )
-                            .wrapContentSize()
-
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
                     ) {
-                        ExposedDropdownMenuBox(
-                            expanded = expandedLocaties,
-                            onExpandedChange = { expandedLocaties = !expandedLocaties }
-                        ) {
-                            TextField(
-                                value = selectedOptionText,
-                                onValueChange = { newLocation ->
-                                    selectedOptionText = newLocation
-                                    homepageViewModel.updateMoviesLocation(newLocation)
-                                },
+                        TitleText(title = "Programma")
+                        // Hier moet programma content komen
+                    }
+                }
 
+                2 -> { // Events Tab
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
+                    ) {
+                        TitleText(title = "Events")
 
-                                readOnly = true,
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedLocaties)
-                                },
-                                modifier = Modifier
-                                    .wrapContentSize()
-
-                                    .menuAnchor()
-
-                                    .clickable { expandedLocaties = !expandedLocaties },
-                                colors = TextFieldDefaults.textFieldColors(
-                                    containerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
-                                    unfocusedIndicatorColor = Color.Transparent
-                                ),
-
-                                textStyle =  TextStyle(
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.White
-                                ),
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = expandedLocaties,
-                                onDismissRequest = { expandedLocaties = false }
-                            ) {
-                                options.forEach { film ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = film) },
-                                        onClick = {
-                                            selectedOptionText = film
-                                            expandedLocaties = false
-                                            homepageViewModel.updateMoviesLocation(film)
-
-                                        }
-                                    )
-                                }
+                        CinemaDropdownMenu(
+                            options = homepageViewModel.options,
+                            selectedOption = homepageViewModel.selectedCinema.collectAsState().value,
+                            onOptionSelected = { newCinema ->
+                                homepageViewModel.updateSelectedCinema(newCinema)
                             }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        homepageViewModel.filteredEvents.collectAsState().value.forEach { event ->
+                            EventItem(
+                                event = event,
+                                navController = navController,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp)
+                            )
                         }
                     }
-
-
                 }
-                MovieScheduleList(programList = programList, navController)
-
             }
-
         }
     }
 }
+
+
+@Composable
+fun Header() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(
+                text = "Welkom bij Lumière",
+                fontSize = 16.sp,
+                color = Color(0xFFAFAFAF)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Image(
+            painter = painterResource(id = R.drawable.lumiere_logo),
+            contentDescription = "logo",
+            modifier = Modifier.size(100.dp)
+        )
+    }
+}
+
 
 @Composable
 fun LoadingScreen(
@@ -418,52 +289,6 @@ fun ToggleFilmOrEvent(isFilms: Boolean, onToggle: () -> Unit) {
         )
     }
 }
-@Composable
-fun MoviePosterCard(movie: Program, navController: NavHostController, modifier: Modifier = Modifier) {
-    println(movie)
-    Column(modifier = modifier.clickable {
-        navController.navigate("movieDetail/${movie.movie.movieId}")
-    }
-    )  {
-        val posterId = movie.movie.posterResourceId
-        val movieTitle = movie.movie.title
-        Image(
-            painter = painterResource(posterId),
-            contentDescription = null,
-            modifier = modifier
-                .fillMaxWidth()
-                .weight(0.75f)
-                .clip(MaterialTheme.shapes.medium)
-                .testTag(posterId.toString())
-                .testTag(movie.movie.posterResourceId.toString()) ,
-
-            contentScale = ContentScale.Crop,
-        )
-        Text(
-            text = movieTitle,
-            modifier
-                .weight(0.25f)
-                .testTag(movieTitle),
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
-
-}
-
-@Composable
-fun MovieList(movieList: List<Program>, navController: NavHostController, modifier: Modifier = Modifier) {
-    LazyRow(modifier = modifier) {
-        items(movieList) { m ->
-            MoviePosterCard(
-                movie = m,
-                navController = navController,
-                modifier = modifier
-            )
-        }
-    }
-}
 
 @Composable
 fun TitleText(title: String, modifier: Modifier = Modifier) {
@@ -476,74 +301,3 @@ fun TitleText(title: String, modifier: Modifier = Modifier) {
         modifier = modifier.padding(16.dp)
     )
 }
-@Composable
-fun MovieScheduleList(
-    programList: List<Program>,
-    navController: NavHostController,
-    modifier: Modifier = Modifier,
-) {
-    val groupedByDate = programList.groupBy { it.date }.toSortedMap()
-    val dateFormatterInput = SimpleDateFormat("yyyy-MM-dd", Locale("nl"))
-    val dateFormatterOutput = SimpleDateFormat("d MMMM yyyy", Locale("nl"))
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        groupedByDate.forEach { (date, programsByDate) ->
-            val parsedDate = dateFormatterInput.parse(date)
-            Text(
-                text = dateFormatterOutput.format(parsedDate),
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-            )
-
-            val groupedByMovie = programsByDate.groupBy { it.movie.title }
-            println(groupedByMovie)
-            groupedByMovie.forEach { (movieTitle, moviePrograms) ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    Text(
-                        text = movieTitle,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
-                        modifier = Modifier.padding(bottom = 14.dp)
-                    )
-
-                    Image(
-                        painter = painterResource(id = moviePrograms.first().movie.posterResourceId),
-                        contentDescription = movieTitle,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .clickable {navController.navigate("movieDetail/${moviePrograms.first().movie.movieId}")},
-                        contentScale = ContentScale.Crop
-
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    moviePrograms.forEach { program ->
-                        Text(
-                            text = "- ${program.hours} @ ${program.location}",
-                            fontSize = 16.sp,
-                            color = Color(0xFFAFAFAF),
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
