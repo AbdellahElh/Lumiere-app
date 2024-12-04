@@ -20,6 +20,7 @@ import com.example.riseandroid.network.SignUpApi
 import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.network.auth0.Auth0Api
+import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.EventRepo
 import com.example.riseandroid.repository.IAuthRepo
@@ -30,6 +31,8 @@ import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.repository.WatchlistRepo
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
@@ -73,7 +76,28 @@ class DefaultAppContainer(private val context: Context,
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
+
     private val httpClient: OkHttpClient = SslHelper.createOkHttpClient(context, loggingInterceptor)
+        .newBuilder()
+        .addInterceptor { chain ->
+            val requestBuilder = chain.request().newBuilder()
+            val credentials = runBlocking {
+                when (val result = authRepo.getCredentials().last()) {
+                    is ApiResource.Success -> result.data
+                    else -> null
+                }
+            }
+
+            if (credentials?.accessToken.isNullOrEmpty()) {
+                Log.w("HttpClient", "Geen geldig token beschikbaar. Verzoek zonder token.")
+            } else {
+                Log.d("HttpClient", "Token gevonden: ${credentials?.accessToken}")
+                requestBuilder.addHeader("Authorization", "Bearer ${credentials?.accessToken}")
+            }
+
+            chain.proceed(requestBuilder.build())
+        }
+        .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(
