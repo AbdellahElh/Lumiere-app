@@ -15,7 +15,7 @@ interface MoviesApi {
         @Query("title") title:String?
     ):  List<MovieModel>
 
-    @GET("api/Movie/posters")
+    @GET("api/Movie/future-posters")
     suspend fun getMoviePosters(): List<MoviePoster>
 
     @GET("api/Movie/{id}")
