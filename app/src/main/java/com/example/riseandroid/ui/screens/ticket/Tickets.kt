@@ -208,9 +208,7 @@ fun TicketsScreenContent(
                     Spacer(modifier = Modifier.height(44.dp))
                 } else {
 
-                    TenturncardScreen(
-                      authToken = authToken
-                    )
+                    TenturncardScreen()
                 }
             }
         }

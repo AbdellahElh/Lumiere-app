@@ -67,6 +67,9 @@ dependencies {
     implementation(libs.retrofit)
     // Retrofit with Kotlin serialization Converter
     implementation(libs.retrofit2.kotlinx.serialization.converter)
+    // Retrofit mock
+    testImplementation(libs.retrofit.mock)
+
     implementation(libs.okhttp)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.espresso.core)
