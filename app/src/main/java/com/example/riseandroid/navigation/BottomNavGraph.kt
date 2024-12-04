@@ -40,7 +40,6 @@ import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
-import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 
@@ -147,7 +146,7 @@ fun BottomNavGraph(
         }
 
         composable("movieDetail/{movieId}") { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getString("movieId")?.toLongOrNull()
+            val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
             if (movieId != null) {
                 MovieDetailScreen(
                     movieId = movieId,
@@ -159,19 +158,7 @@ fun BottomNavGraph(
             }
         }
 
-        composable("watchlist/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email")
-            if (email != null) {
-                WatchlistScreen(
-                    viewModel = watchlistViewModel,
-                    allMovies = allMovies,
-                    onMovieClick = { movieId ->
-                        navController.navigate("movieDetail/$movieId")
-                    },
-                    navController = navController
-                )
-            }
-        }
+
         composable("eventDetail/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId")?.toIntOrNull()
             if (eventId != null) {

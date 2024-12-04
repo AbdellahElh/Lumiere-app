@@ -1,9 +1,7 @@
 package com.example.riseandroid.fake
 
 import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.IMovieRepo
-import com.example.riseandroid.repository.NetworkResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -21,7 +19,8 @@ class FakeMovieRepo : IMovieRepo {
             director = "",
             description = "",
             video = "",
-            videoPlaceholderUrl = ""
+            videoPlaceholderUrl = "",
+            eventId = 1
         ),
         MovieModel(
             id = 2,
@@ -34,7 +33,8 @@ class FakeMovieRepo : IMovieRepo {
             director = "",
             description = "",
             video = "",
-            videoPlaceholderUrl = ""
+            videoPlaceholderUrl = "",
+            eventId = 2
         )
     )
 
@@ -46,6 +46,10 @@ class FakeMovieRepo : IMovieRepo {
         return flow {
             emit(fakeMovies)
         }
+    }
+
+    override suspend fun getMovieById(id: Int): MovieModel {
+        TODO("Not yet implemented")
     }
 
 

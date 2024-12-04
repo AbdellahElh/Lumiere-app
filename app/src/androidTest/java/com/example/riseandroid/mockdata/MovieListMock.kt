@@ -53,7 +53,8 @@ class MovieListMock {
             director = "",
             description = "",
             video = "",
-            videoPlaceholderUrl = ""
+            videoPlaceholderUrl = "",
+            eventId = 1
         ),
             MovieModel(
                 id = 2,
@@ -66,7 +67,8 @@ class MovieListMock {
                 director = "",
                 description = "",
                 video = "",
-                videoPlaceholderUrl = ""
+                videoPlaceholderUrl = "",
+                eventId = 2
             ))
 
     }

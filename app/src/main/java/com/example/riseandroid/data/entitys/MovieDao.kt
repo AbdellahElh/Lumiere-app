@@ -13,6 +13,9 @@ interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMovies(movies: List<MovieEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMovie(movie: MovieEntity)
+
     @Delete
     suspend fun deleteMovie(movie: MovieEntity)
 
@@ -48,4 +51,7 @@ interface MovieDao {
         selectedCinemas: List<String>,
         searchTitle:String?
     ): Flow<List<MovieEntity>>
+
+    @Query("SELECT * FROM movies WHERE id = :movieId LIMIT 1")
+    suspend fun getMovieById(movieId: Int): MovieEntity?
 }

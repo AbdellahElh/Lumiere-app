@@ -9,7 +9,6 @@ import com.example.riseandroid.util.asExternalModel
 import com.example.riseandroid.util.toDomainModel
 import com.example.riseandroid.util.toEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
@@ -46,8 +45,7 @@ class EventRepo(
 
     override suspend fun getSpecificEvent(eventId: Int): EventModel? {
         return try {
-            val localEvent = eventDao.getAllEvents()
-                .firstOrNull()?.find { it.id == eventId }?.asExternalModel()
+            val localEvent = eventDao.getEventById(eventId)?.asExternalModel()
 
             localEvent ?: eventsApi.getSpecificEvent(eventId).toDomainModel()
         } catch (e: Exception) {

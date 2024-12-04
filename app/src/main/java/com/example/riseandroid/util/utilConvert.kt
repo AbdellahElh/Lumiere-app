@@ -18,6 +18,7 @@ val gson = Gson()
 fun MovieEntity.asExternalModel(): MovieModel {
     return MovieModel(
         id = id,
+        eventId = eventId ?: 0,
         title = title,
         coverImageUrl = coverImageUrl,
         genre = genre,
@@ -34,6 +35,7 @@ fun MovieEntity.asExternalModel(): MovieModel {
 fun MovieModel.asEntity(): MovieEntity {
     return MovieEntity(
         id = id,
+        eventId = eventId ?: 0,
         title = title,
         genre = genre ?: "",
         description = description ?: "",
