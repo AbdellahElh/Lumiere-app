@@ -35,8 +35,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import com.example.riseandroid.data.RiseDatabase
-import com.example.riseandroid.data.SslHelper
 
 
 interface AppContainer {
@@ -60,7 +58,7 @@ class DefaultAppContainer(private val context: Context,
                           override val userManager: UserManager
 ) : AppContainer {
     private val BASE_URL = "https://dev-viwl48rh7lran3ul.us.auth0.com"
-    private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
+    private val BASE_URL_BACKEND = "https://10.0.2.2:5001"
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
     private val movieDao = riseDatabase.movieDao()

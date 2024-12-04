@@ -24,9 +24,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.screens.eventDetail.EventDetailScreen
+import com.example.riseandroid.ui.screens.eventDetail.EventDetailViewModel
 import com.example.riseandroid.ui.screens.homepage.Homepage
 import com.example.riseandroid.ui.screens.login.ForgotPasswordScreen
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
@@ -58,7 +61,7 @@ fun BottomNavGraph(
     ) {
 
         composable(route = BottomBarScreen.Home.route) {
-            Homepage(navController = navController) // WEIZIGEN
+            Homepage(navController = navController, selectedTab = 0)
         }
         composable(route = BottomBarScreen.ScanCode.route) {
             ScanCodeScreen(navController = navController)
@@ -154,6 +157,29 @@ fun BottomNavGraph(
             }
         }
 
+        composable("eventDetail/{eventId}") { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId")?.toIntOrNull()
+            if (eventId != null) {
+                EventDetailScreen(
+                    eventId = eventId,
+                    navController = navController,
+                    viewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId)),
+                    authViewModel = authViewModel,
+                    onBackToEvents = {
+                        navController.navigate("homepage?selectedTab=2") {
+                            popUpTo(BottomBarScreen.Home.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+        }
+
+        composable("homepage?selectedTab={selectedTab}",
+            arguments = listOf(navArgument("selectedTab") { defaultValue = 0 })
+        ) { backStackEntry ->
+            val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
+            Homepage(navController = navController, selectedTab = selectedTab)
+        }
 
         composable("watchlist") {
             WatchlistScreen(

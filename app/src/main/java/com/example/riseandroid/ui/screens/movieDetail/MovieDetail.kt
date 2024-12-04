@@ -24,10 +24,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,7 +53,6 @@ import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
-import com.example.riseandroid.ui.screens.movieDetail.components.BottomSheetContent
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 @Composable
@@ -152,19 +149,36 @@ fun MovieDetailContent(
                 MovieInfo(movie)
                 Spacer(modifier = Modifier.height(10.dp))
                 MovieDescription(movie, isExpanded) { isExpanded = !isExpanded }
-                Spacer(modifier = Modifier.height(35.dp))
-                NextStepButton(onClick = { showBottomSheet = true })
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (movie.eventId != 0) {
+                    Button(
+                        onClick = {
+                            navController.navigate("eventDetail/${movie.eventId}")
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFE5CB77),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(vertical = 15.dp)
+                    ) {
+                        Text(
+                            text = "Event Beschikbaar",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
-        }
-        if (showBottomSheet) {
-            val context = LocalContext.current
-            ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
-                sheetState = rememberModalBottomSheetState(),
-                containerColor = Color(0xFFE5CB77)
-            ) {
-                BottomSheetContent(programList, context, navController, movie) { showBottomSheet = false }
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+                NextStepButton(
+                    isUserLoggedIn = isUserLoggedIn,
+                    onClick = { showBottomSheet = true }
+                )
+                Spacer(modifier = Modifier.height(18.dp))
             }
         }
     }
@@ -361,9 +375,21 @@ fun MovieDescription(movie: MovieModel, isExpanded: Boolean, onToggleExpand: () 
 }
 
 @Composable
-fun NextStepButton(onClick: () -> Unit) {
+fun NextStepButton(isUserLoggedIn: Boolean, onClick: () -> Unit) {
+    val context = LocalContext.current
+
     Button(
-        onClick = onClick,
+        onClick = {
+            if (isUserLoggedIn) {
+                onClick()
+            } else {
+                Toast.makeText(
+                    context,
+                    "U moet ingelogd zijn om door te gaan naar de volgende stap",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        },
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFE5CB77),
