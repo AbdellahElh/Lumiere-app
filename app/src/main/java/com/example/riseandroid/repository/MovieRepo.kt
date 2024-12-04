@@ -7,6 +7,8 @@ import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.ResponseMovie
+import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +35,7 @@ class MovieRepo(
         val searchTitleWithPercent = if (searchTitle.isNullOrEmpty()) "%" else "%$searchTitle%"
 
         return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas,searchTitleWithPercent)
-            .map { entities -> entities.map(MovieEntity::asExternalModel) }
+            .map { entities -> entities.map(MovieEntity::asDomainModel) }
             .onStart {
                 withContext(Dispatchers.IO) {
                     refreshMovies(selectedDate, selectedCinemas, searchTitle)
@@ -45,7 +47,7 @@ class MovieRepo(
     override suspend fun getMovieById(id: Int): MovieModel {
         val movieEntity = movieDao.getMovieById(id)
         if (movieEntity != null) {
-            return movieEntity.asExternalModel()
+            return movieEntity.asDomainModel()
         }
         try {
             val movieFromApi = movieApi.getMovieById(id)
@@ -89,7 +91,7 @@ class MovieRepo(
         }
     }
 
-    private suspend fun saveCinemasAndShowtimes(movie: MovieModel) {
+    private suspend fun saveCinemasAndShowtimes(movie: ResponseMovie) {
 
         for (cinema in movie.cinemas) {
             val newCinema = CinemaEntity(

@@ -6,32 +6,30 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.Modifier
-import com.example.riseandroid.data.lumiere.ProgramRepository
 import com.example.riseandroid.fake.FakeMovieRepo
-import com.example.riseandroid.fake.FakeProgramRepo
-import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+import com.example.riseandroid.ui.screens.movieProgram.MovieProgramViewModel
 
 class MovieFiltersUITest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private lateinit var fakeHomepageViewModel: HomepageViewModel
+    private lateinit var fakeProgramViewModel: MovieProgramViewModel
     private lateinit var fakeMovieRepo: FakeMovieRepo
-    private lateinit var fakeProgram:ProgramRepository
 
     @Before
     fun setup() {
         fakeMovieRepo = FakeMovieRepo()
-        fakeProgram = FakeProgramRepo()
-        fakeHomepageViewModel = HomepageViewModel(fakeProgram,fakeMovieRepo)
+        fakeProgramViewModel = MovieProgramViewModel(fakeMovieRepo)
     }
 
     @Test
     fun filters_are_displayed_on_screen() {
         composeTestRule.setContent {
             Surface(modifier = Modifier) {
-                MoviesFilters(homepageViewModel = fakeHomepageViewModel)
+                MoviesFilters(
+                    viewModel = fakeProgramViewModel
+                )
             }
         }
 
@@ -47,7 +45,7 @@ class MovieFiltersUITest {
     fun testFiltersSelection() {
         composeTestRule.setContent {
             Surface(modifier = Modifier) {
-                MoviesFilters(homepageViewModel = fakeHomepageViewModel)
+                MoviesFilters(viewModel = fakeProgramViewModel)
             }
         }
         composeTestRule.onNodeWithText("Selecteer Cinema").assertIsDisplayed()

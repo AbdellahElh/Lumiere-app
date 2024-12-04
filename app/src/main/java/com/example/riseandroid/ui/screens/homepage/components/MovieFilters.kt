@@ -35,18 +35,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+import com.example.riseandroid.ui.screens.movieProgram.MovieProgramViewModel
 import com.example.riseandroid.util.getTodayDate
 import java.util.Calendar
 import java.util.Locale
 
 @Composable
 fun MoviesFilters(
-    homepageViewModel:HomepageViewModel
+    viewModel:MovieProgramViewModel
 ) {
 
-    val selectedDate by homepageViewModel.selectedDate.collectAsState()
-    val selectedCinemas by homepageViewModel.selectedCinemas.collectAsState()
-    val searchTitle by homepageViewModel.searchTitle.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    val selectedCinemas by viewModel.selectedCinemas.collectAsState()
+    val searchTitle by viewModel.searchTitle.collectAsState()
 
     Box(
         modifier = Modifier
@@ -60,7 +61,7 @@ fun MoviesFilters(
             DatePicker(
                 selectedDate = selectedDate,
                 onDateSelected = { selectedLocalDate ->
-                    homepageViewModel.updateFilters(
+                    viewModel.updateFilters(
                         selectedLocalDate,
                         selectedCinemas,
                         searchTitle ?: "",
@@ -73,7 +74,7 @@ fun MoviesFilters(
             CinemaDropDown(
                 selectedCinemas = selectedCinemas,
                 onCinemaSelected = { updatedCinemas ->
-                    homepageViewModel.updateFilters(
+                    viewModel.updateFilters(
                         selectedDate,
                         updatedCinemas,
                         searchTitle ?: "",
@@ -83,7 +84,7 @@ fun MoviesFilters(
             TitleSearch(
                 title = searchTitle ?: "",
                 onTitleChanged = { updatedTitle ->
-                    homepageViewModel.updateFilters(selectedDate, selectedCinemas, updatedTitle)
+                    viewModel.updateFilters(selectedDate, selectedCinemas, updatedTitle)
                 }
             )
 
@@ -97,10 +98,10 @@ fun MoviesFilters(
             ) {
                 Button(
                     onClick = {
-                        homepageViewModel.updateFilters(getTodayDate(),
+                        viewModel.updateFilters(getTodayDate(),
                             emptyList(),
                             "")
-                        homepageViewModel.applyFilters()
+                        viewModel.applyFilters()
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -115,7 +116,7 @@ fun MoviesFilters(
 
                 Button(
                     onClick = {
-                        homepageViewModel.applyFilters()
+                        viewModel.applyFilters()
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -189,7 +190,6 @@ fun DatePicker(selectedDate: String, onDateSelected: (String) -> Unit) {
                 imageVector = Icons.Default.DateRange,
                 contentDescription = "Selecteer datum",
                 modifier = Modifier.padding(start = 8.dp),
-
                 )
         }
     }
@@ -304,14 +304,12 @@ fun TitleSearch(title: String, onTitleChanged: (String) -> Unit) {
 }
 
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun MoviesFiltersPreview() {
-    val viewModel: HomepageViewModel = viewModel(
-        factory = HomepageViewModel.Factory
+    val viewModel: MovieProgramViewModel = viewModel(
+        factory = MovieProgramViewModel.Factory
     )
 
-    MoviesFilters(homepageViewModel = viewModel)
+    MoviesFilters(viewModel = viewModel)
 }
