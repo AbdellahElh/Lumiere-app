@@ -38,6 +38,7 @@ import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.login.LoginScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
+import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
@@ -185,6 +186,12 @@ fun BottomNavGraph(
         ) { backStackEntry ->
             val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
             Homepage(navController = navController, goToMovieDetail=goToMovieDetail, selectedTab = selectedTab)
+        }
+
+        composable(route = "scanner") {
+            ScanCodeScreen(
+                navController = navController,
+            )
         }
     }
 }

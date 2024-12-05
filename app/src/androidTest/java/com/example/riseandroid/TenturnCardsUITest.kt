@@ -1,5 +1,7 @@
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import com.example.riseandroid.fake.FakeTenturncardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -16,11 +18,14 @@ class TenturnCardsUITest {
 
     private lateinit var fakeRepository: FakeTenturncardRepository
     private lateinit var viewModel: TenturncardViewModel
+    lateinit var navController: TestNavHostController
+
 
     @Before
     fun setup() {
         fakeRepository = FakeTenturncardRepository()
         viewModel = TenturncardViewModel(tenturncardRepository=fakeRepository)
+        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
     }
 
 
@@ -28,7 +33,7 @@ class TenturnCardsUITest {
     fun testCardsAreDisplayed() = runTest {
 
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen(navController,tenTurnCardViewModel = viewModel)
         }
         Thread.sleep(3000)
 
@@ -43,7 +48,7 @@ class TenturnCardsUITest {
     @Test
     fun addTenturncardFieldIsDisplayed() = runTest {
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen(navController,tenTurnCardViewModel = viewModel)
         }
         composeTestRule.onNodeWithTag("codeInputField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("addBtn").assertIsDisplayed()
@@ -52,7 +57,7 @@ class TenturnCardsUITest {
     @Test
     fun succesMessageIsShown() = runTest {
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen( navController, tenTurnCardViewModel = viewModel)
         }
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("succesCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
@@ -63,7 +68,7 @@ class TenturnCardsUITest {
     @Test
     fun errorMessageIsShown() = runTest {
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen(navController,tenTurnCardViewModel = viewModel)
         }
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("errorCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()

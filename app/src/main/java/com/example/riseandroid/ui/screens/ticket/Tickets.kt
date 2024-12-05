@@ -93,8 +93,7 @@ fun TicketScreen(
             val tickets = uiState.ticketList.collectAsState(initial = emptyList())
             TicketsScreenContent(
                 TicketList = tickets.value,
-
-
+                navController = navController,
                 authToken = authToken!!
             )
         }
@@ -102,6 +101,7 @@ fun TicketScreen(
 }
 @Composable
 fun TicketsScreenContent(
+    navController: NavController,
     TicketList: List<Ticket>,
    authToken: String, // Accept AuthViewModel
 ) {
@@ -208,7 +208,7 @@ fun TicketsScreenContent(
                     Spacer(modifier = Modifier.height(44.dp))
                 } else {
 
-                    TenturncardScreen()
+                    TenturncardScreen(navController = navController)
                 }
             }
         }

@@ -3,6 +3,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.room.util.TableInfo
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.repository.TenturncardRepository
@@ -40,6 +42,7 @@ import java.util.prefs.NodeChangeEvent
 
 @Composable
 fun TenturncardScreen(
+    navController: NavController,
     tenTurnCardViewModel: TenturncardViewModel = viewModel(factory = TenturncardViewModel.Factory),
 ) {
 
@@ -61,13 +64,16 @@ fun TenturncardScreen(
             inputActivationCodeField(
                 inputText = inputText,
                 onValueChange = { tenTurnCardViewModel.updateInputText(it) },
-                onSubmit = { tenTurnCardViewModel.submitActivationCode(inputText) }
+                onSubmit = { tenTurnCardViewModel.submitActivationCode(inputText) },
+                navController = navController,
             )
             if (cards.isEmpty()) {
                 Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
             } else {
                 LazyRow(
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
                     items(cards) { card ->
                         TenturnCardItem(card)
@@ -85,6 +91,7 @@ fun formatDate(dateString: String): String {
 
 @Composable
 fun inputActivationCodeField(
+    navController: NavController,
     inputText: String,
     onValueChange: (String) -> Unit,
     onSubmit: () -> Unit
@@ -117,14 +124,21 @@ fun inputActivationCodeField(
         // Add spacing between the text field and the button
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Submit button
-        Button(
-            onClick = onSubmit,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .testTag("addBtn")
-        ) {
-            Text("Voeg een tienbeurtenkaart toe")
+        Row {// Submit button
+            Button(
+                onClick = onSubmit,
+                modifier = Modifier
+                    .testTag("addBtn")
+            ) {
+                Text("Voeg een tienbeurtenkaart toe")
+            }
+            Button(
+                onClick = { navController.navigate("scanner") },
+                modifier = Modifier
+                    .testTag("goToScannerBtn")
+            ) {
+                Text("Scan een QR code")
+            }
         }
     }
 }
