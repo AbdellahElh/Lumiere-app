@@ -1,6 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage
 
-import MovieProgram
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +53,7 @@ import com.example.riseandroid.ui.screens.homepage.components.MoviePosterItem
 import com.example.riseandroid.ui.screens.homepage.components.MoviesFilters
 import com.example.riseandroid.ui.screens.homepage.components.SlidingButton
 import com.example.riseandroid.ui.screens.homepage.components.SlidingButtonForHomepage
+import com.example.riseandroid.ui.screens.movieProgram.MovieProgram
 
 
 @Composable

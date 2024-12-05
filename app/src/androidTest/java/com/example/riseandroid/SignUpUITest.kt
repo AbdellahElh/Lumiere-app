@@ -49,26 +49,5 @@ class SignUpUITest {
         signUpTestRule.onNodeWithContentDescription("Register Button").assertIsDisplayed()
     }
 
-//    @Test
-//    fun signUp_Success() {
-//        var receivedCredentials: Credentials? = null
-//        signUpTestRule.setContent {
-//            Surface(modifier = Modifier) {
-//                SignUp(
-//                    signUp = {},
-//                    navController = navController,
-//                    authViewModel = authViewModel
-//                )
-//            }
-//        }
-//
-//        signUpTestRule.onNodeWithText("Email").performTextInput("test@example.com")
-//        signUpTestRule.onNodeWithText("Wachtwoord").performTextInput("Password123*")
-//        signUpTestRule.onNodeWithContentDescription("Register Button").performClick()
-//
-//        assertNotNull(receivedCredentials)
-//        assertEquals("fakeIdToken", receivedCredentials?.idToken)
-//        assertEquals("fakeAccessToken", receivedCredentials?.accessToken)
-//    }
 
 }
