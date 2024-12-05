@@ -28,7 +28,7 @@ class TenturnCardsUITest {
     fun testCardsAreDisplayed() = runTest {
 
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
         }
         Thread.sleep(3000)
 
@@ -43,7 +43,7 @@ class TenturnCardsUITest {
     @Test
     fun addTenturncardFieldIsDisplayed() = runTest {
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
         }
         composeTestRule.onNodeWithTag("codeInputField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("addBtn").assertIsDisplayed()
@@ -52,7 +52,7 @@ class TenturnCardsUITest {
     @Test
     fun succesMessageIsShown() = runTest {
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen( tenTurnCardViewModel = viewModel)
         }
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("succesCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
@@ -63,12 +63,12 @@ class TenturnCardsUITest {
     @Test
     fun errorMessageIsShown() = runTest {
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
         }
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("errorCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
 
-        composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Er ging iets fout")
+        composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Deze kaart behoort al tot iemand")
     }
 
 

@@ -42,12 +42,13 @@ class FakeTenturncardRepository : ITenturncardRepository {
         )
     )
 
-    override suspend fun getTenturncards(authToken: String): Flow<List<Tenturncard>> {
+    override suspend fun getTenturncards(): Flow<List<Tenturncard>> {
         return flow {
             kotlinx.coroutines.delay(1000)
             emit(fakeCards)
         }
     }
+
 
     override fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> {
         return flow {

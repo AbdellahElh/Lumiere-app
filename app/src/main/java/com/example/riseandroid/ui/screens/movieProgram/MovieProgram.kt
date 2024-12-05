@@ -1,3 +1,5 @@
+package com.example.riseandroid.ui.screens.movieProgram;
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,7 +50,6 @@ import com.example.riseandroid.ui.screens.homepage.components.MoviesFilters
 import com.example.riseandroid.ui.screens.movieProgram.MovieProgramViewModel
 import com.example.riseandroid.ui.screens.movieProgram.ProgramUiState
 import kotlinx.coroutines.flow.StateFlow
-
 
 @Composable
 fun MovieProgram(
