@@ -50,13 +50,16 @@ class MovieDetailViewModel(
         title = "",
         coverImageUrl = "",
         genre = "",
-        duration = "",
+        duration = 0,
         director = "",
         description = "",
-        video = "",
         videoPlaceholderUrl = "",
         cast = emptyList(),
-        cinemas = emptyList()
+        cinemas = emptyList(),
+        releaseDate = "",
+        bannerImageUrl = "",
+        posterImageUrl = "",
+        movieLink = ""
     ))
     val selectedMovie: StateFlow<MovieModel> = _selectedMovie.asStateFlow()
 

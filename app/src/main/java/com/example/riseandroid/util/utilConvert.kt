@@ -27,10 +27,13 @@ fun MovieEntity.asExternalModel(): MovieModel {
         duration = duration,
         director = director,
         description = description,
-        video = movieLink,
+        movieLink = movieLink,
         videoPlaceholderUrl = videoPlaceholderUrl,
         cast = emptyList(),
-        cinemas = emptyList()
+        cinemas = emptyList(),
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl,
     )
 }
 
@@ -41,13 +44,14 @@ fun MovieModel.asEntity(): MovieEntity {
         title = title,
         genre = genre ?: "",
         description = description ?: "",
-        duration = duration ?: "",
+        duration = duration ?: 0,
         director = director ?: "",
         videoPlaceholderUrl = videoPlaceholderUrl,
         coverImageUrl = coverImageUrl,
-        bannerImageUrl= coverImageUrl,
+        bannerImageUrl = coverImageUrl,
         posterImageUrl = coverImageUrl,
-        movieLink = video ?: ""
+        movieLink = movieLink,
+        releaseDate = releaseDate,
     )
 }
 

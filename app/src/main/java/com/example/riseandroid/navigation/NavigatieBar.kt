@@ -40,7 +40,8 @@ fun NavHostWrapper(
     val watchlistViewModel: WatchlistViewModel = viewModel(
         factory = WatchlistViewModelFactory(
             watchlistRepo = application.container.watchlistRepo,
-            userManager = application.userManager
+            userManager = application.userManager,
+            application = application
         )
     )
 

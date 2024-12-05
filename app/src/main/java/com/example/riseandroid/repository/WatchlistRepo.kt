@@ -43,10 +43,16 @@ class WatchlistRepo(
                 movieId = movie.id
             )
 
-            watchlistDao.addToWatchlist(movieWatchlist.asEntity())
-            watchlistApi.addToWatchlist(movie)
+            try {
+                watchlistDao.addToWatchlist(movieWatchlist.asEntity())
+                watchlistApi.addToWatchlist(movie)
+            } catch (@SuppressLint("NewApi") e: HttpException) {
+                throw e
+            }
         }
     }
+
+
 
     override suspend fun removeFromWatchlist(movieId: Int, userId: Int) {
         withContext(Dispatchers.IO) {

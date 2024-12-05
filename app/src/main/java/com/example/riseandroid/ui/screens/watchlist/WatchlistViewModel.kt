@@ -1,6 +1,8 @@
 package com.example.riseandroid.ui.screens.watchlist
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -8,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.repository.IWatchlistRepo
+import com.example.riseandroid.util.isNetworkAvailable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +23,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class WatchlistViewModel(private val watchlistRepo: IWatchlistRepo, private val userManager: UserManager) : ViewModel() {
+class WatchlistViewModel(
+    private val watchlistRepo: IWatchlistRepo,
+    private val userManager: UserManager,
+    private val context: Context
+) : ViewModel() {
 
     private val _watchlist = MutableStateFlow<List<MovieModel>>(emptyList())
     val watchlist: StateFlow<List<MovieModel>> = _watchlist.asStateFlow()
@@ -28,11 +35,18 @@ class WatchlistViewModel(private val watchlistRepo: IWatchlistRepo, private val 
     private val _eventFlow = MutableSharedFlow<WatchlistEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private val _isSyncing = MutableStateFlow(false)
+    val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
+
     init {
         userManager.currentUserId
             .onEach { userId ->
                 if (userId != null) {
-                    syncWatchlist(userId)
+                    if (isNetworkAvailable(context)) {
+                        syncWatchlist()
+                    } else {
+                        loadOfflineWatchlist(userId)
+                    }
                 } else {
                     _watchlist.value = emptyList()
                 }
@@ -43,30 +57,53 @@ class WatchlistViewModel(private val watchlistRepo: IWatchlistRepo, private val 
                 } else {
                     flowOf(emptyList())
                 }
-            }.onEach { movies ->
+            }
+            .onEach { movies ->
                 _watchlist.value = movies
-            }.launchIn(viewModelScope)
+            }
+            .launchIn(viewModelScope)
     }
 
     fun refreshWatchlist() {
         val userId = userManager.currentUserId.value
         if (userId != null) {
-            syncWatchlist(userId)
-        }
-    }
-
-
-    private fun syncWatchlist(userId: Int) {
-        viewModelScope.launch {
-            try {
-                watchlistRepo.syncWatchlistWithBackend(userId)
-                Log.d("WatchlistViewModel", "Watchlist gesynchroniseerd voor user $userId")
-            } catch (e: Exception) {
-                Log.e("WatchlistViewModel", "Fout bij synchroniseren: ${e.message}", e)
+            if (isNetworkAvailable(context)) {
+                syncWatchlist()
+            } else {
+                loadOfflineWatchlist(userId)
             }
         }
     }
 
+
+    fun syncWatchlist() {
+        val userId = userManager.currentUserId.value
+        if (userId != null && isNetworkAvailable(context)) {
+            viewModelScope.launch {
+                _isSyncing.value = true
+                try {
+                    watchlistRepo.syncWatchlistWithBackend(userId)
+                    Log.d("WatchlistViewModel", "Watchlist gesynchroniseerd")
+                } catch (e: Exception) {
+                    Log.e("WatchlistViewModel", "Fout bij synchroniseren van watchlist: ${e.message}")
+                } finally {
+                    _isSyncing.value = false // Synchronisatie eindigt
+                }
+            }
+        }
+    }
+
+
+    private fun loadOfflineWatchlist(userId: Int) {
+        viewModelScope.launch {
+            try {
+                Log.d("WatchlistViewModel", "Offline watchlist geladen voor user $userId")
+                // Hier kun je meer logica toevoegen als caching belangrijk is.
+            } catch (e: Exception) {
+                Log.e("WatchlistViewModel", "Fout bij offline laden: ${e.message}", e)
+            }
+        }
+    }
 
     @SuppressLint("NewApi")
     fun toggleMovieInWatchlist(movie: MovieModel) {
@@ -84,7 +121,15 @@ class WatchlistViewModel(private val watchlistRepo: IWatchlistRepo, private val 
                         }
                     }
                 } else {
-                    watchlistRepo.addToWatchlist(movie, userId)
+                    try {
+                        watchlistRepo.addToWatchlist(movie, userId)
+                    } catch (e: HttpException) {
+                        if (e.code() == 409) {
+                            _eventFlow.emit(WatchlistEvent.ShowToast("Deze film staat al in je watchlist"))
+                        } else {
+                            throw e
+                        }
+                    }
                 }
             }
         }
@@ -98,22 +143,25 @@ class WatchlistViewModel(private val watchlistRepo: IWatchlistRepo, private val 
     sealed class WatchlistEvent {
         data class ShowToast(val message: String) : WatchlistEvent()
     }
-
 }
 
 
 class WatchlistViewModelFactory(
     private val watchlistRepo: IWatchlistRepo,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val application: Application
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WatchlistViewModel::class.java)) {
-            return WatchlistViewModel(watchlistRepo, userManager) as T
+            return WatchlistViewModel(
+                watchlistRepo, userManager, application
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
 
 
 

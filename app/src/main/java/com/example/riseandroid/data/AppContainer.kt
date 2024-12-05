@@ -1,6 +1,7 @@
 package com.example.riseandroid.data
 
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
@@ -38,6 +39,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import android.app.Application
 
 
 interface AppContainer {
@@ -212,7 +214,8 @@ class DefaultAppContainer(private val context: Context,
     override val authViewModel: AuthViewModel = AuthViewModel(
         authRepo = authRepo,
         watchlistRepo = watchlistRepo,
-        userManager = userManager
+        userManager = userManager,
+        application = context.applicationContext as Application
     )
 
     override val userId: Int
@@ -245,7 +248,7 @@ class DefaultAppContainer(private val context: Context,
         return try {
             val parts = jwt.split(".")
             if (parts.size < 2) return null
-            val payload = String(android.util.Base64.decode(parts[1], android.util.Base64.URL_SAFE))
+            val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
             JSONObject(payload)
         } catch (e: Exception) {
             null

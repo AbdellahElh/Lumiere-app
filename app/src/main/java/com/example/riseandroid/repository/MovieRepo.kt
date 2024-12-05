@@ -60,13 +60,16 @@ class MovieRepo(
                 title = "",
                 coverImageUrl = "",
                 genre = "",
-                duration = "",
+                duration = 0,
                 director = "",
                 description = "",
-                video = "",
                 videoPlaceholderUrl = "",
                 cast = emptyList(),
-                cinemas = emptyList()
+                cinemas = emptyList(),
+                releaseDate = "",
+                bannerImageUrl = "",
+                posterImageUrl = "",
+                movieLink = ""
             )
         }
     }

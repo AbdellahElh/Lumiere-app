@@ -22,7 +22,8 @@ import kotlinx.coroutines.launch
 class AuthViewModel(
     private val authRepo: IAuthRepo,
     private val watchlistRepo: IWatchlistRepo,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val application: Application
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
@@ -35,7 +36,10 @@ class AuthViewModel(
     val email: StateFlow<String?> get() = _email
 
     private val _watchlistViewModel: WatchlistViewModel by lazy {
-        WatchlistViewModelFactory(watchlistRepo, userManager).create(WatchlistViewModel::class.java)
+        WatchlistViewModelFactory(
+            watchlistRepo, userManager,
+            application
+        ).create(WatchlistViewModel::class.java)
     }
 
     val watchlistViewModel: WatchlistViewModel get() = _watchlistViewModel
@@ -110,7 +114,8 @@ class AuthViewModel(
 
                 AuthViewModel(
                     authRepo = authRepo, userManager = userManager,
-                    watchlistRepo = watchlistRepo
+                    watchlistRepo = watchlistRepo,
+                    application = application
                 )
             }
         }

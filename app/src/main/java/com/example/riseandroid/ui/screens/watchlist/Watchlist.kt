@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +48,8 @@ fun WatchlistScreen(
     val watchlistViewModel: WatchlistViewModel = viewModel(
         factory = WatchlistViewModelFactory(
             watchlistRepo = application.container.watchlistRepo,
-            userManager = application.container.userManager
+            userManager = application.container.userManager,
+            application = application,
         )
     )
 
@@ -76,7 +78,7 @@ fun WatchlistScreen(
                 Text(
                     text = "Your watchlist is empty.",
                     fontSize = 18.sp,
-                    color = androidx.compose.ui.graphics.Color.Gray
+                    color = Color.Gray
                 )
             }
         } else {
@@ -89,7 +91,7 @@ fun WatchlistScreen(
                     Column {
                         WatchlistMovieItem(movie = movie, onClick = { onMovieClick(movie.id) })
                         Divider(
-                            color = androidx.compose.ui.graphics.Color.LightGray,
+                            color = Color.LightGray,
                             thickness = 1.dp,
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
@@ -100,19 +102,20 @@ fun WatchlistScreen(
     }
 }
 
+
 @Composable
 fun TopBar(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(androidx.compose.ui.graphics.Color(0xFFE5CB77))
+            .background(Color(0xFFE5CB77))
             .padding(vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = "Watchlist",
             fontSize = 20.sp,
-            color = androidx.compose.ui.graphics.Color.White,
+            color = Color.White,
             modifier = Modifier.align(Alignment.Center)
         )
         IconButton(
@@ -122,7 +125,7 @@ fun TopBar(navController: NavController) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back to Account",
-                tint = androidx.compose.ui.graphics.Color.White
+                tint = Color.White
             )
         }
     }
@@ -150,7 +153,7 @@ fun WatchlistMovieItem(movie: MovieModel, onClick: () -> Unit) {
         Text(
             text = movie.title,
             fontSize = 18.sp,
-            color = androidx.compose.ui.graphics.Color.White,
+            color = Color.White,
             modifier = Modifier.weight(1f)
         )
     }

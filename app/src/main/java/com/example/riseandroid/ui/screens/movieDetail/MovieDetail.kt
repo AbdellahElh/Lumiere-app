@@ -22,11 +22,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,8 +71,13 @@ fun MovieDetailScreen(
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
     val context = LocalContext.current
+    val isSyncing by watchlistViewModel.isSyncing.collectAsState()
 
-    val isInWatchlist = remember(watchlistState) {
+    LaunchedEffect(movieId) {
+        watchlistViewModel.syncWatchlist()
+    }
+
+    val isInWatchlist = remember(watchlistState, movieId) {
         watchlistState.any { it.id == movieId }
     }
 
@@ -86,6 +93,7 @@ fun MovieDetailScreen(
                 navController = navController,
                 isInWatchlist = isInWatchlist,
                 isUserLoggedIn = isUserLoggedIn,
+                isSyncing = isSyncing,
                 onWatchlistClick = {
                     Log.d("MovieDetailScreen", "Bookmark button clicked for movie ID: $movieId")
                     if (isUserLoggedIn) {
@@ -111,6 +119,7 @@ fun MovieDetailScreen(
 
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailContent(
@@ -119,6 +128,7 @@ fun MovieDetailContent(
     navController: NavController,
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
+    isSyncing: Boolean,
     onWatchlistClick: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -141,7 +151,8 @@ fun MovieDetailContent(
                     isInWatchlist = isInWatchlist,
                     isUserLoggedIn = isUserLoggedIn,
                     onWatchlistClick = onWatchlistClick,
-                    onBackClick = { navigateBack(navController) }
+                    onBackClick = { navigateBack(navController) },
+                    isSyncing = isSyncing,
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 MoviePoster(movie)
@@ -222,6 +233,7 @@ fun MovieDetailHeader(
     navController: NavController,
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
+    isSyncing: Boolean,
     onWatchlistClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -234,7 +246,7 @@ fun MovieDetailHeader(
             contentDescription = "Back",
             modifier = Modifier
                 .size(24.dp)
-                .clickable { onBackClick() } //BEKIJKEN
+                .clickable { onBackClick() }
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
@@ -249,25 +261,28 @@ fun MovieDetailHeader(
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        onWatchlistClick()
-                    },
+                    .clickable(enabled = !isSyncing) { onWatchlistClick() },
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(
-                        id = if (isInWatchlist) R.drawable.btn_bookmark_filled else R.drawable.btn_bookmark_outline
-                    ),
-                    contentDescription = "Bookmark",
-                    modifier = Modifier.size(24.dp)
-                )
+                if (isSyncing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(
+                            id = if (isInWatchlist) R.drawable.btn_bookmark_filled else R.drawable.btn_bookmark_outline
+                        ),
+                        contentDescription = "Bookmark",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }
 }
+
 
 
 @Composable
