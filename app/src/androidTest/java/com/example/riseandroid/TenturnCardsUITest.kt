@@ -73,7 +73,7 @@ class TenturnCardsUITest {
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("errorCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
 
-        composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Er ging iets fout")
+        composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Deze kaart behoort al tot iemand")
     }
 
 

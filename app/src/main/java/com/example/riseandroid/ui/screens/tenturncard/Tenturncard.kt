@@ -49,18 +49,11 @@ fun TenturncardScreen(
     val cards by tenTurnCardViewModel.tenturncards.collectAsState()
     val inputText by tenTurnCardViewModel.inputText.collectAsState()
 
-//    LaunchedEffect(cards) {
-//        tenTurnCardViewModel.fetchTenturncards()
-//    }
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
             inputActivationCodeField(
                 inputText = inputText,
                 onValueChange = { tenTurnCardViewModel.updateInputText(it) },
@@ -81,7 +74,6 @@ fun TenturncardScreen(
                 }
             }
         }
-    }
 }
 fun formatDate(dateString: String): String {
     val dateParts = dateString.substring(0, 10).split("-")
@@ -178,7 +170,11 @@ fun TenturnCardItem(card: Tenturncard) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = formatDate(card.expirationDate),
+                    text = if (card.expirationDate == "") {
+                        "-"
+                    } else {
+                        formatDate(card.expirationDate)
+                    },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -189,7 +185,11 @@ fun TenturnCardItem(card: Tenturncard) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Text(
-                    text = formatDate(card.purchaseDate),
+                    text = if (card.purchaseDate == "") {
+                        "-"
+                    } else {
+                        formatDate(card.purchaseDate)
+                    },
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )

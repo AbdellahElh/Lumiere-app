@@ -40,6 +40,10 @@ class TenturncardViewModel(
     private val _tenturncards = MutableStateFlow<List<Tenturncard>>(emptyList())
     val tenturncards = _tenturncards.asStateFlow()
 
+    init{
+        fetchTenturncards()
+    }
+
     fun fetchTenturncards() {
         viewModelScope.launch {
             try {
