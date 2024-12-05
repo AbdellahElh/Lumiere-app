@@ -56,6 +56,7 @@ import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+import com.example.riseandroid.util.isNetworkAvailable
 
 @Composable
 fun MovieDetailScreen(
@@ -72,6 +73,7 @@ fun MovieDetailScreen(
     val isUserLoggedIn = authState is AuthState.Authenticated
     val context = LocalContext.current
     val isSyncing by watchlistViewModel.isSyncing.collectAsState()
+    val isNetworkAvailable = remember { mutableStateOf(isNetworkAvailable(context)) }
 
     LaunchedEffect(movieId) {
         watchlistViewModel.syncWatchlist()
@@ -94,6 +96,7 @@ fun MovieDetailScreen(
                 isInWatchlist = isInWatchlist,
                 isUserLoggedIn = isUserLoggedIn,
                 isSyncing = isSyncing,
+                isNetworkAvailable = isNetworkAvailable.value,
                 onWatchlistClick = {
                     Log.d("MovieDetailScreen", "Bookmark button clicked for movie ID: $movieId")
                     if (isUserLoggedIn) {
@@ -129,6 +132,7 @@ fun MovieDetailContent(
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
     isSyncing: Boolean,
+    isNetworkAvailable: Boolean,
     onWatchlistClick: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -153,6 +157,7 @@ fun MovieDetailContent(
                     onWatchlistClick = onWatchlistClick,
                     onBackClick = { navigateBack(navController) },
                     isSyncing = isSyncing,
+                    isNetworkAvailable = isNetworkAvailable
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 MoviePoster(movie)
@@ -234,6 +239,7 @@ fun MovieDetailHeader(
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
     isSyncing: Boolean,
+    isNetworkAvailable: Boolean,
     onWatchlistClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -257,7 +263,7 @@ fun MovieDetailHeader(
         )
         Spacer(modifier = Modifier.weight(1f))
 
-        if (isUserLoggedIn) {
+        if (isUserLoggedIn && isNetworkAvailable) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
