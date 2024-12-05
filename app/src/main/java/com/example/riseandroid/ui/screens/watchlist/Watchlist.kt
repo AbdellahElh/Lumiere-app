@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.watchlist
 
+import android.app.Application
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,17 +44,15 @@ import com.example.riseandroid.model.MovieModel
 @Composable
 fun WatchlistScreen(
     onMovieClick: (Int) -> Unit,
-    navController: NavController
-) {
-    val application = LocalContext.current.applicationContext as LumiereApplication
-    val watchlistViewModel: WatchlistViewModel = viewModel(
+    navController: NavController,
+    watchlistViewModel: WatchlistViewModel = viewModel(
         factory = WatchlistViewModelFactory(
-            watchlistRepo = application.container.watchlistRepo,
-            userManager = application.container.userManager,
-            application = application,
+            watchlistRepo = (LocalContext.current.applicationContext as LumiereApplication).container.watchlistRepo,
+            userManager = (LocalContext.current.applicationContext as LumiereApplication).container.userManager,
+            application = LocalContext.current.applicationContext as Application,
         )
     )
-
+) {
     val watchlistMovies by watchlistViewModel.watchlist.collectAsState()
     val context = LocalContext.current
 
@@ -89,7 +89,10 @@ fun WatchlistScreen(
             ) {
                 items(watchlistMovies) { movie ->
                     Column {
-                        WatchlistMovieItem(movie = movie, onClick = { onMovieClick(movie.id) })
+                        WatchlistMovieItem(
+                            movie = movie,
+                            onClick = { onMovieClick(movie.id) }
+                        )
                         Divider(
                             color = Color.LightGray,
                             thickness = 1.dp,
@@ -101,6 +104,7 @@ fun WatchlistScreen(
         }
     }
 }
+
 
 
 @Composable
@@ -137,7 +141,8 @@ fun WatchlistMovieItem(movie: MovieModel, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag("MovieItem_${movie.id}"),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(

@@ -62,6 +62,7 @@ fun BottomBar(navController: NavHostController) {
         BottomBarScreen.Home,
         BottomBarScreen.ScanCode,
         BottomBarScreen.Tickets,
+        BottomBarScreen.Watchlist,
         BottomBarScreen.Account
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()

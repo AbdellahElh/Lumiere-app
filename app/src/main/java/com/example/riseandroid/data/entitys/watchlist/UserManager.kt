@@ -4,9 +4,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class UserManager {
+open class UserManager {
     private val _currentUserId = MutableStateFlow<Int?>(null)
-    val currentUserId: StateFlow<Int?> = _currentUserId.asStateFlow()
+    open val currentUserId: StateFlow<Int?> = _currentUserId.asStateFlow()
 
     fun setUserId(userId: Int) {
         _currentUserId.value = userId

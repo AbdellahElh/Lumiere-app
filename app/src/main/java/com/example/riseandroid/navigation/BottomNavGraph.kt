@@ -68,32 +68,21 @@ fun BottomNavGraph(
         }
         composable(route = BottomBarScreen.Tickets.route) {
             if (!isUserLoggedIn) {
-                Dialog(
-                    onDismissRequest = { navController.popBackStack() }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(Color.White, RoundedCornerShape(8.dp))
-                            .padding(16.dp)
-                    ) {
-                        Column {
-                            Text("Login nodig", fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("Je moet ingelogd zijn om toegang te krijgen tot je tickets.")
-                            Spacer(modifier = Modifier.height(24.dp))
-                            Button(onClick = { navController.popBackStack() },  colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFE5CB77),
-                                contentColor = Color.White
-                            ),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text("Ok")
-                            }
-                        }
-                    }
-                }
+                ShowLoginRequiredDialog(navController, "tickets")
             } else {
                 TicketScreen(1, navController = navController)
+            }
+        }
+        composable(route = BottomBarScreen.Watchlist.route) {
+            if (!isUserLoggedIn) {
+                ShowLoginRequiredDialog(navController, "watchlist")
+            } else {
+                WatchlistScreen(
+                    onMovieClick = { movieId ->
+                        navController.navigate("movieDetail/$movieId")
+                    },
+                    navController = navController
+                )
             }
         }
         composable(route = BottomBarScreen.Account.route) {
@@ -180,17 +169,37 @@ fun BottomNavGraph(
             val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
             Homepage(navController = navController, selectedTab = selectedTab)
         }
-
-        composable("watchlist") {
-            WatchlistScreen(
-                onMovieClick = { movieId ->
-                    navController.navigate("movieDetail/$movieId")
-                },
-                navController = navController
-            )
-        }
     }
 }
 
 
-
+@Composable
+fun ShowLoginRequiredDialog(navController: NavHostController, destination: String) {
+    Dialog(onDismissRequest = { navController.popBackStack() }) {
+        Box(
+            modifier = Modifier
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .padding(16.dp)
+        ) {
+            Column {
+                Text("Login nodig", fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Je moet ingelogd zijn om toegang te krijgen tot je $destination.")
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = {
+                        navController.popBackStack()
+                        navController.navigate(BottomBarScreen.Account.route)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE5CB77),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Ok")
+                }
+            }
+        }
+    }
+}

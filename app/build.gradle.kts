@@ -47,6 +47,17 @@ android {
         viewBinding = true
         compose = true
     }
+
+
+    packaging {
+        resources {
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE.txt"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/NOTICE.txt"
+            excludes += "/META-INF/LICENSE-notice.md"
+        }
+    }
 }
 
 dependencies {

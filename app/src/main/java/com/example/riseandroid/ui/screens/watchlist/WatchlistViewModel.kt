@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class WatchlistViewModel(
+open class WatchlistViewModel(
     private val watchlistRepo: IWatchlistRepo,
     private val userManager: UserManager,
     private val context: Context
