@@ -2,12 +2,16 @@ package com.example.riseandroid.util
 
 import com.example.riseandroid.data.entitys.Cinema
 import com.example.riseandroid.data.entitys.EventEntity
+import com.example.riseandroid.data.entitys.MovieEntity
+import com.example.riseandroid.data.entitys.MoviePosterEntity
 import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.model.Tenturncard
+import com.example.riseandroid.model.Ticket
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -34,7 +38,31 @@ fun Tenturncard.asEntity(): TenturncardEntity {
 
         )
 }
+fun TicketEntity.asExternalModel(): Ticket {
+    return Ticket(
 
+        id = id,
+        dateTime = dateTime,
+        location = location,
+        type = type,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId,
+
+        )
+}
+
+fun Ticket.asEntity(): TicketEntity {
+    return TicketEntity(
+        id = id,
+        dateTime = dateTime,
+        location = location,
+        type = type,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId
+    )
+}
 fun EventEntity.asExternalModel(): EventModel {
     val cinemaType = object : TypeToken<List<Cinema>>() {}.type
     val cinemaList: List<Cinema> = gson.fromJson(cinemasJson, cinemaType) ?: emptyList()

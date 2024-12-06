@@ -20,7 +20,7 @@ import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.SignUpApi
 import com.example.riseandroid.network.TenturncardApi
-import com.example.riseandroid.network.WatchlistApi
+import com.example.riseandroid.network.TicketApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.Auth0Repo
@@ -29,10 +29,12 @@ import com.example.riseandroid.repository.IAuthRepo
 import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.repository.MoviePosterRepo
 import com.example.riseandroid.repository.MovieRepo
+
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.repository.WatchlistRepo
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.repository.TicketRepository
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -43,11 +45,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 interface AppContainer {
-    val programRepository: ProgramRepository
 
     val movieRepo:MovieRepo
+    val ticketRepo: TicketRepository
+
     val moviePosterRepo: MoviePosterRepo
-    val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val ticketRepository: TicketRepository
     val authRepo: IAuthRepo
@@ -67,6 +69,7 @@ class DefaultAppContainer(private val context: Context,
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
     private val movieDao = riseDatabase.movieDao()
+    private val ticketDao = riseDatabase.ticketDao()
     private val moviePosterDao = riseDatabase.moviePosterDao()
     private val tenturncardDao = riseDatabase.tenturncardDao()
     private val eventDao = riseDatabase.eventDao()
@@ -142,6 +145,9 @@ class DefaultAppContainer(private val context: Context,
         EventRepo(eventDao, eventsApi)
     }
 
+
+
+
     private val retrofitService: LumiereApiService by lazy {
         retrofit.create(LumiereApiService::class.java)
     }
@@ -163,6 +169,9 @@ class DefaultAppContainer(private val context: Context,
     private val retrofitTenturncardServiceBackend : TenturncardApi by lazy {
         retrofitBackend.create(TenturncardApi::class.java)
     }
+    private val retrofitTicketServiceBackend : TicketApi by lazy {
+        retrofitBackend.create(TicketApi::class.java)
+    }
 
     override val movieRepo: MovieRepo by lazy {
         val movieDao = movieDao
@@ -176,16 +185,15 @@ class DefaultAppContainer(private val context: Context,
         val auth0Repo = authRepo
         TenturncardRepository(tenturncardApi, tenturncardDao, auth0Repo)
     }
+    override val ticketRepo : TicketRepository by lazy {
+        val ticketApi = retrofitTicketServiceBackend
+        val ticketDao = ticketDao
+        val auth0Repo = authRepo
+        TicketRepository(ticketApi, ticketDao, auth0Repo)
+    }
 
-    override val moviesRepository: MoviesRepository by lazy {
-        NetworkMoviesRepository(retrofitService)
-    }
-    override val programRepository: ProgramRepository by lazy {
-        NetworkProgramRepository(retrofitService)
-    }
-    override val ticketRepository: TicketRepository by lazy {
-        NetworkTicketRepository(retrofitService)
-    }
+
+
     override val authApiService: Auth0Api by lazy {
         retrofit.create(Auth0Api::class.java)
     }
