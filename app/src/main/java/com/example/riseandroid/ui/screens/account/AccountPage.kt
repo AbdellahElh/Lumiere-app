@@ -61,7 +61,6 @@ fun AccountPage(
             style = MaterialTheme.typography.headlineMedium,
             fontSize = 32.sp,
             modifier = Modifier.padding(bottom = 32.dp),
-            color = Color.White
         )
 
         Image(
@@ -72,7 +71,7 @@ fun AccountPage(
                 .padding(bottom = 16.dp)
         )
 
-        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp, color = Color.White)
+        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp, )
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -93,12 +92,14 @@ fun AccountPage(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(
                 checked = notificationsEnabled,
                 onCheckedChange = { notificationsEnabled = it }
             )
-            Text("Ik wil graag notificaties ontvangen voor nieuwe films en events", color = Color.White)
+            Text("Ik wil graag notificaties ontvangen voor nieuwe films en events", )
         }
 
         Spacer(modifier = Modifier.height(32.dp))

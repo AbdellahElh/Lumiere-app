@@ -27,7 +27,6 @@ fun ListAllMovies(
                 .fillMaxWidth()
                 .padding(16.dp),
             style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
-            color = androidx.compose.ui.graphics.Color.White,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     } else {

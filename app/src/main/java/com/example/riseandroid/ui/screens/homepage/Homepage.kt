@@ -235,7 +235,7 @@ fun Header() {
         Spacer(modifier = Modifier.weight(1f))
 
         Image(
-            painter = painterResource(id = R.drawable.lumiere_logo),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = "logo",
             modifier = Modifier.size(100.dp)
         )
