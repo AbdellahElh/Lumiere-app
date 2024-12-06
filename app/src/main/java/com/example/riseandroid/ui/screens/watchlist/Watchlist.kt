@@ -72,7 +72,7 @@ fun WatchlistScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Your watchlist is empty.",
+                    text = "Uw watchlist is leeg.",
                     fontSize = 18.sp,
                     color = Color.Gray
                 )
@@ -109,7 +109,7 @@ fun TopBar(navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFE5CB77))
-            .padding(vertical = 12.dp),
+            .padding(vertical = 25.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
