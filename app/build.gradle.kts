@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.retrofit)
     // Retrofit with Kotlin serialization Converter
     implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.play.services.mlkit.barcode.scanning)
     // Retrofit mock
     testImplementation(libs.retrofit.mock)
 
@@ -111,4 +112,12 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // CameraX
+    implementation (libs.androidx.camera.core)
+    implementation (libs.androidx.camera.camera2)
+    implementation (libs.androidx.camera.lifecycle)
+    implementation (libs.androidx.camera.video)
+    implementation (libs.androidx.camera.view)
+    implementation (libs.androidx.camera.extensions)
 }

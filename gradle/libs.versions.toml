@@ -1,6 +1,7 @@
 [versions]
 agp = "8.7.2"
 androidxJunit = "1.1.5"
+cameraCore = "1.2.2"
 coilCompose = "2.7.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
@@ -26,9 +27,16 @@ firebaseCrashlyticsBuildtools = "3.0.2"
 auth0="2.+"
 jwtdecode="2.0.0"
 junitKtx = "1.2.1"
+playServicesMlkitBarcodeScanning = "18.3.1"
 
 
 [libraries]
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCore" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCore" }
+androidx-camera-extensions = { module = "androidx.camera:camera-extensions", version.ref = "cameraCore" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCore" }
+androidx-camera-video = { module = "androidx.camera:camera-video", version.ref = "cameraCore" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCore" }
 androidx-junit-v115 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-navigation-compose-v253 = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
@@ -63,6 +71,7 @@ firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "fireb
 auth0-jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref = "jwtdecode" }
 auth0-android ={ group="com.auth0.android", name = "auth0", version.ref = "auth0"}
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+play-services-mlkit-barcode-scanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version.ref = "playServicesMlkitBarcodeScanning" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
