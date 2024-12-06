@@ -9,18 +9,14 @@ import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.riseandroid.data.entitys.watchlist.UserManager
-import com.example.riseandroid.data.lumiere.MoviesRepository
-import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
-import com.example.riseandroid.data.lumiere.NetworkProgramRepository
-import com.example.riseandroid.data.lumiere.NetworkTicketRepository
-import com.example.riseandroid.data.lumiere.ProgramRepository
-import com.example.riseandroid.data.lumiere.TicketRepository
+
 import com.example.riseandroid.network.EventsApi
 import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.SignUpApi
 import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.network.TicketApi
+import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.Auth0Repo
@@ -51,7 +47,6 @@ interface AppContainer {
 
     val moviePosterRepo: MoviePosterRepo
     val authApiService: Auth0Api
-    val ticketRepository: TicketRepository
     val authRepo: IAuthRepo
     val tenturncardRepository : TenturncardRepository
     val eventRepo: EventRepo

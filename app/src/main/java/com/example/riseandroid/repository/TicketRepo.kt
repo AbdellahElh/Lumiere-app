@@ -1,8 +1,13 @@
 package com.example.riseandroid.repository
 
 import android.util.Log
+import com.example.riseandroid.data.entitys.CinemaEntity
+import com.example.riseandroid.data.entitys.EventDao
 import com.example.riseandroid.data.entitys.Tickets.TicketDao
 import com.example.riseandroid.model.Ticket
+import com.example.riseandroid.network.EventsApi
+import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.network.TicketApi
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
@@ -19,6 +24,8 @@ class TicketRepository(
     private val ticketApi: TicketApi,
     private val ticketDao: TicketDao,
     private val authrepo: IAuthRepo,
+    private val movieApi: MoviesApi,
+   private val EventApi : EventsApi
 ) : ITicketRepository {
 
     override suspend fun getTickets(): Flow<List<Ticket>> {
@@ -26,6 +33,7 @@ class TicketRepository(
             .map { entities -> entities.map { it.asExternalModel() } }
             .onEach { tickets ->
                 tickets.forEach { ticket ->
+                    saveMovieEvent(ticket)
                     Log.d("TicketList", ticket.toString())
                 }
             }
@@ -48,7 +56,18 @@ class TicketRepository(
             Log.e("TicketRepo", "Error refreshing tickets")
         }
     }
+    private suspend fun saveMovieEvent(ticket: Ticket) {
 
+        if(ticket.eventId != null){
+            val event = EventApi.getSpecificEvent(ticket.eventId)
+            ticketDao.insertEvent(event)
+        }
+        else{
+            val movie = ticket.movieId?.let { movieApi.getMovieById(it) }
+            ticketDao.insertMovie(movie)
+        }
+
+    }
     override fun addTicket(
         movieCode: Int,
         eventCode: Int,

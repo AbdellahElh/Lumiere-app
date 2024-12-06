@@ -21,7 +21,7 @@ import com.example.riseandroid.data.entitys.watchlist.WatchlistEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketDao
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 
-@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class, WatchlistEntity::class, MovieWatchlistEntity::class, MoviePosterEntity::class, TenturncardEntity::class, EventEntity::class], version = 6, exportSchema = false)
+@Database(entities = [MovieEntity::class, CinemaEntity::class, ShowtimeEntity::class,TicketEntity::class, WatchlistEntity::class, MovieWatchlistEntity::class, MoviePosterEntity::class, TenturncardEntity::class, EventEntity::class], version = 7, exportSchema = false)
 abstract class RiseDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao

@@ -10,11 +10,7 @@ import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieEntity
 import java.time.LocalDateTime
 
-enum class TicketType {
-    STANDAARD,
-    SENIOR,
-    STUDENT
-}
+
 
 @Entity(
     tableName = "ticket",
@@ -38,19 +34,11 @@ data class TicketEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val dateTime: String,
     val location: String,
-    val type: TicketType,
+    val type: Int,
     val movieId: Int? = null,
     val eventId: Int? = null,
     val accountId: Int? = null,
 
     @Embedded(prefix = "movie_") val movie: MovieEntity? = null,
     @Embedded(prefix = "event_") val event: EventEntity? = null
-) {
-    val price: Double
-        get() = when (type) {
-            TicketType.STANDAARD -> 12.0
-            TicketType.SENIOR -> 11.5
-            TicketType.STUDENT -> 10.0
-            else -> 12.0
-        }
-}
+)
