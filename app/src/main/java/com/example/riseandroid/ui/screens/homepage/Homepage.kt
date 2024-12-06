@@ -144,6 +144,7 @@ fun ResultScreen(
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
+                        TitleText("Binnenkort")
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -295,7 +296,6 @@ fun TitleText(title: String, modifier: Modifier = Modifier) {
         fontSize = 28.sp,
         //fontFamily = Fontfamily.inter,
         fontWeight = FontWeight.SemiBold,
-        color = Color.White,
         modifier = modifier.padding(16.dp)
     )
 }

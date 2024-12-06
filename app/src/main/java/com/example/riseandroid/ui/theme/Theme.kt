@@ -16,6 +16,7 @@ private val DarkColorScheme = darkColorScheme(
     secondary = PurpleGrey80,
     tertiary = Pink80,
     background = Color(0xFF1B1E25),
+    onPrimary = Color.Black,
     error= Color.Red
 )
 //1B1E25 <- background color
@@ -23,7 +24,7 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    background = Color(0xFF1B1E25),
+    background = Color(0xFFE7ECFB),
     onPrimary = Color.White,
     error= Color.Red,
 
