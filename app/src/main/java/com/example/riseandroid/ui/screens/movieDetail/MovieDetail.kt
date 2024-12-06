@@ -50,7 +50,6 @@ import coil.compose.rememberImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
 import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.model.Program
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
@@ -91,7 +90,6 @@ fun MovieDetailScreen(
 
             MovieDetailContent(
                 movie = movie,
-                programList = uiState.programList.collectAsState(initial = emptyList()).value,
                 navController = navController,
                 isInWatchlist = isInWatchlist,
                 isUserLoggedIn = isUserLoggedIn,
@@ -127,7 +125,6 @@ fun MovieDetailScreen(
 @Composable
 fun MovieDetailContent(
     movie: MovieModel,
-    programList: List<Program>,
     navController: NavController,
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
