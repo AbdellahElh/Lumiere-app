@@ -1,5 +1,6 @@
 package com.example.riseandroid.network
 
+import com.example.riseandroid.model.Cinema
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import retrofit2.http.GET

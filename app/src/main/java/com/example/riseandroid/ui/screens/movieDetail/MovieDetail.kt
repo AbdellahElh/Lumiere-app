@@ -311,6 +311,7 @@ fun MoviePoster(movie: MovieModel) {
     }
 }
 
+
 @Composable
 fun MovieInfo(movie: MovieModel) {
     Text(
@@ -327,7 +328,7 @@ fun MovieInfo(movie: MovieModel) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Directeur: ${movie.director}",
+            text = "Directeur: ${movie.director.orEmpty()}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
             color = Color(0xFFBABFC9)
@@ -340,7 +341,7 @@ fun MovieInfo(movie: MovieModel) {
             .padding(vertical = 14.dp),
     ) {
         Text(
-            text = "${movie.genre}",
+            text = "${movie.genre.orEmpty()}",
             fontSize = 16.sp,
             color = Color(0xFFB2B5BB),
             modifier = Modifier

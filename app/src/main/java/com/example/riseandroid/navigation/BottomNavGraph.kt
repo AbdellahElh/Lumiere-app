@@ -46,13 +46,19 @@ import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 fun BottomNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel,
+    authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory),
     forgotPasswordViewModel: ForgotPasswordViewModel,
     watchlistViewModel: WatchlistViewModel,
 ) {
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
+
+    val goToMovieDetail = { id: String ->
+        navController.navigate("movieDetail/${id}")
+    }
+
+    val authToken by authViewModel.authToken.collectAsState()
     NavHost(
         navController = navController,
         startDestination = BottomBarScreen.Home.route,
@@ -60,13 +66,17 @@ fun BottomNavGraph(
     ) {
 
         composable(route = BottomBarScreen.Home.route) {
-            Homepage(navController = navController, selectedTab = 0)
+            Homepage(goToMovieDetail=goToMovieDetail, navController = navController, selectedTab = 0)
+        }
+        composable(route = BottomBarScreen.ScanCode.route) {
+            ScanCodeScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Tickets.route) {
             if (!isUserLoggedIn) {
                 ShowLoginRequiredDialog(navController, "tickets")
             } else {
-                TicketScreen(1, navController = navController)
+                TicketScreen(
+                    1, navController = navController, authToken = authToken ?: "")
             }
         }
         composable(route = BottomBarScreen.Watchlist.route) {
@@ -142,6 +152,7 @@ fun BottomNavGraph(
             }
         }
 
+
         composable("eventDetail/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId")?.toIntOrNull()
             if (eventId != null) {
@@ -163,7 +174,7 @@ fun BottomNavGraph(
             arguments = listOf(navArgument("selectedTab") { defaultValue = 0 })
         ) { backStackEntry ->
             val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
-            Homepage(navController = navController, selectedTab = selectedTab)
+            Homepage(navController = navController, goToMovieDetail=goToMovieDetail, selectedTab = selectedTab)
         }
     }
 }

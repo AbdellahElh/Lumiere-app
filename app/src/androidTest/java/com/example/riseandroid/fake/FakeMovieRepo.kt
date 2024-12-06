@@ -23,6 +23,7 @@ class FakeMovieRepo : IMovieRepo {
             bannerImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             posterImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg"
+            eventId = 1
         ),
         MovieModel(
             id = 2,
@@ -39,12 +40,14 @@ class FakeMovieRepo : IMovieRepo {
             bannerImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             posterImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg"
+            eventId = 2
         )
     )
 
     override suspend fun getAllMoviesList(
         selectedDate: String,
-        selectedCinemas: List<String>
+        selectedCinemas: List<String>,
+        searchTitle: String?
     ): Flow<List<MovieModel>> {
         return flow {
             emit(fakeMovies)

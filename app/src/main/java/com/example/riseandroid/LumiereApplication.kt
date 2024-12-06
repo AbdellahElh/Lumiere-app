@@ -40,14 +40,7 @@ class LumiereApplication : Application() {
         )
     }
 
-    fun scheduleNotification(
-        context: Context,
-        movieId: Int,
-        movieName: String,
-        location: String,
-        date: String,
-        dateTime: Calendar
-    ) {
+    fun scheduleNotification(context: Context, movieId: Int, movieName: String, location: String, date: String, dateTime: Calendar) {
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             putExtra("MOVIE_ID", movieId)
             putExtra("MOVIE_NAME", movieName)
@@ -65,13 +58,9 @@ class LumiereApplication : Application() {
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, dateTime.timeInMillis, pendingIntent)
     }
 
-    fun displayImmediateNotification(
-        context: Context,
-        movieId: Int,
-        movieName: String,
-        location: String,
-        date: String
-    ) {
+
+
+    fun displayImmediateNotification(context: Context, movieId: Int, movieName: String, location: String, date: String) {
         if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
             val notification = NotificationCompat.Builder(context, "REMINDER_CHANNEL")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)

@@ -2,6 +2,7 @@ package com.example.riseandroid.data.entitys
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDateTime
 
 @Entity(tableName = "tenturncards")
 data class TenturncardEntity(

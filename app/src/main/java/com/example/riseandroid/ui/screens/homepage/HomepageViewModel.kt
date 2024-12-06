@@ -51,6 +51,7 @@ class HomepageViewModel(
 //    private val _programFilms = MutableStateFlow<List<Program>>(emptyList())
 //    val programFilms = _programFilms.asStateFlow()
 
+
     private val _selectedDate = MutableStateFlow(getCurrentDate())
     val selectedDate= _selectedDate.asStateFlow()
 
@@ -69,11 +70,6 @@ class HomepageViewModel(
     private val _filteredEvents = MutableStateFlow<List<EventModel>>(emptyList())
     val filteredEvents: StateFlow<List<EventModel>> = _filteredEvents.asStateFlow()
 
-    fun updateFilters(date: String, cinemas: List<String>,searchTitle:String) {
-        _selectedDate.value = date
-        _selectedCinemas.value = cinemas
-        _searchTitle.value=searchTitle
-    }
 
     private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -90,13 +86,9 @@ class HomepageViewModel(
         viewModelScope.launch {
             homepageUiState = HomepageUiState.Loading
 
-            val cinemas = if (selectedCinemas.value.isEmpty()) {
-                listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
-            } else {
-                selectedCinemas.value
-            }
+            val cinemas = listOf("Brugge", "Antwerpen", "Mechelen", "Cinema Cartoons")
 
-            movieRepo.getAllMoviesList(selectedDate.value, cinemas,searchTitle.value)
+            movieRepo.getAllMoviesList(getCurrentDate(), cinemas,"")
                 .collect { movies ->
                     _allMovies.value = movies
                     homepageUiState = HomepageUiState.Succes(
@@ -126,24 +118,6 @@ class HomepageViewModel(
         }
     }
 
-
-    fun applyFilters() {
-        viewModelScope.launch {
-            homepageUiState = HomepageUiState.Loading
-            try {
-                getAllMoviesList()
-                homepageUiState = HomepageUiState.Succes(
-                    recentMovies = recentMovies,
-                    allMovies = allMovies,
-                    events = events
-                )
-            } catch (e: IOException) {
-                homepageUiState = HomepageUiState.Error
-            } catch (e: HttpException) {
-                homepageUiState = HomepageUiState.Error
-            }
-        }
-    }
 
     private fun getEvents() {
         viewModelScope.launch {

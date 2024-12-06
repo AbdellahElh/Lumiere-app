@@ -7,5 +7,5 @@ data class Tenturncard(
     val expirationDate: String,
     val IsActivated: Boolean,
     val ActivationCode: String,
-) {
+    ) {
 }

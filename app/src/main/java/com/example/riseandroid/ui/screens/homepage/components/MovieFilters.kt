@@ -1,16 +1,11 @@
 package com.example.riseandroid.ui.screens.homepage.components
-
 import android.app.DatePickerDialog
 import android.widget.DatePicker
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
@@ -24,10 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,23 +29,23 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+import com.example.riseandroid.ui.screens.movieProgram.MovieProgramViewModel
 import com.example.riseandroid.util.getTodayDate
 import java.util.Calendar
 import java.util.Locale
 
 @Composable
 fun MoviesFilters(
-    homepageViewModel:HomepageViewModel
+    viewModel:MovieProgramViewModel
 ) {
 
-    val selectedDate by homepageViewModel.selectedDate.collectAsState()
-    val selectedCinemas by homepageViewModel.selectedCinemas.collectAsState()
-    val searchTitle by homepageViewModel.searchTitle.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    val selectedCinemas by viewModel.selectedCinemas.collectAsState()
+    val searchTitle by viewModel.searchTitle.collectAsState()
 
     Box(
         modifier = Modifier
@@ -66,7 +59,7 @@ fun MoviesFilters(
             DatePicker(
                 selectedDate = selectedDate,
                 onDateSelected = { selectedLocalDate ->
-                    homepageViewModel.updateFilters(
+                    viewModel.updateFilters(
                         selectedLocalDate,
                         selectedCinemas,
                         searchTitle ?: "",
@@ -79,7 +72,7 @@ fun MoviesFilters(
             CinemaDropDown(
                 selectedCinemas = selectedCinemas,
                 onCinemaSelected = { updatedCinemas ->
-                    homepageViewModel.updateFilters(
+                    viewModel.updateFilters(
                         selectedDate,
                         updatedCinemas,
                         searchTitle ?: "",
@@ -89,7 +82,7 @@ fun MoviesFilters(
             TitleSearch(
                 title = searchTitle ?: "",
                 onTitleChanged = { updatedTitle ->
-                    homepageViewModel.updateFilters(selectedDate, selectedCinemas, updatedTitle)
+                    viewModel.updateFilters(selectedDate, selectedCinemas, updatedTitle)
                 }
             )
 
@@ -103,10 +96,10 @@ fun MoviesFilters(
             ) {
                 Button(
                     onClick = {
-                        homepageViewModel.updateFilters(getTodayDate(),
+                        viewModel.updateFilters(getTodayDate(),
                             emptyList(),
                             "")
-                        homepageViewModel.applyFilters()
+                        viewModel.applyFilters()
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -121,7 +114,7 @@ fun MoviesFilters(
 
                 Button(
                     onClick = {
-                        homepageViewModel.applyFilters()
+                        viewModel.applyFilters()
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -195,7 +188,6 @@ fun DatePicker(selectedDate: String, onDateSelected: (String) -> Unit) {
                 imageVector = Icons.Default.DateRange,
                 contentDescription = "Selecteer datum",
                 modifier = Modifier.padding(start = 8.dp),
-
                 )
         }
     }
@@ -310,14 +302,12 @@ fun TitleSearch(title: String, onTitleChanged: (String) -> Unit) {
 }
 
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun MoviesFiltersPreview() {
-    val viewModel: HomepageViewModel = viewModel(
-        factory = HomepageViewModel.Factory
+    val viewModel: MovieProgramViewModel = viewModel(
+        factory = MovieProgramViewModel.Factory
     )
 
-    MoviesFilters(homepageViewModel = viewModel)
+    MoviesFilters(viewModel = viewModel)
 }

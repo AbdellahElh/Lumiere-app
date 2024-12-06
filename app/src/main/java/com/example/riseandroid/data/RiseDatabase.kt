@@ -1,3 +1,4 @@
+// RiseDatabase.kt
 package com.example.riseandroid.data
 
 import android.content.Context

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,11 +25,13 @@ import coil.compose.AsyncImage
 import com.example.riseandroid.model.MovieModel
 
 @Composable
-fun MoviePoster(movie: MovieModel, navController: NavHostController, modifier: Modifier = Modifier) {
+fun MoviePoster(movie: MovieModel,
+                modifier: Modifier = Modifier,
+                goToMovieDetail: (id: String) -> Unit,) {
     val imageUrl = movie.coverImageUrl
 
     Column(modifier = modifier.clickable {
-        navController.navigate("movieDetail/${movie.id}")
+        goToMovieDetail(movie.id.toString())
     }.fillMaxWidth()
     ) {
 
@@ -47,7 +50,8 @@ fun MoviePoster(movie: MovieModel, navController: NavHostController, modifier: M
                 model = imageUrl,
                 contentDescription = movie.title,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(200.dp)
+                    .height(300.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
             )

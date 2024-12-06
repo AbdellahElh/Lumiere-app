@@ -1,6 +1,7 @@
 package com.example.riseandroid.ui.screens.login
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -15,8 +16,12 @@ import com.example.riseandroid.ui.screens.account.AuthViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
@@ -52,17 +57,16 @@ class LoginViewModel(
         _uiState.value = _uiState.value.copy(loginError = false)
     }
 
+
     fun onSubmit() {
         viewModelScope.launch {
-            authRepo.performLogin(
-                userName = uiState.value.username,
-                password = uiState.value.password
-            ).collect { apiResource ->
-                _authResponse.value = apiResource
-
-                if (apiResource is ApiResource.Success && apiResource.data != null) {
-                    authViewModel.setAuthenticated(apiResource.data)
-                    login(apiResource.data)
+            authRepo.performLogin(userName = uiState.value.username, password = uiState.value.password)
+                .collect { apiResource ->
+                    _authResponse.value = apiResource
+                    if (apiResource is ApiResource.Success && apiResource.data != null) {
+                        // Credentials ontvangen, update de authState
+                        authViewModel.setAuthenticated(apiResource.data)
+                        login(apiResource.data)
 
                     _navigateToAccount.emit(true)
                 } else if (apiResource is ApiResource.Error<*>) {

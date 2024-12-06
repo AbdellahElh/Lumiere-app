@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
@@ -56,27 +57,28 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
         emit(ApiResource.Loading<Credentials>())
         try {
             val credentials = credentialsManager.awaitCredentials()
-            if (credentials != null){
-                emit(ApiResource.Success<Credentials>(credentials))
-            }
-            else {
-                emit(ApiResource.Error<Credentials>("No credentials found"))
-            }
+            emit(ApiResource.Success<Credentials>(credentials))
         }catch (e : Exception){
             emit(ApiResource.Error<Credentials>(e.message ?: "Failed to get credentials"))
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun getLoggedInId(): Flow<ApiResource<Int>> = flow {
-        val resource = getCredentials().first()
-        val idToken = resource.data?.user?.getId()
-        val authIdSplit = idToken?.split("|")
-        val accountId = authIdSplit?.get(1)?.toInt()
-        if (idToken != null) {
-            emit(ApiResource.Success<Int>(accountId))
-        }
-        else{
-            emit(ApiResource.Error<Int>("Gebruiker moet ingelogd zijn"))
+    override suspend fun getLoggedInId(): Flow<ApiResource<Int>> {
+        return getCredentials().map {
+            val extraInfo = it.data?.user?.getExtraInfo()
+            val userMetadata = extraInfo?.get("https://lumiere.com/user_metadata") as? Map<*, *>
+            val lumiereUserId = userMetadata?.get("lumiereUserId") as? Double
+            // Convert lumiereUserId to an Int
+            val lumiereUserIdAsInt = lumiereUserId?.toInt()
+            if (it is ApiResource.Loading) {
+                return@map ApiResource.Loading<Int>()
+            }
+            if (lumiereUserIdAsInt != null) {
+                return@map ApiResource.Success<Int>(lumiereUserIdAsInt)
+            }
+            else{
+                return@map ApiResource.Error<Int>(it.message.toString() ?: "Er ging iets mis bij het ophalen van de gebruiker")
+            }
         }
     }
 
