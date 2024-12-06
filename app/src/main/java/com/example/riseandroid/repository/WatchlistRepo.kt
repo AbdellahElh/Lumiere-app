@@ -7,10 +7,10 @@ import com.example.riseandroid.data.entitys.watchlist.WatchlistDao
 import com.example.riseandroid.data.entitys.watchlist.WatchlistEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MovieWatchlistModel
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
-import com.example.riseandroid.util.asResponseModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 
 interface IWatchlistRepo {
     fun getMoviesInWatchlist(userId: Int): Flow<List<MovieModel>>
-    suspend fun addToWatchlist(movie: MovieModel, userId: Int)
+    suspend fun addToWatchlist(movie: ResponseMovie, userId: Int)
     suspend fun removeFromWatchlist(movieId: Int, userId: Int)
     suspend fun getWatchlistId(userId: Int): Int
     suspend fun syncWatchlistWithBackend(userId: Int)
@@ -37,7 +37,7 @@ class WatchlistRepo(
         }
     }
 
-    override suspend fun addToWatchlist(movie: MovieModel, userId: Int) {
+    override suspend fun addToWatchlist(movie: ResponseMovie, userId: Int) {
         withContext(Dispatchers.IO) {
             val watchlistId = getWatchlistId(userId)
 
@@ -48,7 +48,7 @@ class WatchlistRepo(
 
             try {
                 watchlistDao.addToWatchlist(movieWatchlist.asEntity())
-                watchlistApi.addToWatchlist(movie.asResponseModel())
+                watchlistApi.addToWatchlist(movie)
             } catch (@SuppressLint("NewApi") e: HttpException) {
                 throw e
             }
