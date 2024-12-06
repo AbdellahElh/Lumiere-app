@@ -68,9 +68,6 @@ fun BottomNavGraph(
         composable(route = BottomBarScreen.Home.route) {
             Homepage(goToMovieDetail=goToMovieDetail, navController = navController, selectedTab = 0)
         }
-        composable(route = BottomBarScreen.ScanCode.route) {
-            ScanCodeScreen(navController = navController)
-        }
         composable(route = BottomBarScreen.Tickets.route) {
             if (!isUserLoggedIn) {
                 ShowLoginRequiredDialog(navController, "tickets")
