@@ -1,6 +1,5 @@
 package com.example.riseandroid
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,34 +16,37 @@ import com.example.riseandroid.ui.LumiereApp
 import com.example.riseandroid.ui.theme.RiseAndroidTheme
 import android.app.NotificationChannel
 import android.app.NotificationManager
-//import android.content.Context.getSystemService
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
-import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.example.riseandroid.ui.screens.scanner.ScannerState
+import com.example.riseandroid.ui.screens.scanner.ScannerViewModel
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
+import kotlinx.coroutines.launch
 
-typealias LumaListener = (luma: Double) -> Unit
 
 class MainActivity : ComponentActivity() {
     private lateinit var appContainer: AppContainer
-    //Request permissions
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        isGranted : Boolean ->
-        if (isGranted) {
-            showCamera()
-        }
-        else {
+    private val scannerViewModel: ScannerViewModel by viewModels()
 
+    private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
+        scannerViewModel.onScanResult(result.contents)
+    }
+
+    //registerForActivityResult needs a lifecycle owner, that's why it is in MainActivity
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            launchScanner()
+        } else {
+            scannerViewModel.showToast("Camera permission denied")
         }
     }
-    private lateinit var binding : ActivityMainBinding
 
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -60,10 +62,42 @@ class MainActivity : ComponentActivity() {
         createNotificationChannel(this)
         enableEdgeToEdge()
         appContainer = (application as LumiereApplication).container
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        // Observe ScannerState from ViewModel
+        lifecycleScope.launch {
+            scannerViewModel.state.collect { state ->
+                handleScannerState(state)
+            }
+        }
     }
 
+    private fun handleScannerState(state: ScannerState) {
+        when (state) {
+            is ScannerState.ShowResult -> {
+                Toast.makeText(this, "Result: ${state.result}", Toast.LENGTH_SHORT).show()
+            }
+            ScannerState.Cancelled -> {
+                Toast.makeText(this, "Scan Cancelled", Toast.LENGTH_SHORT).show()
+            }
+            ScannerState.RequestCameraPermission -> {
+                requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+            }
+            is ScannerState.ShowToast -> {
+                Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
+    private fun launchScanner() {
+        val options = ScanOptions().apply {
+            setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+            setPrompt("Scan QR code")
+            setCameraId(0)
+            setBeepEnabled(false)
+            setBarcodeImageEnabled(true)
+            setOrientationLocked(false)
+        }
+        scanLauncher.launch(options)
+    }
 
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -75,12 +109,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
 
 }
 

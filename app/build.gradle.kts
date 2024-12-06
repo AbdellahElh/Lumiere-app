@@ -114,6 +114,5 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // ZXing
-    implementation(libs.journeyapps.zxing.android.embedded)
-    implementation(libs.core.x.x.x)
+    implementation(libs.zxing.core)
 }

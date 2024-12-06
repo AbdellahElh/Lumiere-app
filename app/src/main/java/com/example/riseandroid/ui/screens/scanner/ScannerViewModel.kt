@@ -1,63 +1,44 @@
 package com.example.riseandroid.ui.screens.scanner
 
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
-import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-class ScannerViewModel(
-    binding : MainActivityBinding,
-) : ViewModel() {
-    init {
-        binding.fab.setOnClickListener {
-            checkPermissionCamera(this)
+
+sealed interface ScannerState {
+    data class ShowResult(val result: String) : ScannerState
+    object Cancelled : ScannerState
+    object RequestCameraPermission : ScannerState
+    data class ShowToast(val message: String) : ScannerState
+}
+
+class ScannerViewModel : ViewModel() {
+    private val _state = MutableStateFlow<ScannerState>(ScannerState.Cancelled)
+    val state: StateFlow<ScannerState> = _state
+
+    fun onScanResult(contents: String?) {
+        if (contents == null) {
+            _state.value = ScannerState.Cancelled
+        } else {
+            _state.value = ScannerState.ShowResult(contents)
         }
     }
 
-
-    private val scanLauncher =
-        registerForActivityResult(ScanContract()) { result : ScanIntentResult ->
-            run {
-                if(result.contents == null) {
-                    Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show()
-                }
-                else {
-                    setResult(result.contents)
-                }
-            }
-        }
-
-    private fun setResult(string : String) {
-        binding.textResult.text = string
+    fun requestCameraPermission() {
+        _state.value = ScannerState.RequestCameraPermission
     }
 
-    private fun checkPermissionCamera(context: Context) {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            showCamera()
-        }
-        else if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
-            Toast.makeText(context, "CAMERA permission required", Toast.LENGTH_SHORT).show()
-        }
-        else {
-
-        }
-    }
-
-    private fun showCamera() {
-        val options = ScanOptions()
-        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-        options.setPrompt("Scan QR code")
-        options.setCameraId(0)
-        options.setBeepEnabled(false)
-        options.setBarcodeImageEnabled(true)
-        options.setOrientationLocked(false)
-
-        scanLauncher.launch(options)
+    fun showToast(message: String) {
+        _state.value = ScannerState.ShowToast(message)
     }
 }

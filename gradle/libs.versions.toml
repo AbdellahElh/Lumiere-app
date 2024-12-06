@@ -3,6 +3,7 @@ agp = "8.7.2"
 androidxJunit = "1.1.5"
 cameraCore = "1.2.2"
 coilCompose = "2.7.0"
+coreVersion = "3.5.1"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -29,6 +30,7 @@ jwtdecode="2.0.0"
 junitKtx = "1.2.1"
 playServicesMlkitBarcodeScanning = "18.3.1"
 zxingAndroidEmbeddedVersion = "4.3.0"
+scanner = "4.3.0"
 
 
 [libraries]
@@ -75,6 +77,8 @@ auth0-jwtdecode = { group = "com.auth0.android", name = "jwtdecode", version.ref
 auth0-android ={ group="com.auth0.android", name = "auth0", version.ref = "auth0"}
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 play-services-mlkit-barcode-scanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version.ref = "playServicesMlkitBarcodeScanning" }
+scanner = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "scanner" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
