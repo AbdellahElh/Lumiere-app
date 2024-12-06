@@ -1,5 +1,6 @@
 package com.example.riseandroid.data
 
+import android.app.Application
 import android.content.Context
 import android.util.Base64
 import android.util.Log
@@ -39,7 +40,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import android.app.Application
 
 
 interface AppContainer {
@@ -63,7 +63,7 @@ class DefaultAppContainer(private val context: Context,
                           override val userManager: UserManager
 ) : AppContainer {
     private val BASE_URL = "https://dev-viwl48rh7lran3ul.us.auth0.com"
-    private val BASE_URL_BACKEND = "https://10.0.2.2:5001"
+    private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
     private val movieDao = riseDatabase.movieDao()
@@ -126,12 +126,9 @@ class DefaultAppContainer(private val context: Context,
         )
     }
 
-    private val watchlistApi: WatchlistApi = Retrofit.Builder()
-        .baseUrl("$BASE_URL_BACKEND/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .client(httpClient)
-        .build()
-        .create(WatchlistApi::class.java)
+    private val watchlistApi: WatchlistApi by lazy {
+        retrofitBackend.create(WatchlistApi::class.java)
+    }
 
     override val watchlistRepo: IWatchlistRepo by lazy {
         WatchlistRepo(watchlistDao, watchlistApi)
