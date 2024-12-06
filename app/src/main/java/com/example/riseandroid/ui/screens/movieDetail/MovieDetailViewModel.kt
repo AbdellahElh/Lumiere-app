@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IMovieRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +20,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface MovieDetailUiState {
-    data class Success(val specificMovie: MovieModel) : MovieDetailUiState
+    data class Success(val specificMovie: ResponseMovie) : MovieDetailUiState
     object Error : MovieDetailUiState
     object Loading : MovieDetailUiState
 }
@@ -33,7 +33,7 @@ class MovieDetailViewModel(
     var movieDetailUiState: MovieDetailUiState by mutableStateOf(MovieDetailUiState.Loading)
         private set
 
-    private val _selectedMovie = MutableStateFlow<MovieModel>(MovieModel(
+    private val _selectedMovie = MutableStateFlow<ResponseMovie>(ResponseMovie(
         id = 0,
         eventId = 0,
         title = "",
@@ -50,7 +50,7 @@ class MovieDetailViewModel(
         posterImageUrl = "",
         movieLink = ""
     ))
-    val selectedMovie: StateFlow<MovieModel> = _selectedMovie.asStateFlow()
+    val selectedMovie: StateFlow<ResponseMovie> = _selectedMovie.asStateFlow()
 
     init {
         getMovieDetails()

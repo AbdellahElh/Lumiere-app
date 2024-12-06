@@ -49,7 +49,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
-import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
@@ -124,7 +124,7 @@ fun MovieDetailScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailContent(
-    movie: MovieModel,
+    movie: ResponseMovie,
     navController: NavController,
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
@@ -289,7 +289,7 @@ fun MovieDetailHeader(
 
 
 @Composable
-fun MoviePoster(movie: MovieModel) {
+fun MoviePoster(movie: ResponseMovie) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -310,7 +310,7 @@ fun MoviePoster(movie: MovieModel) {
 
 
 @Composable
-fun MovieInfo(movie: MovieModel) {
+fun MovieInfo(movie: ResponseMovie) {
     Text(
         text = movie.title,
         fontSize = 28.sp,
@@ -361,7 +361,7 @@ fun MovieInfo(movie: MovieModel) {
 }
 
 @Composable
-fun MovieDescription(movie: MovieModel, isExpanded: Boolean, onToggleExpand: () -> Unit) {
+fun MovieDescription(movie: ResponseMovie, isExpanded: Boolean, onToggleExpand: () -> Unit) {
     Text(
         text = "Beschrijving",
         fontSize = 28.sp,

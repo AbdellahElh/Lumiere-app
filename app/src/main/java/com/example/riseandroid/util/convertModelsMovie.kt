@@ -46,6 +46,26 @@ fun MovieEntity.asDomainModel(): MovieModel {
     )
 }
 
+fun MovieEntity.asResponse(): ResponseMovie {
+    return ResponseMovie(
+        id = id,
+        eventId = eventId ?: 0,
+        title = title,
+        coverImageUrl = coverImageUrl,
+        genre = genre,
+        duration = duration,
+        director = director,
+        description = description,
+        movieLink = movieLink,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        cast = emptyList(),
+        cinemas = emptyList(),
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl
+    )
+}
+
 fun MovieModel.asEntity(): MovieEntity {
     return MovieEntity(
         id = id,

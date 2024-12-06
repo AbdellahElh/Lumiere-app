@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.util.isNetworkAvailable
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -106,7 +107,7 @@ open class WatchlistViewModel(
     }
 
     @SuppressLint("NewApi")
-    fun toggleMovieInWatchlist(movie: MovieModel) {
+    fun toggleMovieInWatchlist(movie: ResponseMovie) {
         viewModelScope.launch {
             val userId = userManager.currentUserId.value
             if (userId != null) {
