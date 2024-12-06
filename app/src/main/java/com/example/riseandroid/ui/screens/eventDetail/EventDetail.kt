@@ -254,6 +254,7 @@ fun EventDescription(event: EventModel, isExpanded: Boolean, onToggleExpand: () 
     if (event.description.length > 100) {
         Text(
             text = if (isExpanded) "Lees Minder" else "Lees Meer",
+            color = Color(0xFF8D7E39),
             fontSize = 15.sp,
             fontWeight = FontWeight.Light,
             modifier = Modifier
