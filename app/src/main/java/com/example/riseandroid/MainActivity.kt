@@ -1,3 +1,4 @@
+// MainActivity.kt
 package com.example.riseandroid
 
 import android.annotation.SuppressLint
@@ -7,18 +8,18 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.auth0.android.Auth0
 import com.example.riseandroid.data.AppContainer
 import com.example.riseandroid.ui.LumiereApp
 import com.example.riseandroid.ui.theme.RiseAndroidTheme
+import com.example.riseandroid.ui.theme.ThemeViewModel
 import android.app.NotificationChannel
 import android.app.NotificationManager
-//import android.content.Context.getSystemService
 import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -33,28 +34,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         appContainer = (application as LumiereApplication).container
         setContent {
-            RiseAndroidTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) {  innerPadding ->
-                    LumiereApp(account = appContainer.authRepo.auth0)
+            // Obtain the ThemeViewModel scoped to the Activity
+            val themeViewModel: ThemeViewModel = viewModel()
+
+            // Collect the theme state as Compose State
+            val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+
+            // Apply the theme based on the isDarkTheme state
+            RiseAndroidTheme(
+                darkTheme = isDarkTheme
+            ) {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    LumiereApp(
+                        account = appContainer.authRepo.auth0
+                        // No need to pass theme parameters here
+                    )
                 }
             }
         }
     }
 }
 
-
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview(showBackground = true)
 @Composable
 fun AppPreview() {
-    RiseAndroidTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            LumiereApp(account = Auth0("UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9", "dev-viwl48rh7lran3ul.us.auth0.com"))
-        }
+    RiseAndroidTheme(darkTheme = false) {
+        LumiereApp(
+            account = Auth0("UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9", "dev-viwl48rh7lran3ul.us.auth0.com")
+        )
     }
 }
-
 
 private fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -65,7 +74,6 @@ private fun createNotificationChannel(context: Context) {
             description = descriptionText
         }
 
-        // Get the NotificationManager from the provided context
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
