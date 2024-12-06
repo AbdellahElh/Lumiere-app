@@ -26,7 +26,6 @@ class TenturncardRepositoryTest {
     val testDispatcher = TestDispatcherRule()
 
     private val tenturncardApi = FakeTenturncardApi()
-    //using relaxed to avoid manually stubbing DAO calls
     private val tenturncardDao = FakeTenturncardDao()
     private val authrepo = FakeAuth0Repo()
     private lateinit var tenturncardRepo: TenturncardRepository

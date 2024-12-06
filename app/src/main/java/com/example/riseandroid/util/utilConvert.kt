@@ -15,23 +15,6 @@ import com.google.gson.reflect.TypeToken
 
 val gson = Gson()
 
-fun MovieEntity.asExternalModel(): MovieModel {
-    return MovieModel(
-        id = id,
-        eventId = eventId ?: 0,
-        title = title,
-        coverImageUrl = coverImageUrl,
-        genre = genre,
-        duration = duration,
-        director = director,
-        description = description,
-        video = movieLink,
-        videoPlaceholderUrl = videoPlaceholderUrl,
-        cast = emptyList(),
-        cinemas = emptyList()
-    )
-}
-
 fun MovieModel.asEntity(): MovieEntity {
     return MovieEntity(
         id = id,
@@ -47,23 +30,6 @@ fun MovieModel.asEntity(): MovieEntity {
         posterImageUrl = coverImageUrl,
         movieLink = video ?: ""
     )
-}
-
-fun MoviePosterEntity.asExternalModel(): MoviePoster {
-    return MoviePoster(
-        id = id,
-        cover = cover,
-        releaseDate = releaseDate
-    )
-}
-
-fun MoviePoster.asEntity(): MoviePosterEntity {
-    return MoviePosterEntity(
-        id = id,
-        cover = cover,
-        releaseDate = releaseDate
-    )
-
 }
 
 fun TenturncardEntity.asExternalModel(): Tenturncard {

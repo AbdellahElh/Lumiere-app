@@ -8,6 +8,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.riseandroid.data.entitys.TenturncardEntity
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.After
@@ -21,13 +22,12 @@ class TenturncardDaoTest {
     private lateinit var risedb : RiseDatabase
 
     private var toAddTenturncard = TenturncardEntity(
-        id = 0,
+        id = 1,
         amountLeft = 10,
+        ActivationCode = "activationCode",
+        UserTenturncardId = 1,
         purchaseDate = null,
-        expirationDate = null,
-        ActivationCode = "testactivationcode",
-        IsActivated = false,
-        UserTenturncardId = 0
+        expirationDate = null
     )
 
     @Before
@@ -53,6 +53,6 @@ class TenturncardDaoTest {
     fun daoAdd_addTenturncardToDb() = runBlocking {
         tenturncardDao.addTenturncard(toAddTenturncard)
         val allTenturncards = tenturncardDao.getAllTenturncards().first()
-        assertEquals(allTenturncards, toAddTenturncard)
+        assertEquals(allTenturncards.first(), toAddTenturncard)
     }
 }

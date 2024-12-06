@@ -57,6 +57,10 @@ fun BottomNavGraph(
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
 
+    val goToMovieDetail = { id: String ->
+        navController.navigate("movieDetail/${id}")
+    }
+
     val authToken by authViewModel.authToken.collectAsState()
     NavHost(
         navController = navController,
@@ -65,7 +69,7 @@ fun BottomNavGraph(
     ) {
 
         composable(route = BottomBarScreen.Home.route) {
-            Homepage(navController = navController, selectedTab = 0)
+            Homepage(goToMovieDetail=goToMovieDetail, navController = navController, selectedTab = 0)
         }
 
         composable(route = BottomBarScreen.Tickets.route) {
@@ -180,7 +184,7 @@ fun BottomNavGraph(
             arguments = listOf(navArgument("selectedTab") { defaultValue = 0 })
         ) { backStackEntry ->
             val selectedTab = backStackEntry.arguments?.getInt("selectedTab") ?: 0
-            Homepage(navController = navController, selectedTab = selectedTab)
+            Homepage(navController = navController, goToMovieDetail=goToMovieDetail, selectedTab = selectedTab)
         }
     }
 }

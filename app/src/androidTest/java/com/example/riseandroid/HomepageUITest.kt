@@ -56,9 +56,14 @@ class HomepageUITest {
     val allMoviesList = MovieListMock().LoadAllMoviesMock()
     val eventsList = EventListMock().LoadAllEventsMock()
 
+    lateinit var goToMovieDetail: (String) -> Unit
+
     @Before
     fun setup() {
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        goToMovieDetail = { movieId ->
+            navController.navigate("movieDetail/$movieId")
+        }
     }
 
     @Test
@@ -66,6 +71,7 @@ class HomepageUITest {
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
                 FakeResultScreen(
+                    goToMovieDetail = goToMovieDetail,
                     navController = navController,
                     recentMovieList = recentMovieList,
                     allMoviesNonRecent = allMoviesList,
@@ -84,6 +90,7 @@ class HomepageUITest {
         homepageTestRule.setContent {
             Surface(modifier = Modifier) {
                 FakeResultScreen(
+                    goToMovieDetail = goToMovieDetail,
                     navController = navController,
                     recentMovieList = recentMovieList,
                     allMoviesNonRecent = allMoviesList,
@@ -106,7 +113,8 @@ class HomepageUITest {
                     recentMovieList = recentMovieList,
                     allMoviesNonRecent = allMoviesList,
                     eventsList = eventsList,
-                    selectedTab = 2
+                    selectedTab = 2,
+                    goToMovieDetail = goToMovieDetail
                 )
             }
         }
@@ -119,6 +127,7 @@ class HomepageUITest {
 
 @Composable
 fun FakeResultScreen(
+    goToMovieDetail: (id: String) -> Unit,
     navController: NavHostController,
     recentMovieList: List<MoviePoster>,
     allMoviesNonRecent: List<MovieModel>,
@@ -183,7 +192,7 @@ fun FakeResultScreen(
 
                         ListAllMovies(
                             allMoviesNonRecent = allMoviesNonRecent,
-                            navController = navController,
+                            goToMovieDetail=goToMovieDetail,
                             modifier = Modifier
                                 .padding(dimensionResource(R.dimen.image_padding))
                                 .height(400.dp)

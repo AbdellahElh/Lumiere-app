@@ -2,6 +2,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.riseandroid.fake.FakeTenturncardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -27,7 +28,7 @@ class TenturnCardsUITest {
     fun testCardsAreDisplayed() = runTest {
 
         composeTestRule.setContent {
-            TenturncardScreen(authToken = "dummyToken", tenTurnCardViewModel = viewModel)
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
         }
         Thread.sleep(3000)
 
@@ -37,6 +38,37 @@ class TenturnCardsUITest {
         composeTestRule.onAllNodesWithText("5")[0].assertIsDisplayed()
         composeTestRule.onAllNodesWithText("Bewerken")[0].assertIsDisplayed()
 
+    }
+
+    @Test
+    fun addTenturncardFieldIsDisplayed() = runTest {
+        composeTestRule.setContent {
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
+        }
+        composeTestRule.onNodeWithTag("codeInputField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("addBtn").assertIsDisplayed()
+    }
+
+    @Test
+    fun succesMessageIsShown() = runTest {
+        composeTestRule.setContent {
+            TenturncardScreen( tenTurnCardViewModel = viewModel)
+        }
+        composeTestRule.onNodeWithTag("codeInputField").performTextInput("succesCode")
+        composeTestRule.onNodeWithTag("addBtn").performClick()
+
+        composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Tienbeurtenkaart succesvol toegevoegd")
+    }
+
+    @Test
+    fun errorMessageIsShown() = runTest {
+        composeTestRule.setContent {
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
+        }
+        composeTestRule.onNodeWithTag("codeInputField").performTextInput("errorCode")
+        composeTestRule.onNodeWithTag("addBtn").performClick()
+
+        composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Deze kaart behoort al tot iemand")
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.homepage
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,10 +53,12 @@ import com.example.riseandroid.ui.screens.homepage.components.MoviePosterItem
 import com.example.riseandroid.ui.screens.homepage.components.MoviesFilters
 import com.example.riseandroid.ui.screens.homepage.components.SlidingButton
 import com.example.riseandroid.ui.screens.homepage.components.SlidingButtonForHomepage
+import com.example.riseandroid.ui.screens.movieProgram.MovieProgram
 
 
 @Composable
 fun Homepage(
+    goToMovieDetail: (id: String) -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier,
     selectedTab: Int = 0,
@@ -69,6 +72,7 @@ fun Homepage(
             val allMoviesNonRecent by homepageViewModel.allMovies.collectAsState()
 
             ResultScreen(
+                goToMovieDetail = goToMovieDetail,
                 navController = navController,
                 recentMovieList = recentMovies,
                 modifier = modifier,
@@ -86,6 +90,7 @@ fun Homepage(
 
 @Composable
 fun ResultScreen(
+    goToMovieDetail: (id: String) -> Unit,
     navController: NavHostController,
     recentMovieList: List<MoviePoster>,
     allMoviesNonRecent: List<MovieModel>,
@@ -155,11 +160,9 @@ fun ResultScreen(
 
                         TitleText(title = stringResource(R.string.alle_films_title))
 
-                        MoviesFilters(homepageViewModel = homepageViewModel)
-
                         ListAllMovies(
                             allMoviesNonRecent = allMoviesNonRecent,
-                            navController = navController,
+                            goToMovieDetail=goToMovieDetail,
                             modifier = Modifier
                                 .padding(posterImagePadding)
                                 .height(400.dp)
@@ -167,16 +170,11 @@ fun ResultScreen(
                     }
                 }
 
-                1 -> { // Programma Tab
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
-                    ) {
-                        TitleText(title = "Programma")
-                        // Hier moet programma content komen
-                    }
+                1 -> {
+                    MovieProgram(
+                        goToMovieDetail = goToMovieDetail,
+                        modifier = modifier,
+                    )
                 }
 
                 2 -> { // Events Tab

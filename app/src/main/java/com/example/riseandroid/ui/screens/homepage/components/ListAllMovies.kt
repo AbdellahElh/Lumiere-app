@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ListAllMovies(
     allMoviesNonRecent: List<MovieModel>,
-    navController: NavHostController,
+    goToMovieDetail: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (allMoviesNonRecent.isEmpty()) {
@@ -35,7 +35,7 @@ fun ListAllMovies(
             items(allMoviesNonRecent) { movie ->
                 MoviePoster(
                     movie = movie,
-                    navController = navController,
+                    goToMovieDetail=goToMovieDetail,
                     modifier = modifier
                         .padding(dimensionResource(R.dimen.image_padding))
                 )

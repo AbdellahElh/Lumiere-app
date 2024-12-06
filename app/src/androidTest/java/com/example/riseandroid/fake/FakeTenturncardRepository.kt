@@ -8,7 +8,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class FakeTenturncardRepository : ITenturncardRepository {
-
+    private val toAddCard = TenturncardEntity(
+        amountLeft = 10,
+        ActivationCode = "succesCode",
+        UserTenturncardId = 0,
+        purchaseDate = null,
+        expirationDate = null
+    )
     private val fakeCards = listOf(
         Tenturncard(
             id = 1,
@@ -36,14 +42,23 @@ class FakeTenturncardRepository : ITenturncardRepository {
         )
     )
 
-    override suspend fun getTenturncards(authToken: String): Flow<List<Tenturncard>> {
+    override suspend fun getTenturncards(): Flow<List<Tenturncard>> {
         return flow {
             kotlinx.coroutines.delay(1000)
             emit(fakeCards)
         }
     }
 
-    override suspend fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> {
-        TODO("Not yet implemented")
+
+    override fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> {
+        return flow {
+            emit(ApiResource.Loading())
+            if (activationCode == "succesCode") {
+                emit(ApiResource.Success(toAddCard))
+            }
+            else {
+                emit(ApiResource.Error("Something went wrong"))
+            }
+        }
     }
 }
