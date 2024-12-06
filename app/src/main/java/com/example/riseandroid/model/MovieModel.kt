@@ -1,5 +1,7 @@
 package com.example.riseandroid.model
 
+import com.example.riseandroid.data.entitys.Cinema
+
 data class MovieModel(
     val id: Int,
     val eventId: Int?,

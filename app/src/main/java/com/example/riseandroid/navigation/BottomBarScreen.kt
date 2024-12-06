@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.composables.icons.lucide.CircleUserRound
 import com.composables.icons.lucide.House
 import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.ScanQrCode
 import com.composables.icons.lucide.Star
 import com.composables.icons.lucide.Tickets
 
@@ -20,12 +19,6 @@ sealed class BottomBarScreen(
         title = "Home",
         icon =Lucide.House
 
-    )
-
-    object ScanCode : BottomBarScreen(
-        route = "qrScan",
-        title = "Scan",
-        icon = Lucide.ScanQrCode
     )
     object Tickets : BottomBarScreen(
         route = "tickets",

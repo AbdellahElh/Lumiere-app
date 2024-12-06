@@ -1,6 +1,5 @@
 package com.example.riseandroid.network
 
-import com.example.riseandroid.model.MovieModel
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -10,14 +9,11 @@ import retrofit2.http.Path
 interface WatchlistApi {
 
     @GET("api/Watchlist")
-    suspend fun getWatchlist(): List<MovieModel>
+    suspend fun getWatchlist(): List<ResponseMovie>
 
     @POST("api/Watchlist")
-    suspend fun addToWatchlist(@Body movie: MovieModel)
+    suspend fun addToWatchlist(@Body movie: ResponseMovie)
 
     @DELETE("api/Watchlist/{movieId}")
     suspend fun removeFromWatchlist(@Path("movieId") movieId: Int)
 }
-
-
-

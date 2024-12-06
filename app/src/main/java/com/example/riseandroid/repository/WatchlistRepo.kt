@@ -8,8 +8,9 @@ import com.example.riseandroid.data.entitys.watchlist.WatchlistEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.network.WatchlistApi
+import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
-import com.example.riseandroid.util.asExternalModel
+import com.example.riseandroid.util.asResponseModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,7 +31,9 @@ class WatchlistRepo(
 
     override fun getMoviesInWatchlist(userId: Int): Flow<List<MovieModel>> {
         return watchlistDao.getMoviesInWatchlist(userId).map { entities ->
-            entities.map { entity -> entity.asExternalModel() }
+            entities.map { entity ->
+                entity.asDomainModel()
+            }
         }
     }
 
@@ -45,14 +48,12 @@ class WatchlistRepo(
 
             try {
                 watchlistDao.addToWatchlist(movieWatchlist.asEntity())
-                watchlistApi.addToWatchlist(movie)
+                watchlistApi.addToWatchlist(movie.asResponseModel())
             } catch (@SuppressLint("NewApi") e: HttpException) {
                 throw e
             }
         }
     }
-
-
 
     override suspend fun removeFromWatchlist(movieId: Int, userId: Int) {
         withContext(Dispatchers.IO) {
@@ -61,12 +62,10 @@ class WatchlistRepo(
             try {
                 watchlistApi.removeFromWatchlist(movieId)
             } catch (@SuppressLint("NewApi") e: HttpException) {
-                throw e // Afhandeling van de fout gebeurt in de ViewModel
+                throw e // De ViewModel moet de fout verder afhandelen
             }
         }
     }
-
-
 
     override suspend fun syncWatchlistWithBackend(userId: Int) {
         withContext(Dispatchers.IO) {
@@ -78,7 +77,6 @@ class WatchlistRepo(
             watchlistDao.insertMovies(movieEntities)
 
             val watchlistId = getWatchlistId(userId)
-
             val movieWatchlistEntities = backendMovies.map { movie ->
                 MovieWatchlistEntity(
                     watchlistId = watchlistId,
@@ -89,7 +87,6 @@ class WatchlistRepo(
         }
     }
 
-
     override suspend fun getWatchlistId(userId: Int): Int {
         return watchlistDao.getWatchlistIdForUser(userId) ?: run {
             val newWatchlist = WatchlistEntity(userId = userId)
@@ -99,5 +96,7 @@ class WatchlistRepo(
         }
     }
 }
+
+
 
 

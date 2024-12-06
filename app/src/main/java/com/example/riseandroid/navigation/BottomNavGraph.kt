@@ -36,7 +36,6 @@ import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.login.LoginScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
-import com.example.riseandroid.ui.screens.scanner.ScanCodeScreen
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
@@ -62,9 +61,6 @@ fun BottomNavGraph(
 
         composable(route = BottomBarScreen.Home.route) {
             Homepage(navController = navController, selectedTab = 0)
-        }
-        composable(route = BottomBarScreen.ScanCode.route) {
-            ScanCodeScreen(navController = navController)
         }
         composable(route = BottomBarScreen.Tickets.route) {
             if (!isUserLoggedIn) {
