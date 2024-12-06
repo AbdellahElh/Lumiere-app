@@ -2,7 +2,6 @@ package com.example.riseandroid.ui.screens.ticket
 
 
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,12 +12,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.data.lumiere.MoviesRepository
-import com.example.riseandroid.data.lumiere.ProgramRepository
-import com.example.riseandroid.data.lumiere.TicketRepository
-import com.example.riseandroid.model.Movie
-import com.example.riseandroid.model.Program
 import com.example.riseandroid.model.Ticket
+import com.example.riseandroid.repository.ITicketRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,14 +23,13 @@ import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface TicketUiState {
-    data class Success( val ticketList: Flow<List<Ticket>>) : TicketUiState
+    data class Success( val ticketList: StateFlow<List<Ticket>>) : TicketUiState
     object Error : TicketUiState
     object Loading : TicketUiState
 }
 
 class TicketViewModel(
-    private val userId: Long,
-    private val ticketRepository: TicketRepository,
+    private val ticketRepository: ITicketRepository,
 
     ) : ViewModel() {
 
@@ -43,37 +37,43 @@ class TicketViewModel(
         private set
 
     private val _allTickets = MutableStateFlow<List<Ticket>>(emptyList())
-    val allTickets: StateFlow<List<Ticket>> = _allTickets.asStateFlow()
+    val Alltickets = _allTickets.asStateFlow()
+
 
     init {
         getTickets()
     }
-
-    private fun getTickets() {
+    fun getTickets() {
         viewModelScope.launch {
-            ticketUiState = TicketUiState.Loading
-            ticketUiState = try {
-                val ticketList = ticketRepository.getTicketsPerUser(userId)
+            try {
+                val tickets = ticketRepository.getTickets()
+                    .collect { tickets ->
+                        _allTickets.value = tickets
+                        ticketUiState  = TicketUiState.Success(
+                            ticketList = Alltickets
+                        )
+                    }
 
-                TicketUiState.Success(ticketList)
-            } catch (e: IOException) {
-                TicketUiState.Error
-            } catch (e: HttpException) {
-                TicketUiState.Error
+            } catch (e: Exception) {
+
+                _allTickets.value = emptyList()
             }
         }
     }
 
     companion object {
-        fun provideFactory(userId: Long): ViewModelProvider.Factory = viewModelFactory {
+
+
+
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as LumiereApplication)
-                val ticketRepository = application.container.ticketRepository
-
-                TicketViewModel(userId, ticketRepository )
+                val ticketRepo=application.container.ticketRepo
+                TicketViewModel(ticketRepository = ticketRepo)
             }
         }
     }
+
 }
 
 

@@ -15,6 +15,8 @@ import com.example.riseandroid.data.entitys.MoviePosterEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
 import com.example.riseandroid.data.entitys.TenturncardDao
 import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.data.entitys.Tickets.TicketDao
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 
 @Database(
     entities = [
@@ -23,6 +25,7 @@ import com.example.riseandroid.data.entitys.TenturncardEntity
         ShowtimeEntity::class,
         MoviePosterEntity::class,
         TenturncardEntity::class,
+        TicketEntity::class,
         EventEntity::class
     ],
     version = 4,
@@ -31,6 +34,7 @@ import com.example.riseandroid.data.entitys.TenturncardEntity
 abstract class RiseDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
+    abstract fun ticketDao(): TicketDao
     abstract fun moviePosterDao(): MoviePosterDao
     abstract fun tenturncardDao() : TenturncardDao
     abstract fun eventDao(): EventDao
