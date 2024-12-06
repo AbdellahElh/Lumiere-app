@@ -128,8 +128,8 @@ fun FiltersButtonToggle(
         Icon(
             imageVector = if (!areFiltersVisible) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp,
             contentDescription = "Show filters",
-            modifier = Modifier.padding(start = 2.dp).size(40.dp),
-            tint = Color.White
+            modifier = Modifier.padding(start = 2.dp).size(40.dp)
+
             )
     }
 }

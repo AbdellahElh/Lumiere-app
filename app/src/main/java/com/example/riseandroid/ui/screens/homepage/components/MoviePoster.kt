@@ -60,7 +60,6 @@ fun MoviePoster(movie: MovieModel,
         Text(
             text = movie.title,
             modifier = Modifier.fillMaxWidth().padding(8.dp).testTag(movie.title),
-            color = Color.White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )
