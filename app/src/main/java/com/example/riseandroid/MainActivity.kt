@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.example.riseandroid.ui.screens.scanner.ScannerAction
 import com.example.riseandroid.ui.screens.scanner.ScannerState
 import com.example.riseandroid.ui.screens.scanner.ScannerViewModel
 import com.journeyapps.barcodescanner.ScanContract
@@ -38,20 +39,27 @@ class MainActivity : ComponentActivity() {
     private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         scannerViewModel.onScanResult(result.contents)
     }
-
-    //registerForActivityResult needs a lifecycle owner, that's why it is in MainActivity
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            launchScanner()
-        } else {
-            scannerViewModel.showToast("Camera permission denied")
-        }
+        scannerViewModel.checkCameraPermission(isGranted)
     }
 
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Observe state changes from the Scanner ViewModel
+        lifecycleScope.launch {
+            scannerViewModel.scannerState.collect { state ->
+                handleScannerState(state)
+            }
+        }
+
+        // Observe actions from the Scanner ViewModel
+        lifecycleScope.launch {
+            scannerViewModel.actionState.collect { action ->
+                handleScannerAction(action)
+            }
+        }
         initializeApp()
         setContent {
             MainContent()
@@ -62,10 +70,15 @@ class MainActivity : ComponentActivity() {
         createNotificationChannel(this)
         enableEdgeToEdge()
         appContainer = (application as LumiereApplication).container
-        // Observe ScannerState from ViewModel
-        lifecycleScope.launch {
-            scannerViewModel.state.collect { state ->
-                handleScannerState(state)
+    }
+
+
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @Composable
+    private fun MainContent() {
+        RiseAndroidTheme {
+            Scaffold(modifier = Modifier.fillMaxSize()) {
+                LumiereApp(account = appContainer.authRepo.auth0)
             }
         }
     }
@@ -78,12 +91,18 @@ class MainActivity : ComponentActivity() {
             ScannerState.Cancelled -> {
                 Toast.makeText(this, "Scan Cancelled", Toast.LENGTH_SHORT).show()
             }
-            ScannerState.RequestCameraPermission -> {
-                requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-            }
             is ScannerState.ShowToast -> {
                 Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
             }
+            is ScannerState.Loading -> null
+        }
+    }
+
+    private fun handleScannerAction(action: ScannerAction?) {
+        when (action) {
+            ScannerAction.LaunchScanner -> null
+            ScannerAction.RequestCameraPermission -> requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+            null -> Unit // No action to perform
         }
     }
 
@@ -98,18 +117,6 @@ class MainActivity : ComponentActivity() {
         }
         scanLauncher.launch(options)
     }
-
-
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-    @Composable
-    private fun MainContent() {
-        RiseAndroidTheme {
-            Scaffold(modifier = Modifier.fillMaxSize()) {
-                LumiereApp(account = appContainer.authRepo.auth0)
-            }
-        }
-    }
-
 }
 
 
