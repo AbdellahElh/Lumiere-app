@@ -22,6 +22,7 @@ import android.os.Build
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.lifecycleScope
 import com.example.riseandroid.ui.screens.scanner.ScannerAction
 import com.example.riseandroid.ui.screens.scanner.ScannerState
@@ -29,41 +30,30 @@ import com.example.riseandroid.ui.screens.scanner.ScannerViewModel
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var appContainer: AppContainer
-    private val scannerViewModel: ScannerViewModel by viewModels()
+    private val scannerViewModel: ScannerViewModel by viewModels (factoryProducer = { ScannerViewModel.Factory })
 
     private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
         scannerViewModel.onScanResult(result.contents)
     }
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        scannerViewModel.checkCameraPermission(isGranted)
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        scannerViewModel.checkCameraPermission(false)
     }
 
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Observe state changes from the Scanner ViewModel
-        lifecycleScope.launch {
-            scannerViewModel.scannerState.collect { state ->
-                handleScannerState(state)
-            }
-        }
-
-        // Observe actions from the Scanner ViewModel
-        lifecycleScope.launch {
-            scannerViewModel.actionState.collect { action ->
-                handleScannerAction(action)
-            }
-        }
         initializeApp()
         setContent {
             MainContent()
         }
+
     }
 
     private fun initializeApp() {
@@ -81,39 +71,37 @@ class MainActivity : ComponentActivity() {
                 LumiereApp(account = appContainer.authRepo.auth0)
             }
         }
+        observeScannerActions()
     }
 
-    private fun handleScannerState(state: ScannerState) {
-        when (state) {
-            is ScannerState.ShowResult -> {
-                Toast.makeText(this, "Result: ${state.result}", Toast.LENGTH_SHORT).show()
+    private fun observeScannerActions() {
+        lifecycleScope.launch {
+            scannerViewModel.actionFlowState.collect { action ->
+                when (action) {
+                    ScannerAction.RequestCameraPermission -> {
+                        requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+                    }
+                    ScannerAction.LaunchScanner -> {
+                        println("Launch scanner")
+                        launchScanner()
+                    }
+                }
             }
-            ScannerState.Cancelled -> {
-                Toast.makeText(this, "Scan Cancelled", Toast.LENGTH_SHORT).show()
-            }
-            is ScannerState.ShowToast -> {
-                Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
-            }
-            is ScannerState.Loading -> null
         }
     }
 
-    private fun handleScannerAction(action: ScannerAction?) {
-        when (action) {
-            ScannerAction.LaunchScanner -> null
-            ScannerAction.RequestCameraPermission -> requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-            null -> Unit // No action to perform
-        }
-    }
 
-    private fun launchScanner() {
+
+
+    fun launchScanner() {
         val options = ScanOptions().apply {
             setDesiredBarcodeFormats(ScanOptions.QR_CODE)
             setPrompt("Scan QR code")
-            setCameraId(0)
+            setCameraId(1)
             setBeepEnabled(false)
             setBarcodeImageEnabled(true)
-            setOrientationLocked(false)
+            setOrientationLocked(true)
+            //setCaptureActivity()
         }
         scanLauncher.launch(options)
     }
