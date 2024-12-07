@@ -1,6 +1,8 @@
 package com.example.riseandroid.data.entitys.Tickets
 
 import androidx.room.*
+import com.example.riseandroid.data.entitys.EventEntity
+import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.network.ResponseMovie
 import kotlinx.coroutines.flow.Flow
@@ -16,10 +18,10 @@ interface TicketDao {
     suspend fun insertTickets(tickets: List<TicketEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertEvent(event: EventResponse)
+    suspend fun insertEvent(event: EventEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMovie(movie: ResponseMovie)
+    suspend fun insertMovie(movie: MovieEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTicket(ticket: TicketEntity)

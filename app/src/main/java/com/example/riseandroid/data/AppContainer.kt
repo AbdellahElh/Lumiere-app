@@ -184,7 +184,9 @@ class DefaultAppContainer(private val context: Context,
         val ticketApi = retrofitTicketServiceBackend
         val ticketDao = ticketDao
         val auth0Repo = authRepo
-        TicketRepository(ticketApi, ticketDao, auth0Repo)
+        val movieApi = retrofitServiceBackend
+        val EventApi = eventsApi
+        TicketRepository(ticketApi, ticketDao, auth0Repo, movieApi, EventApi)
     }
 
 

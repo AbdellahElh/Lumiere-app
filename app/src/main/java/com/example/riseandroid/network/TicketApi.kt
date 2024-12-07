@@ -15,11 +15,13 @@ interface TicketApi {
     @GET("/api/ticket")
     suspend fun getTickets(): List<Ticket>
 
-//    @POST("/api/ticket/add/")
-//    fun addTicket(
-//        @Query("MovieId") movieId: Int,
-//        @Query("EventId") eventId: Int,
-//        @Query("cinemaName") cinemaName: String,
-//        @Query("showtime") showtime: LocalDateTime
-//    ): Call<Unit>
+    @POST("/api/ticket/add/")
+    fun addTicket(
+        @retrofit2.http.Query("MovieId") movieId: Int,
+        @retrofit2.http.Query("EventId") eventId: Int,
+        @retrofit2.http.Query("cinemaName") cinemaName: String,
+        @retrofit2.http.Query("showtime") showtime: String
+    ): Call<Ticket>
+
+
 }

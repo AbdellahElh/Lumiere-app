@@ -1,24 +1,23 @@
 package com.example.riseandroid.repository
 
 import android.util.Log
-import com.example.riseandroid.data.entitys.CinemaEntity
-import com.example.riseandroid.data.entitys.EventDao
 import com.example.riseandroid.data.entitys.Tickets.TicketDao
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+import com.example.riseandroid.data.entitys.Tickets.TicketType
 import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.network.EventsApi
 import com.example.riseandroid.network.MoviesApi
-import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.network.TicketApi
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
+import com.example.riseandroid.util.toEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
-import java.time.LocalDateTime
+import retrofit2.awaitResponse
 
 class TicketRepository(
     private val ticketApi: TicketApi,
@@ -48,66 +47,69 @@ class TicketRepository(
         try {
 
             val ticketsFromApi = ticketApi.getTickets()
-            val ticketAsEntities = ticketsFromApi.map { it.asEntity() }
+            val ticketAsEntities = ticketsFromApi.mapNotNull { it.asEntity() }
             ticketDao.deleteAllTickets()
             ticketDao.insertTickets(ticketAsEntities)
 
         } catch (e: Exception) {
-            Log.e("TicketRepo", "Error refreshing tickets")
+            Log.e("TicketRepo", "Error refreshing tickets" + e)
         }
     }
     private suspend fun saveMovieEvent(ticket: Ticket) {
 
         if(ticket.eventId != null){
             val event = EventApi.getSpecificEvent(ticket.eventId)
-            ticketDao.insertEvent(event)
+            val eventEntity = event.toEntity()
+            ticketDao.insertEvent(eventEntity)
         }
         else{
             val movie = ticket.movieId?.let { movieApi.getMovieById(it) }
-            ticketDao.insertMovie(movie)
+            val movieEntity = movie?.asEntity()
+            if (movie != null) {
+                if (movieEntity != null) {
+                    ticketDao.insertMovie(movieEntity)
+                }
+            }
         }
 
     }
-    override fun addTicket(
+    override suspend fun addTicket(
         movieCode: Int,
         eventCode: Int,
         cinemaName: String,
-        showtime: LocalDateTime
-    ): Flow<ApiResource<Ticket>> = flow {
+        showtime: String
+    ): TicketEntity {
+        return withContext(Dispatchers.IO) {
+            val newTicket = TicketEntity(
+                dateTime = showtime,
+                location = cinemaName,
+                type = 0,
+                movieId = movieCode,
+                eventId = eventCode,
+                accountId = getLoggedInUserId()
+            )
+
+            try {
+                val response = ticketApi.addTicket(
+                    movieId = movieCode,
+                    eventId = eventCode,
+                    cinemaName = cinemaName,
+                    showtime = showtime
+                )
+                if (response.awaitResponse().isSuccessful) {
+                    ticketDao.addTicket(newTicket)
+                    newTicket
+                } else {
+                    ticketDao.deleteTicket(newTicket)
+                    throw Exception("Failed to add ticket on the server")
+                }
+            } catch (e: Exception) {
+                ticketDao.deleteTicket(newTicket)
+                throw e
+            }
+        }
     }
 
-//        emit(ApiResource.Loading())
-//        val newTicket = TicketEntity(
-//            dateTime = showtime,
-//            location = cinemaName,
-//            type = TicketType.STANDAARD,
-//            movieId = movieCode,
-//            eventId = eventCode,
-//            accountId = getLoggedInUserId()
-//        )
-//        try {
-//            val response = ticketApi.addTicket(
-//                movieId = movieCode,
-//                eventId = eventCode,
-//                cinemaName = cinemaName,
-//                showtime = showtime
-//            )
-//            if (response.awaitResponse().isSuccessful) {
-//                emit(ApiResource.Success(newTicket))
-//                ticketDao.addTicket(newTicket)
-//            } else {
-//                emit(ApiResource.Error<TicketEntity>("Toevoegen gefaald"))
-//                ticketDao.deleteTicket(newTicket)
-//            }
-//        } catch (e: Exception) {
-//            emit(
-//                ApiResource.Error<TicketEntity>(
-//                    message = e.toString() ?: "Er was een onverwachte fout"
-//                )
-//            )
-//            ticketDao.deleteTicket(newTicket)
-//        }
-//    }.flowOn(Dispatchers.IO)
 
 
 

@@ -4,8 +4,7 @@ import androidx.room.Embedded
 import androidx.room.PrimaryKey
 import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieEntity
-
-
+import com.example.riseandroid.data.entitys.Tickets.TicketType
 
 
 data class Ticket(

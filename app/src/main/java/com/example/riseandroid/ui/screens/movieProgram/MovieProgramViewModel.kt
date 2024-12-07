@@ -13,8 +13,6 @@ import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.MovieModel
 
 import com.example.riseandroid.repository.IMovieRepo
-import com.example.riseandroid.ui.screens.homepage.HomepageUiState
-import com.example.riseandroid.ui.screens.movieDetail.components.getCurrentDate
 import com.example.riseandroid.util.getTodayDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -38,7 +38,6 @@ fun Tenturncard.asEntity(): TenturncardEntity {
 }
 fun TicketEntity.asExternalModel(): Ticket {
     return Ticket(
-
         id = id,
         dateTime = dateTime,
         location = location,
@@ -46,6 +45,8 @@ fun TicketEntity.asExternalModel(): Ticket {
         movieId = movieId,
         eventId = eventId,
         accountId = accountId,
+        movie = movie,
+        event = event
 
         )
 }
@@ -58,7 +59,9 @@ fun Ticket.asEntity(): TicketEntity {
         type = type,
         movieId = movieId,
         eventId = eventId,
-        accountId = accountId
+        accountId = accountId,
+        movie = movie,
+        event = event
     )
 }
 fun EventEntity.asExternalModel(): EventModel {

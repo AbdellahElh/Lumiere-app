@@ -3,32 +3,30 @@ package com.example.riseandroid.data.entitys.Tickets
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.example.riseandroid.data.entitys.Account
+import com.example.riseandroid.data.entitys.CinemaEntity
 import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieEntity
 import java.time.LocalDateTime
 
 
+enum class TicketType {
+    STANDAARD,
+    SENIOR,
+    STUDENT
+}
 
 @Entity(
     tableName = "ticket",
     foreignKeys = [
-        ForeignKey(
-            entity = MovieEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["movieId"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = EventEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["eventId"],
-            onDelete = ForeignKey.CASCADE
-        ),
+        ForeignKey(entity = MovieEntity::class, parentColumns = ["id"], childColumns = ["movieId"]),
+        ForeignKey(entity = EventEntity::class, parentColumns = ["id"], childColumns = ["eventId"])
+    ],
+    indices = [Index("movieId"), Index("eventId")]
 
-    ]
 )
 data class TicketEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

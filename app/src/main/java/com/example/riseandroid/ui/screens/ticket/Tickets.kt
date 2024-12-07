@@ -62,6 +62,7 @@ import com.example.riseandroid.R
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.model.Ticket
+import java.util.Locale
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -75,6 +76,11 @@ import com.example.riseandroid.ui.screens.movieDetail.MovieDetailUiState
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import kotlin.text.format
 
 @Composable
 fun TicketScreen(
@@ -214,6 +220,18 @@ fun TicketsScreenContent(
 
 @Composable
 fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket: Ticket) {
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+    val date = dateFormatter.parse(ticket.dateTime)
+    val milliseconds = date?.time
+    val formattedDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date(milliseconds ?: 0))
+    val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(milliseconds ?: 0))
+    var title = ""
+    if (ticket.movieId != null) {
+        title = ticket.movie?.title.toString()
+
+    }else{
+        title = ticket.event?.title.toString()
+    }
     Box(
         modifier = modifier
             .fillMaxWidth(0.85f)
@@ -238,7 +256,7 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "${ticket.dateTime}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(text = "${formattedTime}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
                 Text(text = "${ticket.id}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -255,7 +273,7 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "${ticket.dateTime}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(text = "${formattedDate}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
                 Text(text = "${ticket.location}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -273,7 +291,7 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Film: ${ticket.movie?.title}", color = Color.Black, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(text = "Film: ${title}", color = Color.Black, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
                 Text("e-ticket", color = Color(0xFFF14763), fontSize =20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
             }
 

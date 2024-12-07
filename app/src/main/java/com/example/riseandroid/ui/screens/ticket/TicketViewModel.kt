@@ -2,6 +2,7 @@ package com.example.riseandroid.ui.screens.ticket
 
 
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,9 +13,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.repository.ITicketRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,6 +61,30 @@ class TicketViewModel(
             }
         }
     }
+    fun addTicket(
+        movieId: Int,
+        eventId: Int,
+        cinemaName: String,
+        showtime: String,
+        onResult: (TicketEntity?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val ticket = ticketRepository.addTicket(movieId, eventId, cinemaName, showtime)
+                onResult(ticket)
+            } catch (e: IOException) {
+                Log.e("TicketViewModel", "Netwerk error toevoegen ticket", e)
+                onResult(null)
+            } catch (e: HttpException) {
+                Log.e("TicketViewModel", "HTTP error toevoegen ticket", e)
+                onResult(null)
+            } catch (e: Exception) {
+                Log.e("TicketViewModel", "Error toevoegen ticket", e)
+                onResult(null)
+            }
+        }
+    }
+
 
     companion object {
 
