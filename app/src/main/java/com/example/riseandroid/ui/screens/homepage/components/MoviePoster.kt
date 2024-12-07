@@ -20,12 +20,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 
 @Composable
-fun MoviePoster(movie: MovieModel,
+fun MoviePoster(movie: ResponseMovie,
                 modifier: Modifier = Modifier,
                 goToMovieDetail: (id: String) -> Unit,) {
     val imageUrl = movie.coverImageUrl

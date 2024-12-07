@@ -144,7 +144,6 @@ fun WatchlistMovieItem(movie: MovieModel, onClick: () -> Unit) {
         Text(
             text = movie.title,
             fontSize = 18.sp,
-            color = Color.White,
             modifier = Modifier.weight(1f)
         )
     }
