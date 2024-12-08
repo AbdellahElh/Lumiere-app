@@ -1,7 +1,6 @@
 package com.example.riseandroid.ui.screens.account
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -73,21 +72,6 @@ fun AccountPage(
         )
 
         Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp, color = Color.White)
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = {
-                if (authState is AuthState.Authenticated && email != null) {
-                    navController.navigate("watchlist/${email}")
-                } else {
-                    Toast.makeText(context, "U moet ingelogd zijn om de watchlist te bekijken", Toast.LENGTH_SHORT).show()
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Watchlist")
-        }
 
         Spacer(modifier = Modifier.weight(1f))
 

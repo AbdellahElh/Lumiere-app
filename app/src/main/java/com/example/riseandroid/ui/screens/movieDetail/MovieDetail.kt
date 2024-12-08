@@ -1,5 +1,6 @@
 package com.example.riseandroid.ui.screens.movieDetail
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,11 +22,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,16 +46,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
-import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.model.Program
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+import com.example.riseandroid.util.isNetworkAvailable
 
 @Composable
 fun MovieDetailScreen(
@@ -68,24 +71,34 @@ fun MovieDetailScreen(
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
     val context = LocalContext.current
-    val isInWatchlist = watchlistState.contains(movieId)
+    val isSyncing by watchlistViewModel.isSyncing.collectAsState()
+    val isNetworkAvailable = remember { mutableStateOf(isNetworkAvailable(context)) }
+
+    LaunchedEffect(movieId) {
+        watchlistViewModel.syncWatchlist()
+    }
+
+    val isInWatchlist = remember(watchlistState, movieId) {
+        watchlistState.any { it.id == movieId }
+    }
 
     when (val uiState = viewModel.movieDetailUiState) {
         is MovieDetailUiState.Loading -> LoadingScreen()
         is MovieDetailUiState.Error -> ErrorScreen()
         is MovieDetailUiState.Success -> {
             val movie = uiState.specificMovie
-            val program = uiState.programList.collectAsState(initial = emptyList())
 
             MovieDetailContent(
                 movie = movie,
-                programList = program.value,
                 navController = navController,
                 isInWatchlist = isInWatchlist,
                 isUserLoggedIn = isUserLoggedIn,
+                isSyncing = isSyncing,
+                isNetworkAvailable = isNetworkAvailable.value,
                 onWatchlistClick = {
+                    Log.d("MovieDetailScreen", "Bookmark button clicked for movie ID: $movieId")
                     if (isUserLoggedIn) {
-                        watchlistViewModel.toggleMovieInWatchlist(movieId)
+                        watchlistViewModel.toggleMovieInWatchlist(movie)
                         val message = if (isInWatchlist) {
                             "${movie.title} is verwijderd uit je watchlist"
                         } else {
@@ -106,14 +119,17 @@ fun MovieDetailScreen(
 }
 
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailContent(
-    movie: MovieModel,
-    programList: List<Program>,
+    movie: ResponseMovie,
     navController: NavController,
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
+    isSyncing: Boolean,
+    isNetworkAvailable: Boolean,
     onWatchlistClick: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -136,7 +152,9 @@ fun MovieDetailContent(
                     isInWatchlist = isInWatchlist,
                     isUserLoggedIn = isUserLoggedIn,
                     onWatchlistClick = onWatchlistClick,
-                    onBackClick = { navigateBack(navController) }
+                    onBackClick = { navigateBack(navController) },
+                    isSyncing = isSyncing,
+                    isNetworkAvailable = isNetworkAvailable
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 MoviePoster(movie)
@@ -179,6 +197,7 @@ fun MovieDetailContent(
     }
 }
 
+
 @Composable
 fun MovieItem(movie: Movie, onClick: () -> Unit) {
     Row(
@@ -216,6 +235,8 @@ fun MovieDetailHeader(
     navController: NavController,
     isInWatchlist: Boolean,
     isUserLoggedIn: Boolean,
+    isSyncing: Boolean,
+    isNetworkAvailable: Boolean,
     onWatchlistClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
@@ -228,7 +249,7 @@ fun MovieDetailHeader(
             contentDescription = "Back",
             modifier = Modifier
                 .size(24.dp)
-                .clickable { onBackClick() } //BEKIJKEN
+                .clickable { onBackClick() }
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
@@ -239,33 +260,36 @@ fun MovieDetailHeader(
         )
         Spacer(modifier = Modifier.weight(1f))
 
-        if (isUserLoggedIn) {
+        if (isUserLoggedIn && isNetworkAvailable) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        onWatchlistClick()
-                    },
+                    .clickable(enabled = !isSyncing) { onWatchlistClick() },
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(
-                        id = if (isInWatchlist) R.drawable.btn_bookmark_filled else R.drawable.btn_bookmark_outline
-                    ),
-                    contentDescription = "Bookmark",
-                    modifier = Modifier.size(24.dp)
-                )
+                if (isSyncing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(
+                            id = if (isInWatchlist) R.drawable.btn_bookmark_filled else R.drawable.btn_bookmark_outline
+                        ),
+                        contentDescription = "Bookmark",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }
 }
 
 
+
 @Composable
-fun MoviePoster(movie: MovieModel) {
+fun MoviePoster(movie: ResponseMovie) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -273,7 +297,7 @@ fun MoviePoster(movie: MovieModel) {
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = rememberAsyncImagePainter(movie.coverImageUrl),
+            painter = rememberImagePainter(movie.coverImageUrl),
             contentDescription = "Movie Poster",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -286,7 +310,7 @@ fun MoviePoster(movie: MovieModel) {
 
 
 @Composable
-fun MovieInfo(movie: MovieModel) {
+fun MovieInfo(movie: ResponseMovie) {
     Text(
         text = movie.title,
         fontSize = 28.sp,
@@ -325,7 +349,7 @@ fun MovieInfo(movie: MovieModel) {
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = "${movie.duration.orEmpty()}",
+            text = "${movie.duration}",
             fontSize = 14.sp,
             color = Color(0xFFB2B5BB),
             modifier = Modifier
@@ -337,7 +361,7 @@ fun MovieInfo(movie: MovieModel) {
 }
 
 @Composable
-fun MovieDescription(movie: MovieModel, isExpanded: Boolean, onToggleExpand: () -> Unit) {
+fun MovieDescription(movie: ResponseMovie, isExpanded: Boolean, onToggleExpand: () -> Unit) {
     Text(
         text = "Beschrijving",
         fontSize = 28.sp,

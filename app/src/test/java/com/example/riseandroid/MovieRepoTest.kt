@@ -3,17 +3,17 @@ package com.example.riseandroid
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.fake.movies.FakeMovieApi
 import com.example.riseandroid.fake.movies.FakeMovieDao
-import com.example.riseandroid.repository.MovieRepo
-import com.example.riseandroid.repository.IMovieRepo
 import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.repository.IMovieRepo
+import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.rules.TestDispatcherRule
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 
 class MovieRepoTest {
 
@@ -64,7 +64,7 @@ class MovieRepoTest {
         title = "Test Movie",
         coverImageUrl = "test_url",
         genre = "Drama",
-        duration = "120 min",
+        duration = 120,
         director = "Director Name",
         description = "Test Description",
         videoPlaceholderUrl = "video_url",
@@ -72,21 +72,25 @@ class MovieRepoTest {
         bannerImageUrl = "banner",
         posterImageUrl = "poster",
         movieLink = "movieLink",
+        releaseDate = "2023-10-01"
     )
 
     private val movieModel = MovieModel(
         id = 1,
-        title = "Test Movie",
-        coverImageUrl = "test_url",
-        genre = "Drama",
-        duration = "120 min",
-        director = "Director Name",
-        description = "Test Description",
-        video = "video_url",
-        videoPlaceholderUrl = "placeholder_url",
-        cast = emptyList(),
+        title = "Fake Movie1",
         cinemas = emptyList(),
-        eventId = 1,
+        cast = emptyList(),
+        coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+        genre = "",
+        duration = 100,
+        director = "",
+        description = "",
+        videoPlaceholderUrl = "",
+        releaseDate = "12-12-2021",
+        bannerImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+        posterImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+        movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+        eventId = 1
     )
 
 

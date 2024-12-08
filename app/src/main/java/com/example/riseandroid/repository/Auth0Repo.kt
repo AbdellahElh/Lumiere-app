@@ -125,10 +125,10 @@ class Auth0Repo( private val authentication: AuthenticationAPIClient,
     }
 
     override suspend fun sendForgotPasswordEmail(email: String): Flow<ApiResource<Void>> = flow {
-        emit(ApiResource.Loading<Void>()) // Emit loading state
+        emit(ApiResource.Loading<Void>())
 
         try {
-            val call = authApi.sendForgotPasswordEmail(email) // Auth0 API gebruiken
+            val call = authApi.sendForgotPasswordEmail(email)
 
             withContext(Dispatchers.IO) {
                 val response = call.execute()

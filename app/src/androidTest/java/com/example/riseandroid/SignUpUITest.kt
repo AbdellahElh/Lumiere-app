@@ -1,15 +1,16 @@
 
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
 
 import androidx.compose.material3.Surface
-import androidx.navigation.testing.TestNavHostController
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import com.example.riseandroid.fake.FakeAuthRepo
+import com.example.riseandroid.fake.FakeUserManager
+import com.example.riseandroid.fake.FakeWatchlistRepo
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.signup.SignUp
 import org.junit.Before
@@ -27,7 +28,10 @@ class SignUpUITest {
     fun setup() {
         navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         authViewModel = AuthViewModel(
-            authRepo = FakeAuthRepo()
+            authRepo = FakeAuthRepo(),
+            watchlistRepo = FakeWatchlistRepo(),
+            userManager = FakeUserManager(),
+            application = ApplicationProvider.getApplicationContext()
         )
     }
 

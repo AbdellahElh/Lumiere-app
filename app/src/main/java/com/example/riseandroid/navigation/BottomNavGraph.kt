@@ -25,8 +25,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.auth0.android.Auth0
-import com.example.riseandroid.model.Movie
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -40,17 +38,16 @@ import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
+import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 
 @Composable
 fun BottomNavGraph(
     navController: NavHostController,
-    account: Auth0,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory),
     forgotPasswordViewModel: ForgotPasswordViewModel,
-    allMovies: List<Movie>,
     watchlistViewModel: WatchlistViewModel,
 ) {
     val context = LocalContext.current
@@ -71,36 +68,24 @@ fun BottomNavGraph(
         composable(route = BottomBarScreen.Home.route) {
             Homepage(goToMovieDetail=goToMovieDetail, navController = navController, selectedTab = 0)
         }
-
         composable(route = BottomBarScreen.Tickets.route) {
             if (!isUserLoggedIn) {
-                Dialog(
-                    onDismissRequest = { navController.popBackStack() }
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(Color.White, RoundedCornerShape(8.dp))
-                            .padding(16.dp)
-                    ) {
-                        Column {
-                            Text("Login nodig", fontWeight = FontWeight.Bold)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text("Je moet ingelogd zijn om toegang te krijgen tot je tickets.")
-                            Spacer(modifier = Modifier.height(24.dp))
-                            Button(onClick = { navController.popBackStack() },  colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFFE5CB77),
-                                contentColor = Color.White
-                            ),
-                                shape = RoundedCornerShape(12.dp)
-                            ) {
-                                Text("Ok")
-                            }
-                        }
-                    }
-                }
+                ShowLoginRequiredDialog(navController, "tickets")
             } else {
                 TicketScreen(
                     1, navController = navController, authToken = authToken ?: "")
+            }
+        }
+        composable(route = BottomBarScreen.Watchlist.route) {
+            if (!isUserLoggedIn) {
+                ShowLoginRequiredDialog(navController, "watchlist")
+            } else {
+                WatchlistScreen(
+                    onMovieClick = { movieId ->
+                        navController.navigate("movieDetail/$movieId")
+                    },
+                    navController = navController
+                )
             }
         }
         composable(route = BottomBarScreen.Account.route) {
@@ -155,7 +140,9 @@ fun BottomNavGraph(
                 MovieDetailScreen(
                     movieId = movieId,
                     navController = navController,
-                    viewModel = viewModel<MovieDetailViewModel>(factory = MovieDetailViewModel.provideFactory(movieId)),
+                    viewModel = viewModel<MovieDetailViewModel>(
+                        factory = MovieDetailViewModel.provideFactory(movieId)
+                    ),
                     watchlistViewModel = watchlistViewModel,
                     authViewModel = authViewModel
                 )
@@ -190,3 +177,33 @@ fun BottomNavGraph(
 }
 
 
+@Composable
+fun ShowLoginRequiredDialog(navController: NavHostController, destination: String) {
+    Dialog(onDismissRequest = { navController.popBackStack() }) {
+        Box(
+            modifier = Modifier
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .padding(16.dp)
+        ) {
+            Column {
+                Text("Login nodig", fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Je moet ingelogd zijn om toegang te krijgen tot je $destination.")
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = {
+                        navController.popBackStack()
+                        navController.navigate(BottomBarScreen.Account.route)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE5CB77),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Ok")
+                }
+            }
+        }
+    }
+}

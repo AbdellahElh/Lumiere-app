@@ -1,10 +1,7 @@
 package com.example.riseandroid.mockdata
 
-import com.example.riseandroid.R
-import com.example.riseandroid.model.Movie
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
-import com.example.riseandroid.model.Program
+import com.example.riseandroid.network.ResponseMovie
 
 class MovieListMock {
 
@@ -14,33 +11,39 @@ class MovieListMock {
             MoviePoster(id = 2, cover = "fakeCover", releaseDate = "fakeDate"))
     }
 
-    fun LoadAllMoviesMock(): List<MovieModel> {
-        return listOf(MovieModel(
+    fun LoadAllMoviesMock(): List<ResponseMovie> {
+        return listOf(ResponseMovie(
             id = 1,
             title = "FakeMovie1",
             cinemas = emptyList(),
             cast = emptyList(),
             coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
             genre = "",
-            duration = "",
+            duration = 100,
             director = "",
             description = "",
-            video = "",
             videoPlaceholderUrl = "",
+            releaseDate = "12-12-2021",
+            bannerImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+            posterImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+            movieLink = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
             eventId = 1
         ),
-            MovieModel(
+            ResponseMovie(
                 id = 2,
                 title = "FakeMovie2",
                 cinemas = emptyList(),
                 cast = emptyList(),
-                coverImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+                coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
                 genre = "",
-                duration = "",
+                duration = 100,
                 director = "",
                 description = "",
-                video = "",
                 videoPlaceholderUrl = "",
+                releaseDate = "12-12-2021",
+                bannerImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+                posterImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+                movieLink = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
                 eventId = 2
             ))
 

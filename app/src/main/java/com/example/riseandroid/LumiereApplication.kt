@@ -1,26 +1,43 @@
 package com.example.riseandroid
 
-import android.app.Application
-import com.example.riseandroid.data.AppContainer
-import com.example.riseandroid.data.DefaultAppContainer
 import android.app.AlarmManager
+import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.example.riseandroid.notifications.NotificationReceiver
-import java.util.Calendar
-import android.app.NotificationManager
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.room.Room
+import com.auth0.android.Auth0
+import com.auth0.android.authentication.AuthenticationAPIClient
+import com.auth0.android.authentication.storage.CredentialsManager
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.riseandroid.data.AppContainer
+import com.example.riseandroid.data.DefaultAppContainer
+import com.example.riseandroid.data.RiseDatabase
+import com.example.riseandroid.data.entitys.watchlist.UserManager
+import com.example.riseandroid.network.WatchlistApi
+import com.example.riseandroid.network.auth0.Auth0Api
+import com.example.riseandroid.notifications.NotificationReceiver
+import com.example.riseandroid.repository.Auth0Repo
+import com.example.riseandroid.repository.WatchlistRepo
+import com.example.riseandroid.ui.screens.account.AuthViewModel
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Calendar
 
 
 class LumiereApplication : Application() {
-    /** AppContainer instance used by the rest of classes to obtain dependencies */
+    val userManager = UserManager()
     lateinit var container: AppContainer
+
     override fun onCreate() {
         super.onCreate()
-        container = DefaultAppContainer(context = applicationContext)
+
+        container = DefaultAppContainer(
+            context = this,
+            userManager = userManager
+        )
     }
 
     fun scheduleNotification(context: Context, movieId: Int, movieName: String, location: String, date: String, dateTime: Calendar) {
@@ -32,12 +49,12 @@ class LumiereApplication : Application() {
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            movieId.toInt(),
+            movieId,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, dateTime.timeInMillis, pendingIntent)
     }
 
@@ -46,22 +63,22 @@ class LumiereApplication : Application() {
     fun displayImmediateNotification(context: Context, movieId: Int, movieName: String, location: String, date: String) {
         if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
             val notification = NotificationCompat.Builder(context, "REMINDER_CHANNEL")
-                .setSmallIcon(R.drawable.ic_launcher_foreground) // Replace with your app's icon
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Reminder for $movieName")
                 .setContentText("Your movie at $location on $date is coming up soon.")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
 
             with(NotificationManagerCompat.from(context)) {
-                notify(movieId.toInt(), notification)
+                notify(movieId, notification)
             }
         } else {
-            println("Notifications are not enabled on this device.") // Log if notifications are disabled
+            println("Notifications are not enabled on this device.")
         }
     }
-
-
-
-
 }
+
+
+
+
 

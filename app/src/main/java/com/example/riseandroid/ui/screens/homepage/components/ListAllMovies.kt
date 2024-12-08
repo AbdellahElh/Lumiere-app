@@ -4,19 +4,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.navigation.NavHostController
-import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.R
-import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
+import com.example.riseandroid.R
+import com.example.riseandroid.network.ResponseMovie
 
 
 @Composable
 fun ListAllMovies(
-    allMoviesNonRecent: List<MovieModel>,
+    allMoviesNonRecent: List<ResponseMovie>,
     goToMovieDetail: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -43,3 +42,5 @@ fun ListAllMovies(
         }
     }
 }
+
+
