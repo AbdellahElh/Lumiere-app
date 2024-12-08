@@ -7,10 +7,6 @@ import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.ui.screens.ticket.TicketViewModel
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
-class FakeWatchlistViewModel(
-    watchlistRepo: IWatchlistRepo,
-    userManager: UserManager,
-    context: Context
-) : WatchlistViewModel(watchlistRepo, userManager, context)
-
-
+class FakeTicketViewModel(
+    ticketRepository: FakeTicketRepository
+) : TicketViewModel(ticketRepository)

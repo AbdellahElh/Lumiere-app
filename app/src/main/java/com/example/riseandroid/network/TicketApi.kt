@@ -17,7 +17,7 @@ interface TicketApi {
     suspend fun getTickets(): List<TicketResponse>
 
     @POST("/api/ticket/add/")
-    fun addTicket(
+    suspend fun addTicket(
         @retrofit2.http.Query("MovieId") movieId: Int,
         @retrofit2.http.Query("EventId") eventId: Int,
         @retrofit2.http.Query("cinemaName") cinemaName: String,

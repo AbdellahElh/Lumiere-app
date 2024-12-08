@@ -5,16 +5,11 @@ import com.example.riseandroid.data.entitys.EventDao
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.Tickets.TicketDao
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
-import com.example.riseandroid.data.entitys.Tickets.TicketType
-import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.Ticket
-import com.example.riseandroid.network.EventsApi
-import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.TicketApi
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
-import com.example.riseandroid.util.toEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,7 +23,7 @@ class TicketRepository(
     private val ticketDao: TicketDao,
     private val authrepo: IAuthRepo,
     private val movieApi: MovieDao,
-    private val EventApi : EventDao
+    private val EventApi: EventDao?
 ) : ITicketRepository {
 
     override suspend fun getTickets(): Flow<List<Ticket>> {
@@ -63,7 +58,7 @@ class TicketRepository(
     private suspend fun saveMovieEvent(ticket: Ticket) {
 
         if(ticket.eventId != null){
-            val event = EventApi.getEventById(ticket.eventId)
+            val event = EventApi?.getEventById(ticket.eventId)
             val eventEntity = event
             if (eventEntity != null) {
                 ticketDao.insertEvent(eventEntity)

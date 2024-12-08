@@ -8,7 +8,6 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
-import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 
 import com.example.riseandroid.network.EventsApi

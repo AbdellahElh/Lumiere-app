@@ -29,7 +29,7 @@ sealed interface TicketUiState {
     object Loading : TicketUiState
 }
 
-class TicketViewModel(
+open class TicketViewModel(
     private val ticketRepository: ITicketRepository,
 
     ) : ViewModel() {

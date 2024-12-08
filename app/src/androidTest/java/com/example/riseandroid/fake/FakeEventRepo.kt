@@ -23,7 +23,8 @@ class FakeEventRepo : IEventRepo {
                     cover = null,
                     location = "Location 1",
                     eventLink = null,
-                    cinemas = emptyList()
+                    cinemas = emptyList(),
+                    movies = emptyList()
                 ),
                 EventModel(
                     id = 2,
@@ -38,7 +39,9 @@ class FakeEventRepo : IEventRepo {
                     cover = null,
                     location = "Location 2",
                     eventLink = null,
-                    cinemas = emptyList()
+                    cinemas = emptyList(),
+                    movies = emptyList()
+
                 )
             )
         )

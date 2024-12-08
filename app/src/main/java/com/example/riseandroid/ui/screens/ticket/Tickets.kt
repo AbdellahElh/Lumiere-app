@@ -347,7 +347,7 @@ fun QRCodeScreen(id: String) {
     val qrCodeBitmap = generateQRCode(id)
     Image(
         bitmap = qrCodeBitmap.asImageBitmap(),
-        contentDescription = "QR Code",
+        contentDescription = "QR Code$id",
         modifier = Modifier.size(180.dp)
     )
 }
