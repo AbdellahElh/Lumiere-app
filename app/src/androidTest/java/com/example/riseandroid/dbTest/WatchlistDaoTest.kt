@@ -81,17 +81,13 @@ class WatchlistDaoTest {
 
     @Test
     fun addAndGetMoviesInWatchlist() = runBlocking {
-        // Eerst zorgen we dat er een watchlist voor de gebruiker bestaat
         watchlistDao.insertWatchlist(testWatchlistEntity)
 
-        // Voeg een film toe
         watchlistDao.addMovieToWatchlist(testMovieEntity)
 
-        // Om de film aan de watchlist te koppelen moeten we de watchlistId opzoeken
         val watchlistId = watchlistDao.getWatchlistIdForUser(testUserId)
         assertNotNull(watchlistId)
 
-        // Nu voegen we een MovieWatchlistEntity toe om de link te leggen
         watchlistDao.addToWatchlist(
             MovieWatchlistEntity(
                 movieId = testMovieEntity.id,
@@ -99,7 +95,6 @@ class WatchlistDaoTest {
             )
         )
 
-        // Check of de film ook daadwerkelijk uit de DAO komt
         val moviesFlow = watchlistDao.getMoviesInWatchlist(testUserId)
         val movies = moviesFlow.first()
         assertEquals(1, movies.size)
@@ -109,29 +104,23 @@ class WatchlistDaoTest {
 
     @Test
     fun removeMovieFromWatchlist() = runBlocking {
-        // Insert de watchlist
         watchlistDao.insertWatchlist(testWatchlistEntity)
         val watchlistId = watchlistDao.getWatchlistIdForUser(testUserId)
         assertNotNull(watchlistId)
 
-        // Insert twee films
         watchlistDao.insertMovies(listOf(testMovieEntity, secondTestMovieEntity))
 
-        // Koppel beide films aan de watchlist
         val relations = listOf(
             MovieWatchlistEntity(movieId = testMovieEntity.id, watchlistId = watchlistId!!),
             MovieWatchlistEntity(movieId = secondTestMovieEntity.id, watchlistId = watchlistId)
         )
         watchlistDao.insertMovieWatchlistRelations(relations)
 
-        // Check dat beide films er in zitten
         var movies = watchlistDao.getMoviesInWatchlist(testUserId).first()
         assertEquals(2, movies.size)
 
-        // Verwijder één film uit de watchlist
         watchlistDao.removeFromWatchlist(testMovieEntity.id, testUserId)
 
-        // Check of er nog maar één film over is
         movies = watchlistDao.getMoviesInWatchlist(testUserId).first()
         assertEquals(1, movies.size)
         assertEquals(secondTestMovieEntity.id, movies.first().id)
@@ -139,7 +128,6 @@ class WatchlistDaoTest {
 
     @Test
     fun clearWatchlistForUser() = runBlocking {
-        // Insert watchlist en films
         watchlistDao.insertWatchlist(testWatchlistEntity)
         val watchlistId = watchlistDao.getWatchlistIdForUser(testUserId)
         assertNotNull(watchlistId)
@@ -154,7 +142,6 @@ class WatchlistDaoTest {
         var movies = watchlistDao.getMoviesInWatchlist(testUserId).first()
         assertEquals(2, movies.size)
 
-        // Wis de watchlist voor deze user
         watchlistDao.clearWatchlistForUser(testUserId)
 
         movies = watchlistDao.getMoviesInWatchlist(testUserId).first()
@@ -163,7 +150,6 @@ class WatchlistDaoTest {
 
     @Test
     fun clearAllWatchlistData() = runBlocking {
-        // Insert watchlist en film, etc.
         watchlistDao.insertWatchlist(testWatchlistEntity)
         val watchlistId = watchlistDao.getWatchlistIdForUser(testUserId)
         assertNotNull(watchlistId)
@@ -176,7 +162,6 @@ class WatchlistDaoTest {
         var movies = watchlistDao.getMoviesInWatchlist(testUserId).first()
         assertEquals(1, movies.size)
 
-        // Wis alle watchlist data
         watchlistDao.clearAllWatchlistData()
 
         movies = watchlistDao.getMoviesInWatchlist(testUserId).first()
