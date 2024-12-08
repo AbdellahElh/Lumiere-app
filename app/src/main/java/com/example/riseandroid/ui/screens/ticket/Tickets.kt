@@ -226,11 +226,11 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
     val formattedDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date(milliseconds ?: 0))
     val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(milliseconds ?: 0))
     var title = ""
-    if (ticket.movieId != null) {
-        title = ticket.movie?.title.toString()
+    if (ticket.movie != null) {
+        title = ticket.movie.title
 
     }else{
-        title = ticket.event?.title.toString()
+        title = ticket.event?.title ?: ""
     }
     Box(
         modifier = modifier
