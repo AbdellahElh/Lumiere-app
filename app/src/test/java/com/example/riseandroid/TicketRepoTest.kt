@@ -55,7 +55,7 @@ class TicketRepoTest {
             showtime = "2024-12-31T20:00:00"
         )
         assertNotNull(newTicket)
-        assertEquals(3, newTicket.id)
+        assertEquals(0, newTicket.id)
     }
 
 

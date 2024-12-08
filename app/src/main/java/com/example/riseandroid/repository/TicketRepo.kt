@@ -32,7 +32,6 @@ class TicketRepository(
             .onEach { tickets ->
                 tickets.forEach { ticket ->
                     saveMovieEvent(ticket)
-                    Log.d("TicketList", ticket.toString())
                 }
             }
             .onStart {
