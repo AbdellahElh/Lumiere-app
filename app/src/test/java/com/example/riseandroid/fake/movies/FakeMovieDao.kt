@@ -59,13 +59,14 @@ class FakeMovieDao:MovieDao {
             title = "Test Movie",
             genre = "Drama",
             description = "Test Description",
-            duration = "120 min",
+            duration = 120,
             director = "Director Name",
             videoPlaceholderUrl = "video_placeholder_url",
             coverImageUrl = "cover_url",
             bannerImageUrl = "banner_url",
             posterImageUrl = "poster_url",
-            movieLink = "movie_link"
+            movieLink = "movie_link",
+            releaseDate = "2021-12-12"
         ),
         MovieEntity(
             id = 2,
@@ -73,13 +74,14 @@ class FakeMovieDao:MovieDao {
             title = "Another Movie",
             genre = "Comedy",
             description = "Another Description",
-            duration = "90 min",
+            duration = 90,
             director = "Another Director",
             videoPlaceholderUrl = "another_placeholder_url",
             coverImageUrl = "another_cover_url",
             bannerImageUrl = "another_banner_url",
             posterImageUrl = "another_poster_url",
-            movieLink = "another_movie_link"
+            movieLink = "another_movie_link",
+            releaseDate = "2021-12-13"
         )
     )
     private val cinemas = mutableListOf(

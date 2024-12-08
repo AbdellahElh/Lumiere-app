@@ -13,6 +13,7 @@ import com.example.riseandroid.fake.FakeUserManager
 import com.example.riseandroid.fake.FakeWatchlistRepo
 import com.example.riseandroid.fake.FakeWatchlistViewModel
 import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import junit.framework.TestCase.assertEquals
@@ -53,12 +54,11 @@ class WatchlistUITest {
 
     @Test
     fun watchlistScreen_DisplaysEmptyMessage_WhenWatchlistIsEmpty() {
-        // Create an empty fake repository
         val emptyRepo = object : IWatchlistRepo {
             override fun getMoviesInWatchlist(userId: Int): Flow<List<MovieModel>> {
                 return flowOf(emptyList())
             }
-            override suspend fun addToWatchlist(movie: MovieModel, userId: Int) {}
+            override suspend fun addToWatchlist(movie: ResponseMovie, userId: Int) {}
             override suspend fun removeFromWatchlist(movieId: Int, userId: Int) {}
             override suspend fun getWatchlistId(userId: Int): Int = 1
             override suspend fun syncWatchlistWithBackend(userId: Int) {}
