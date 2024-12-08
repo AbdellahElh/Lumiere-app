@@ -63,4 +63,8 @@ class FakeAuthRepo : IAuthRepo {
             emit(ApiResource.Success(fakeCredentials))
         }
     }
+
+    override suspend fun getLoggedInId(): Flow<ApiResource<Int>> {
+        TODO("Not yet implemented")
+    }
 }
