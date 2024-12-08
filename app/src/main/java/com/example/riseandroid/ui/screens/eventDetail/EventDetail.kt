@@ -102,7 +102,7 @@ fun EventDetailScreen(
                     BottomSheetContentEvents(
                         ticketViewModel = ticketViewModel,
                         eventId= eventId,
-                        cinemas = event.cinemas,
+                        cinemas = event.cinemas ?: emptyList(),
                         context = context,
                         navController = navController,
                         event = event,

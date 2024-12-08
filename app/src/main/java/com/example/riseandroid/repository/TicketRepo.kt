@@ -1,9 +1,13 @@
 package com.example.riseandroid.repository
 
 import android.util.Log
+import com.example.riseandroid.data.entitys.EventDao
+import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.Tickets.TicketDao
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketType
+import com.example.riseandroid.data.response.EventResponse
+import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.network.EventsApi
 import com.example.riseandroid.network.MoviesApi
@@ -23,8 +27,8 @@ class TicketRepository(
     private val ticketApi: TicketApi,
     private val ticketDao: TicketDao,
     private val authrepo: IAuthRepo,
-    private val movieApi: MoviesApi,
-   private val EventApi : EventsApi
+    private val movieApi: MovieDao,
+    private val EventApi : EventDao
 ) : ITicketRepository {
 
     override suspend fun getTickets(): Flow<List<Ticket>> {
@@ -46,8 +50,9 @@ class TicketRepository(
     private suspend fun refreshTickets() {
         try {
 
-            val ticketsFromApi = ticketApi.getTickets()
-            val ticketAsEntities = ticketsFromApi.mapNotNull { it.asEntity() }
+            val ticketsFromApi: List<TicketResponse> = ticketApi.getTickets()
+            val ticketAsEntities = ticketsFromApi.map { it.asEntity() }
+
             ticketDao.deleteAllTickets()
             ticketDao.insertTickets(ticketAsEntities)
 
@@ -58,13 +63,15 @@ class TicketRepository(
     private suspend fun saveMovieEvent(ticket: Ticket) {
 
         if(ticket.eventId != null){
-            val event = EventApi.getSpecificEvent(ticket.eventId)
-            val eventEntity = event.toEntity()
-            ticketDao.insertEvent(eventEntity)
+            val event = EventApi.getEventById(ticket.eventId)
+            val eventEntity = event
+            if (eventEntity != null) {
+                ticketDao.insertEvent(eventEntity)
+            }
         }
         else{
             val movie = ticket.movieId?.let { movieApi.getMovieById(it) }
-            val movieEntity = movie?.asEntity()
+            val movieEntity = movie
             if (movie != null) {
                 if (movieEntity != null) {
                     ticketDao.insertMovie(movieEntity)

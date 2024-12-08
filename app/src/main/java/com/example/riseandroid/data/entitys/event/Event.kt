@@ -17,9 +17,9 @@ data class EventEntity(
     val videoPlaceholderUrl: String?,
     val cover: String?,
     val location: String?,
-    val eventLink: String,
-    val cinemasJson: String,
-    val moviesJson: String
+    val eventLink: String?,
+    val cinemasJson: String?,
+    val moviesJson: String?
 
 )
 

@@ -7,6 +7,7 @@ import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.ResponseCinema
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
@@ -47,12 +48,22 @@ class MovieRepo(
     override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
         if (movieEntity != null) {
-            return movieEntity.asResponse()
+            val cinemas = movieDao.getCinemasByMovieId(id).map { cinemaEntity ->
+                val showtimes = movieDao.getShowtimesByMovieAndCinema(id, cinemaEntity.id).map { showtimeEntity ->
+                    "${showtimeEntity.showDate}T${showtimeEntity.showTime}"
+                }
+                ResponseCinema(
+                    id = cinemaEntity.id,
+                    name = cinemaEntity.name,
+                    showtimes = showtimes
+                )
+            }
+            return movieEntity.asResponse().copy(cinemas = cinemas)
         }
         try {
             val movieFromApi = movieApi.getMovieById(id)
             movieDao.insertMovie(movieFromApi.asEntity())
-
+            saveCinemasAndShowtimes(movieFromApi)
             return movieFromApi
         } catch (e: Exception) {
             Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")

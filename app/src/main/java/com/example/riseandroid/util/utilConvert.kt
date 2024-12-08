@@ -7,6 +7,7 @@ import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.response.EventResponse
+import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.model.Tenturncard
@@ -55,9 +56,37 @@ fun TicketEntity.asExternalModel(): Ticket {
 fun Ticket.asEntity(): TicketEntity {
     return TicketEntity(
         id = id,
+        dateTime = dateTime ?: "unknown",
+        location = location ?: "unknown",
+        type = type ?: 0,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId,
+        movie = movie,
+        event = event
+    )
+}
+fun TicketResponse.asExternalModel(): Ticket {
+    return Ticket(
+        id = id,
         dateTime = dateTime,
         location = location,
         type = type,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId,
+        movie = movie,
+        event = event
+
+    )
+}
+
+fun TicketResponse.asEntity(): TicketEntity {
+    return TicketEntity(
+        id = id,
+        dateTime = dateTime ?: "unknown",
+        location = location ?: "unknown",
+        type = type ?: 0,
         movieId = movieId,
         eventId = eventId,
         accountId = accountId,

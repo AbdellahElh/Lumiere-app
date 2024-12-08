@@ -37,6 +37,8 @@ class TicketViewModel(
     var ticketUiState: TicketUiState by mutableStateOf(TicketUiState.Loading)
         private set
 
+
+
     private val _allTickets = MutableStateFlow<List<Ticket>>(emptyList())
     val Alltickets = _allTickets.asStateFlow()
 
@@ -46,6 +48,7 @@ class TicketViewModel(
     }
     fun getTickets() {
         viewModelScope.launch {
+            ticketUiState = TicketUiState.Loading
             try {
                 val tickets = ticketRepository.getTickets()
                     .collect { tickets ->

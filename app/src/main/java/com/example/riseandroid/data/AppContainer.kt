@@ -8,6 +8,7 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 
 import com.example.riseandroid.network.EventsApi
@@ -184,8 +185,8 @@ class DefaultAppContainer(private val context: Context,
         val ticketApi = retrofitTicketServiceBackend
         val ticketDao = ticketDao
         val auth0Repo = authRepo
-        val movieApi = retrofitServiceBackend
-        val EventApi = eventsApi
+        val movieApi = movieDao
+        val EventApi = eventDao
         TicketRepository(ticketApi, ticketDao, auth0Repo, movieApi, EventApi)
     }
 

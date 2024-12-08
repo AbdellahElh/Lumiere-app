@@ -89,6 +89,9 @@ fun TicketScreen(
     navController: NavController,
     viewModel: TicketViewModel = viewModel(factory = TicketViewModel.Factory),
     ) {
+    LaunchedEffect(Unit) {
+        viewModel.getTickets()
+    }
     when (val uiState = viewModel.ticketUiState) {
         is TicketUiState.Loading -> LoadingScreen()
         is TicketUiState.Error -> ErrorScreen()
@@ -227,10 +230,10 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
     val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(milliseconds ?: 0))
     var title = ""
     if (ticket.movie != null) {
-        title = ticket.movie.title
+         title = "Film: ${ticket.movie.title}"
 
     }else{
-        title = ticket.event?.title ?: ""
+        title = "Event: ${ticket.event?.title}"
     }
     Box(
         modifier = modifier
@@ -291,8 +294,26 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Film: ${title}", color = Color.Black, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
-                Text("e-ticket", color = Color(0xFFF14763), fontSize =20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(
+                    text = title,
+                    color = Color.Black,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .rotate(180f)
+                        .weight(1f, fill = false)
+                        .alignByBaseline()
+                )
+                Text(
+                    text = "e-ticket",
+                    color = Color(0xFFF14763),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .rotate(180f)
+                        .weight(0.5f)
+                        .alignByBaseline()
+                )
             }
 
 

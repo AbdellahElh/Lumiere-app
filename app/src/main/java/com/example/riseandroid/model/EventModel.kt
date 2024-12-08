@@ -16,8 +16,9 @@ data class EventModel(
     val cover: String?,
     val location: String?,
     val eventLink: String?,
-    val cinemas: List<Cinema>,
+    val cinemas: List<Cinema>?,
     val movies : List<MovieEntity>?
+
 )
 
 
