@@ -24,7 +24,7 @@ class TicketRepository(
     private val ticketDao: TicketDao,
     private val authrepo: IAuthRepo,
     private val movieApi: MovieDao,
-    private val EventApi: EventDao?
+    private val EventApi: EventDao
 ) : ITicketRepository {
 
     override suspend fun getTickets(): Flow<List<Ticket>> {
@@ -75,29 +75,33 @@ class TicketRepository(
         }
 
     }
-    override suspend fun addTicket(
-        ticket : AddTicketDTO
-
-    ): TicketEntity {
+    override suspend fun addTicket(ticket: AddTicketDTO): TicketEntity {
+        val movieId = if (ticket.MovieId == 0) null else ticket.MovieId
+        val eventId = if (ticket.EventId == 0) null else ticket.EventId
         return withContext(Dispatchers.IO) {
             val newTicket = TicketEntity(
                 dateTime = ticket.ShowTime,
                 location = ticket.CinemaName,
                 type = 0,
-                movieId = ticket.MovieId,
-                eventId = ticket.EventId,
+                movieId = movieId,
+                eventId = eventId,
                 accountId = getLoggedInUserId()
             )
 
+            ticketDao.addTicket(newTicket)
+
             try {
                 val response = ticketApi.addTicket(ticket)
-                ticketDao.addTicket(response)
                 response
             } catch (e: Exception) {
-                throw e
+                ticketDao.deleteTicket(newTicket)
+                throw RuntimeException("gefaald om ticket toe te voegen: ${e.localizedMessage}", e)
             }
         }
     }
+
+
+
 
 
 

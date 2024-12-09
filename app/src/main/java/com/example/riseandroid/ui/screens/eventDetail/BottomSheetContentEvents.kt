@@ -42,7 +42,9 @@ import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.ui.screens.movieDetail.components.EmailSender
 import com.example.riseandroid.ui.screens.ticket.TicketViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Properties
@@ -190,6 +192,7 @@ fun DropdownMenuWithLabel(
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun onCheckoutEvent(
     ticketViewModel: TicketViewModel,
     eventId: Int,
@@ -199,7 +202,7 @@ fun onCheckoutEvent(
     event: EventModel,
     context: Context,
     email: String
-    ) {
+) {
     val url = when (selectedCinema) {
         "Brugge" -> "https://tickets.lumierecinema.be/lumiere/nl/flow_configs/webshop/steps/start/show/${event.id}"
         "Antwerpen" -> "https://tickets.lumiere-antwerpen.be/lumiereantwerpen/nl/flow_configs/webshop/steps/start/show/${event.id}"
@@ -207,9 +210,9 @@ fun onCheckoutEvent(
         "Cinema Cartoons" -> "https://tickets.cinemacartoons.be/cartoons/nl/flow_configs/webshop/steps/start/show/${event.id}"
         else -> ""
     }
-    val showtime = "$date" + "T" + "$selectedTime" + ":00"
+    val showtime = date + "T" + selectedTime + ":00"
     if (url.isNotEmpty()) {
-        val newTicket =  AddTicketDTO(
+        val newTicket = AddTicketDTO(
             MovieId = 0,
             EventId = eventId,
             CinemaName = selectedCinema,
@@ -221,66 +224,59 @@ fun onCheckoutEvent(
                     username = "rise6698@gmail.com",
                     password = "zkuq squo tgzz kriv"
                 )
-                val ticketID = ticket.id;
-                var ticketType = "";
-                var price = 0.0 ;
-                if(ticket.type == 0){
-                    price = 12.00;
-                    ticketType = "Standaard"
-                }else if(ticket.type == 1){
-                    price = 11.5;
-                    ticketType = "Senior"
+                val ticketID = ticket.id
 
-                }else if(ticket.type == 2){
-                    price = 10.00
-                    ticketType = "Student"
-
-                }else{
-                    price = .00;
-                    ticketType = "Andere"
-
+                val (price, ticketType) = when (ticket.type) {
+                    0 -> 12.00 to "Standaard"
+                    1 -> 11.50 to "Senior"
+                    2 -> 10.00 to "Student"
+                    else -> 12.00 to "Andere"
                 }
 
+                var emailBody = """
+                    <p>Beste Lumiere {Location} bezoeker, <br/><br/>
+                    Bedankt voor je aankoop. De betaling voor je bestelling met nummer {Id} is ontvangen en verwerkt. <br/>
+                    Je kan je e-tickets via de volgende link openen:</p>
+                    <a href='https://localhost:5001/tickets/{Id}'>Open je ticket</a>
+                    <p>Je hoeft ze niet af te drukken, je kan ze gewoon op je smartphone laten zien aan de ingang van de cinema.</p>
+                    <h4>Instructies:</h4>
+                    <ul>
+                        <li>Noteer veiligheidshalve het bestelnummer.</li>
+                        <li>Neem je ticket mee naar de voorstelling.</li>
+                        <li>Gelieve je ticket te tonen aan de medewerker bij het binnenkomen van de cinema. Indien de medewerker niet aanwezig is dan zal de kassamedewerker je ticket valideren. In beide gevallen mag je op vertoon en na scan van je ticket de cinema binnen</li>
+                    </ul>
+                    <h2>Info Tickets:</h2>
+                    <h3>{Title}</h3>
+                    <p>{DateTime}</p>
+                    <p>1X {Type}:{Price}€</p>
+                    <p>Totaal: {Price}€</p>
+                    <p><br/>Veel plezier bij de voorstelling! <br/><br/> vriendelijke groet, <br/><br/> het team van stadsbioscoop Lumiere {Location}</p>
+                """.trimIndent()
 
-                val emailBody = """
-                <p>Beste Lumiere {Location} bezoeker, <br/><br/>
-                Bedankt voor je aankoop. De betaling voor je bestelling met nummer {Id} is ontvangen en verwerkt. <br/>
-                Je kan je e-tickets via de volgende link openen:</p>
-                <a href='https://localhost:5001/tickets/{Id}'>Open je ticket</a>
-                <p>Je hoeft ze niet af te drukken, je kan ze gewoon op je smartphone laten zien aan de ingang van de cinema.</p>
-                <h4>Instructies:</h4>
-                <ul>
-                    <li>Noteer veiligheidshalve het bestelnummer.</li>
-                    <li>Neem je ticket mee naar de voorstelling.</li>
-                    <li>Gelieve je ticket te tonen aan de medewerker bij het binnenkomen van de cinema. Indien de medewerker niet aanwezig is dan zal de kassamedewerker je ticket valideren. In beide gevallen mag je op vertoon en na scan van je ticket de cinema binnen</li>
-                </ul>
-                <h2>Info Tickets:</h2>
-                <h3>{title}</h3>
-                <p>{DateTime }</p>
-                <p>1X {Type}:{Price}€</p>
-                <p>Totaal: {Price}€</p>
-                <p><br/>Veel plezier bij de voorstelling! <br/><br/> vriendelijke groet, <br/><br/> het team van stadsbioscoop Lumiere {Location}</p>
-            """.trimIndent()
-                emailBody.replace("{Location}", selectedCinema)
-                emailBody.replace("{Id}", ticketID.toString())
-                emailBody.replace("{Title}", event.title)
-                emailBody.replace("{Type}", ticketType)
-                emailBody.replace("{Price}", price.toString())
+                emailBody = emailBody
+                    .replace("{Location}", selectedCinema)
+                    .replace("{Id}", ticketID.toString())
+                    .replace("{Title}", event.title)
+                    .replace("{Type}", ticketType)
+                    .replace("{Price}", price.toString())
+                    .replace("{DateTime}", showtime)
 
-
-
-                emailSender.sendEmail(
-                    to = email,
-                    subject = "Bevestiging van uw aankoop bij stadsbioscoop Lumiere {selectedCinema}",
-                    body = emailBody
-                )
+                GlobalScope.launch(Dispatchers.IO) {
+                    emailSender.sendEmail(
+                        to = email,
+                        subject = "Bevestiging van uw aankoop bij stadsbioscoop Lumiere $selectedCinema",
+                        body = emailBody
+                    )
+                }
 
             }
-            }
+        }
+
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         context.startActivity(intent)
     } else {
         Toast.makeText(context, "Geen geldige URL gevonden", Toast.LENGTH_SHORT).show()
     }
 }
+
 

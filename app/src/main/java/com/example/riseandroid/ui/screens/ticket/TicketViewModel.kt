@@ -59,8 +59,11 @@ open class TicketViewModel(
                         )
                     }
 
+            } catch (e: IOException) {
+                Log.e("TicketViewModel", "Netwerk error tickets krijgen", e)
+                _allTickets.value = emptyList()
             } catch (e: Exception) {
-
+                Log.e("TicketViewModel", "Error krijgen tickets", e)
                 _allTickets.value = emptyList()
             }
         }

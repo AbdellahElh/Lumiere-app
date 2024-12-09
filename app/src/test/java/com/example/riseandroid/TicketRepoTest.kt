@@ -2,6 +2,7 @@ package com.example.riseandroid
 
 import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.fake.FakeAuth0Repo
+import com.example.riseandroid.fake.FakeEventDao
 import com.example.riseandroid.fake.movies.FakeMovieDao
 import com.example.riseandroid.fake.ticket.FakeTicketApi
 import com.example.riseandroid.fake.ticket.FakeTicketDao
@@ -28,6 +29,7 @@ class TicketRepoTest {
     private val ticketApi = FakeTicketApi()
     private val movieDao = FakeMovieDao()
     private val authRepo =  FakeAuth0Repo()
+    private val eventDao = FakeEventDao()
 
 
     @Before
@@ -37,7 +39,7 @@ class TicketRepoTest {
             ticketDao = ticketDao,
             authrepo = authRepo,
             movieApi = movieDao,
-            EventApi = null
+            EventApi =eventDao
         )
     }
     @Test
