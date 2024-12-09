@@ -78,6 +78,16 @@ fun MovieDetailScreen(
         watchlistViewModel.syncWatchlist()
     }
 
+    LaunchedEffect(watchlistViewModel) {
+        watchlistViewModel.eventFlow.collect { event ->
+            when (event) {
+                is WatchlistViewModel.WatchlistEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     val isInWatchlist = remember(watchlistState, movieId) {
         watchlistState.any { it.id == movieId }
     }

@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import java.io.IOException
 
 open class WatchlistViewModel(
     private val watchlistRepo: IWatchlistRepo,
@@ -120,6 +121,8 @@ open class WatchlistViewModel(
                         } else {
                             throw e
                         }
+                    } catch (e: IOException) {
+                        _eventFlow.emit(WatchlistEvent.ShowToast("Kon de server niet bereiken. Probeer later opnieuw."))
                     }
                 } else {
                     try {
@@ -130,12 +133,13 @@ open class WatchlistViewModel(
                         } else {
                             throw e
                         }
+                    } catch (e: IOException) {
+                        _eventFlow.emit(WatchlistEvent.ShowToast("Kon de server niet bereiken. Probeer later opnieuw."))
                     }
                 }
             }
         }
     }
-
 
     fun isInWatchlist(movieId: Int): Boolean {
         return _watchlist.value.any { it.id == movieId }
