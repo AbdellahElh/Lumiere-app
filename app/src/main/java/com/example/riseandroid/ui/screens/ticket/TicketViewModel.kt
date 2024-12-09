@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.repository.ITicketRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,15 +66,12 @@ open class TicketViewModel(
         }
     }
     fun addTicket(
-        movieId: Int,
-        eventId: Int,
-        cinemaName: String,
-        showtime: String,
+        newTicket: AddTicketDTO,
         onResult: (TicketEntity?) -> Unit
     ) {
         viewModelScope.launch {
             try {
-                val ticket = ticketRepository.addTicket(movieId, eventId, cinemaName, showtime)
+                val ticket = ticketRepository.addTicket(newTicket)
                 onResult(ticket)
             } catch (e: IOException) {
                 Log.e("TicketViewModel", "Netwerk error toevoegen ticket", e)

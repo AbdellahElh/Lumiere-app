@@ -3,6 +3,7 @@ package com.example.riseandroid.fake
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.repository.ApiResource
@@ -100,21 +101,17 @@ class FakeTicketRepository : ITicketRepository {
     }
 
     override suspend fun addTicket(
-        movieCode: Int,
-        eventCode: Int,
-        cinemaName: String,
-        showtime: String
+        ticket : AddTicketDTO
     ): TicketEntity {
         val newTicket = TicketEntity(
             id = fakeTickets.size + 1,
-            dateTime = showtime,
-            location = cinemaName,
+            dateTime = ticket.ShowTime,
+            location = ticket.CinemaName,
             type = 0,
-            movieId = movieCode,
-            eventId = eventCode,
+            movieId = ticket.MovieId,
+            eventId = ticket.EventId,
             accountId = 1
         )
-//        fakeTickets = fakeTickets + newTicket
         return newTicket
     }
 }

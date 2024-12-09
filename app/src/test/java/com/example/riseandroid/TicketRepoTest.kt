@@ -1,5 +1,6 @@
 package com.example.riseandroid
 
+import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.fake.FakeAuth0Repo
 import com.example.riseandroid.fake.movies.FakeMovieDao
 import com.example.riseandroid.fake.ticket.FakeTicketApi
@@ -48,12 +49,13 @@ class TicketRepoTest {
 
     @Test
     fun testAddTicket() = runTest {
-        val newTicket = ticketRepo.addTicket(
-            movieCode = 4,
-            eventCode = 0,
-            cinemaName = "Gent",
-            showtime = "2024-12-31T20:00:00"
+        val ticket = AddTicketDTO(
+            MovieId = 4,
+            EventId = 0,
+            CinemaName = "gent",
+            ShowTime = "2024-12-31T20:00:00"
         )
+        val newTicket = ticketRepo.addTicket(ticket)
         assertNotNull(newTicket)
     }
 

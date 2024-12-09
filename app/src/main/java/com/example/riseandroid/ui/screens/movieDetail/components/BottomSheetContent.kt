@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.entitys.Cinema
+import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.Movie
 import com.example.riseandroid.model.MovieModel
@@ -223,7 +224,13 @@ fun onCheckoutEvent(
     }
     val showtime = "$date" + "T" + "$selectedTime" + ":00"
     if (url.isNotEmpty()) {
-        ticketViewModel.addTicket(movieId, 0, selectedCinema, showtime) { ticket ->
+        val newTicket =  AddTicketDTO(
+            MovieId = movieId,
+            EventId = 0,
+            CinemaName = selectedCinema,
+            ShowTime = showtime
+        )
+        ticketViewModel.addTicket(newTicket) { ticket ->
             if (ticket != null) {
                 val emailSender = EmailSender(
                     username = "rise6698@gmail.com",

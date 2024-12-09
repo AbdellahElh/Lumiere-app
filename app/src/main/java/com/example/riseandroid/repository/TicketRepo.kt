@@ -5,6 +5,7 @@ import com.example.riseandroid.data.entitys.EventDao
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.Tickets.TicketDao
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.network.TicketApi
@@ -75,28 +76,21 @@ class TicketRepository(
 
     }
     override suspend fun addTicket(
-        movieCode: Int,
-        eventCode: Int,
-        cinemaName: String,
-        showtime: String
+        ticket : AddTicketDTO
+
     ): TicketEntity {
         return withContext(Dispatchers.IO) {
             val newTicket = TicketEntity(
-                dateTime = showtime,
-                location = cinemaName,
+                dateTime = ticket.ShowTime,
+                location = ticket.CinemaName,
                 type = 0,
-                movieId = movieCode,
-                eventId = eventCode,
+                movieId = ticket.MovieId,
+                eventId = ticket.EventId,
                 accountId = getLoggedInUserId()
             )
 
             try {
-                val response = ticketApi.addTicket(
-                    movieId = movieCode,
-                    eventId = eventCode,
-                    cinemaName = cinemaName,
-                    showtime = showtime
-                )
+                val response = ticketApi.addTicket(ticket)
                 ticketDao.addTicket(response)
                 response
             } catch (e: Exception) {
