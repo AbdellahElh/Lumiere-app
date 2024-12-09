@@ -1,6 +1,7 @@
-import android.widget.Button
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,17 +30,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.util.TableInfo
 import com.example.riseandroid.model.Tenturncard
-import com.example.riseandroid.repository.TenturncardRepository
-import com.example.riseandroid.ui.screens.account.AuthViewModel
-import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
-import java.util.prefs.NodeChangeEvent
+
 
 
 @Composable
@@ -71,7 +67,7 @@ fun TenturncardScreen(
                         .padding(16.dp)
                 ) {
                     items(cards) { card ->
-                        TenturnCardItem(card, onSubmit = {tenTurnCardViewModel.updateTenturncard(card)})
+                        TenturnCardItem(card, viewModel = tenTurnCardViewModel)
                     }
                 }
             }
@@ -130,7 +126,7 @@ fun inputActivationCodeField(
 }
 
 @Composable
-fun TenturnCardItem(card: Tenturncard, onSubmit: () -> Unit) {
+fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel) {
     var isEditing by remember { mutableStateOf(false) }
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -195,39 +191,66 @@ fun TenturnCardItem(card: Tenturncard, onSubmit: () -> Unit) {
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            if (!isEditing) {
-                Text(
-                    text = "${card.amountLeft}",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-            else {
-                TextField(
-                    value = card.amountLeft,
-                    modifier = Modifier,
-                    onValueChange = //TODO reference to btn below
-                )
-            }
-            Button(
-                onClick = {
-                    if (isEditing) {
-                        //TODO find a way to submit a copy of the card instead of the actual card
-                        //TODO or test if the error handling in the repo is enough as a backup
-                        onSubmit()
-                    }
-                    isEditing = !isEditing // Toggle editing state
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text(
-                    text = if (isEditing) "Opslaan" else "Bewerken", // Update text based on state
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
+            CardEditor(card, viewModel)
         }
     }
 }
+
+@Composable
+fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
+    val context = LocalContext.current
+    var isEditing by remember { mutableStateOf(false) }
+    var amountLeft by remember { mutableStateOf(card.amountLeft.toString()) }
+    val uiState = viewModel.tenturncardUiState
+
+
+    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        if (!isEditing) {
+            Text(
+                text = "$amountLeft",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        } else {
+            TextField(
+                value = amountLeft,
+                onValueChange = { amountLeft = it },
+                modifier = Modifier.fillMaxWidth().testTag("EditTextField"),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                if (isEditing) {
+                    viewModel.updateTenturncard(
+                        card.copy(amountLeft = amountLeft.toIntOrNull() ?: card.amountLeft)
+                    )
+                }
+                isEditing = !isEditing // Toggle editing state
+            },
+            modifier = Modifier.fillMaxWidth().testTag("editCardBtn"),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        ) {
+            Text(
+                text = if (isEditing) "Opslaan" else "Bewerken",
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
+    // React to state changes
+    when (uiState) {
+        is TenturncardUiState.Succes -> {
+            Toast.makeText(context, "Kaart succesvol aangepast", Toast.LENGTH_SHORT).show()
+        }
+        is TenturncardUiState.Error -> {
+            Toast.makeText(context, uiState.message ?: "Er ging iets fout", Toast.LENGTH_SHORT).show()
+        }
+        else -> Unit // No action for other states
+    }
+}
+
+
 
 

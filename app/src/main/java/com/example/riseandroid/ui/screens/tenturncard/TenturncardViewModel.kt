@@ -118,14 +118,18 @@ class TenturncardViewModel(
                 tenturncardRepository.editTenturncard(card).collect {
                     resource ->
                     when(resource) {
-                        is ApiResource.Error -> TODO()
-                        is ApiResource.Initial -> TODO()
-                        is ApiResource.Loading -> TODO()
-                        is ApiResource.Success -> TODO()
+                        is ApiResource.Error -> {
+                            tenturncardUiState = TenturncardUiState.Error(resource.message ?: "Er ging iets fout")
+                        }
+                        is ApiResource.Initial -> null
+                        is ApiResource.Loading -> null
+                        is ApiResource.Success -> {
+                            tenturncardUiState = TenturncardUiState.Succes(_tenturncards)
+                        }
                     }
                 }
             }catch (e : Exception) {
-                tenturncardUiState = TenturncardUiState.Error(e.message)
+                tenturncardUiState = TenturncardUiState.Error(e.message ?: "Er ging iets fout")
             }
         }
     }
