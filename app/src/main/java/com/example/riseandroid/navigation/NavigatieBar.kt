@@ -100,7 +100,7 @@ fun RowScope.AddItem(
             )
         },
         selected = currentDestination?.hierarchy?.any {
-            it.route == screen.route
+            it.route?.startsWith(screen.route) == true
         } == true,
         colors = NavigationBarItemDefaults.colors(
             indicatorColor = Color.Blue

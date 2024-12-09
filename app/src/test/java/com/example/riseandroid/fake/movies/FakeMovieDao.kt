@@ -56,10 +56,10 @@ class FakeMovieDao:MovieDao {
         MovieEntity(
             id = 1,
             eventId = 101,
-            title = "Test Movie",
+            title = "Fake Movie1",
             genre = "Drama",
             description = "Test Description",
-            duration = 120,
+            duration = 100,
             director = "Director Name",
             videoPlaceholderUrl = "video_placeholder_url",
             coverImageUrl = "cover_url",

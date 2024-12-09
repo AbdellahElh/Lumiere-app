@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.EventModel
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IEventRepo
@@ -26,7 +27,7 @@ import java.util.Date
 import java.util.Locale
 
 sealed interface HomepageUiState {
-    data class Succes(val allMovies: StateFlow<List<ResponseMovie>>,
+    data class Succes(val allMovies: StateFlow<List<MovieModel>>,
                       val recentMovies: StateFlow<List<MoviePoster>>,
                       val events: StateFlow<List<EventModel>>) : HomepageUiState
     object Error : HomepageUiState
@@ -43,7 +44,7 @@ class HomepageViewModel(
     private val _recentMovies = MutableStateFlow<List<MoviePoster>>(emptyList())
     val recentMovies = _recentMovies.asStateFlow()
 
-    private val _allMovies = MutableStateFlow<List<ResponseMovie>>(emptyList())
+    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
     val allMovies = _allMovies.asStateFlow()
 
     private val _selectedDate = MutableStateFlow(getCurrentDate())

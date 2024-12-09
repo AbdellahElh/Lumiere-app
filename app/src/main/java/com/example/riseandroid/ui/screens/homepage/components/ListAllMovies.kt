@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.example.riseandroid.R
-import com.example.riseandroid.network.ResponseMovie
+import com.example.riseandroid.model.MovieModel
 
 
 @Composable
 fun ListAllMovies(
-    allMoviesNonRecent: List<ResponseMovie>,
+    allMoviesNonRecent: List<MovieModel>,
     goToMovieDetail: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {

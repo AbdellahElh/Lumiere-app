@@ -44,8 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.riseandroid.R
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
-import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.homepage.components.CinemaDropdownMenu
 import com.example.riseandroid.ui.screens.homepage.components.EventItem
 import com.example.riseandroid.ui.screens.homepage.components.ListAllMovies
@@ -93,7 +93,7 @@ fun ResultScreen(
     goToMovieDetail: (id: String) -> Unit,
     navController: NavHostController,
     recentMovieList: List<MoviePoster>,
-    allMoviesNonRecent: List<ResponseMovie>,
+    allMoviesNonRecent: List<MovieModel>,
     modifier: Modifier = Modifier,
     homepageViewModel: HomepageViewModel = viewModel(
         factory = HomepageViewModel.Factory
@@ -248,12 +248,12 @@ fun LoadingScreen(
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize() // Ensure the box takes up the full screen
+            .fillMaxSize()
     ) {
         Image(
             modifier = Modifier
                 .size(200.dp)
-                .align(Alignment.Center) // Center the image in the Box
+                .align(Alignment.Center)
                 .testTag("LoadingImage"),
             painter = painterResource(R.drawable.loading_img),
             contentDescription = stringResource(R.string.loading)

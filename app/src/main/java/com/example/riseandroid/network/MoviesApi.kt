@@ -18,7 +18,7 @@ interface MoviesApi {
     suspend fun getMoviePosters(): List<MoviePoster>
 
     @GET("api/Movie/{id}")
-    suspend fun getMovieById(@Path("id") movieId: Int): ResponseMovie
+    suspend fun getMovieById(@Path("id") movieId: Int): MovieApiResponseById
 }
 
 
@@ -44,4 +44,8 @@ data class ResponseCinema(
     val id:Int,
     val name: String,
     val showtimes: List<String> = emptyList()
+)
+
+data class MovieApiResponseById(
+    val movie: ResponseMovie
 )

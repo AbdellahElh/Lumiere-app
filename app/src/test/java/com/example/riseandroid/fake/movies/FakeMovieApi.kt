@@ -1,6 +1,7 @@
 package com.example.riseandroid.fake.movies
 
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.MovieApiResponseById
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.ResponseMovie
 
@@ -18,8 +19,8 @@ class FakeMovieApi : MoviesApi {
         return moviePostersResponse
     }
 
-    override suspend fun getMovieById(movieId: Int): ResponseMovie {
-        return movieResponse;
+    override suspend fun getMovieById(movieId: Int): MovieApiResponseById {
+        return MovieApiResponseById(movie = movieResponse)
     }
 
     private var movieResponse: ResponseMovie = ResponseMovie(

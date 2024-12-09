@@ -89,14 +89,25 @@ fun BottomNavGraph(
             }
         }
         composable(route = BottomBarScreen.Account.route) {
-            AccountPage(
-                navController = navController,
-                context = context,
-                authViewModel = authViewModel
-            )
+            if (!isUserLoggedIn) {
+                LoginScreen(
+                    navController = navController,
+                    login = { credentials ->
+                        println("Logged in with credentials: $credentials")
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                    authViewModel = authViewModel
+                )
+            } else {
+                AccountPage(
+                    navController = navController,
+                    context = context,
+                    authViewModel = authViewModel
+                )
+            }
         }
 
-        composable(route = "login") {
+        composable(route = "account/login") {
             LoginScreen(
                 navController = navController,
                 login = { credentials ->
@@ -107,7 +118,7 @@ fun BottomNavGraph(
             )
         }
 
-        composable(route = "signup") {
+        composable(route = "account/signup") {
             SignUp(
                 signUp = { credentials ->
                     println("Signed up with credentials: $credentials")
@@ -115,14 +126,6 @@ fun BottomNavGraph(
                 modifier = Modifier.fillMaxSize(),
                 authViewModel = authViewModel,
                 navController = navController
-            )
-        }
-
-        composable(route = "account") {
-            AccountPage(
-                navController = navController,
-                context = context,
-                authViewModel = authViewModel
             )
         }
 
@@ -193,7 +196,7 @@ fun ShowLoginRequiredDialog(navController: NavHostController, destination: Strin
                 Button(
                     onClick = {
                         navController.popBackStack()
-                        navController.navigate(BottomBarScreen.Account.route)
+                        navController.navigate("account/login")
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFE5CB77),
