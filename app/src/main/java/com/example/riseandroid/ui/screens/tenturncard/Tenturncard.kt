@@ -1,3 +1,4 @@
+import android.widget.Button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +20,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +42,7 @@ import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
 import java.util.prefs.NodeChangeEvent
+
 
 @Composable
 fun TenturncardScreen(
@@ -60,10 +66,12 @@ fun TenturncardScreen(
                 Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
             } else {
                 LazyRow(
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
                 ) {
                     items(cards) { card ->
-                        TenturnCardItem(card)
+                        TenturnCardItem(card, onSubmit = {tenTurnCardViewModel.updateTenturncard(card)})
                     }
                 }
             }
@@ -122,7 +130,8 @@ fun inputActivationCodeField(
 }
 
 @Composable
-fun TenturnCardItem(card: Tenturncard) {
+fun TenturnCardItem(card: Tenturncard, onSubmit: () -> Unit) {
+    var isEditing by remember { mutableStateOf(false) }
     Card(
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -186,23 +195,39 @@ fun TenturnCardItem(card: Tenturncard) {
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+            if (!isEditing) {
                 Text(
                     text = "${card.amountLeft}",
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-
-
+            }
+            else {
+                TextField(
+                    value = card.amountLeft,
+                    modifier = Modifier,
+                    onValueChange = //TODO reference to btn below
+                )
+            }
             Button(
-                onClick = { /* Voeg functionaliteit toe voor bewerken */ },
+                onClick = {
+                    if (isEditing) {
+                        //TODO find a way to submit a copy of the card instead of the actual card
+                        //TODO or test if the error handling in the repo is enough as a backup
+                        onSubmit()
+                    }
+                    isEditing = !isEditing // Toggle editing state
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
-                    text = "Bewerken",
+                    text = if (isEditing) "Opslaan" else "Bewerken", // Update text based on state
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             }
         }
     }
 }
+
+

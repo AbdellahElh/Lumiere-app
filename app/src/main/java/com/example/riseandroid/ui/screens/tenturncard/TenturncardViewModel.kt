@@ -111,6 +111,25 @@ class TenturncardViewModel(
         }
     }
 
+    fun updateTenturncard(card : Tenturncard) {
+        viewModelScope.launch {
+            tenturncardUiState = TenturncardUiState.Loading
+            try {
+                tenturncardRepository.editTenturncard(card).collect {
+                    resource ->
+                    when(resource) {
+                        is ApiResource.Error -> TODO()
+                        is ApiResource.Initial -> TODO()
+                        is ApiResource.Loading -> TODO()
+                        is ApiResource.Success -> TODO()
+                    }
+                }
+            }catch (e : Exception) {
+                tenturncardUiState = TenturncardUiState.Error(e.message)
+            }
+        }
+    }
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
