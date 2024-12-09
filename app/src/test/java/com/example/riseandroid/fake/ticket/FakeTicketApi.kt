@@ -1,6 +1,7 @@
 package com.example.riseandroid.fake.ticket
 
 import com.example.riseandroid.data.entitys.MovieEntity
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.network.TicketApi
@@ -71,8 +72,8 @@ class FakeTicketApi : TicketApi {
         eventId: Int,
         cinemaName: String,
         showtime: String
-    ): Call<TicketResponse> {
-        val newTicket = TicketResponse(
+    ): TicketEntity {
+        val newTicket = TicketEntity(
             id = dummyTickets.size + 1,
             movieId = movieId,
             eventId = eventId,
@@ -96,6 +97,6 @@ class FakeTicketApi : TicketApi {
                 movieLink = "movielink",
             )
         )
-        return Calls.response(newTicket)
+        return newTicket
     }
 }

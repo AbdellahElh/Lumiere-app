@@ -97,15 +97,9 @@ class TicketRepository(
                     cinemaName = cinemaName,
                     showtime = showtime
                 )
-                if (response.awaitResponse().isSuccessful) {
-                    ticketDao.addTicket(newTicket)
-                    newTicket
-                } else {
-                    ticketDao.deleteTicket(newTicket)
-                    throw Exception("Failed to add ticket on the server")
-                }
+                ticketDao.addTicket(response)
+                response
             } catch (e: Exception) {
-                ticketDao.deleteTicket(newTicket)
                 throw e
             }
         }

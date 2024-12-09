@@ -47,7 +47,6 @@ interface AppContainer {
 
     val moviePosterRepo: MoviePosterRepo
     val authApiService: Auth0Api
-    val ticketRepository: TicketRepository
     val authRepo: IAuthRepo
     val tenturncardRepository : TenturncardRepository
     val eventRepo: EventRepo

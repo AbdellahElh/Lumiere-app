@@ -42,8 +42,7 @@ class MovieRepo(
             }
 
     }
-    override suspend fun getMovieById(id: Int): ResponseMovie {
-        val movieEntity = movieDao.getMovieById(id)
+
 
     override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
@@ -63,7 +62,7 @@ class MovieRepo(
         try {
             val movieApiResponse = movieApi.getMovieById(id)
 
-            val movieFromApi = movieApiResponse.movie
+            val movieFromApi = movieApiResponse
 
             movieDao.insertMovie(movieFromApi.asEntity())
             saveCinemasAndShowtimes(movieFromApi)

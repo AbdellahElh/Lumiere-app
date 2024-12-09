@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flow
 class FakeMovieRepo : IMovieRepo {
 
     private val fakeMoviesResponse = listOf(
-        MovieModel(
+        ResponseMovie(
             id = 1,
             title = "Fake Movie1",
             cinemas = emptyList(),

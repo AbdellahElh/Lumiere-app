@@ -22,7 +22,7 @@ interface TicketApi {
         @retrofit2.http.Query("EventId") eventId: Int,
         @retrofit2.http.Query("cinemaName") cinemaName: String,
         @retrofit2.http.Query("showtime") showtime: String
-    ): Call<TicketResponse>
+    ): TicketEntity
 
 
 }
