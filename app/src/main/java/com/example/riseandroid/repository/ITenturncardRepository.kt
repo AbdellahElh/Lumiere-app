@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ITenturncardRepository {
     suspend fun getTenturncards(): Flow<List<Tenturncard>>
-    suspend fun addTenturncard(activationCode : String): Flow<ApiResource<TenturncardEntity>>
+    fun addTenturncard(activationCode : String): Flow<ApiResource<TenturncardEntity>>
     suspend fun editTenturncard(toUpdateCard : Tenturncard) : Flow<ApiResource<TenturncardResponse>>
 }

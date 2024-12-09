@@ -72,7 +72,7 @@ class FakeTenturncardRepository : ITenturncardRepository {
     }
 
 
-    override suspend fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> {
+    override fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> {
         return flow {
             emit(ApiResource.Loading())
             if (activationCode == "succesCode") {

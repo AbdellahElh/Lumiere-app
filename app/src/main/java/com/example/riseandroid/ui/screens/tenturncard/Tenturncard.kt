@@ -241,8 +241,8 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
     }
     // React to state changes
     when (uiState) {
-        is TenturncardUiState.Succes -> {
-            Toast.makeText(context, "Kaart succesvol aangepast", Toast.LENGTH_SHORT).show()
+        is TenturncardUiState.EditSucces -> {
+            Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
         }
         is TenturncardUiState.Error -> {
             Toast.makeText(context, uiState.message ?: "Er ging iets fout", Toast.LENGTH_SHORT).show()

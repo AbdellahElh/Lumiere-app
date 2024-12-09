@@ -56,7 +56,7 @@ class TenturncardRepository(
     }
 
 
-    override suspend fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> =
+    override fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> =
         flow {
             emit(ApiResource.Loading())
             val newTenturncard = TenturncardEntity(

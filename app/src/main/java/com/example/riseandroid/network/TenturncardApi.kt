@@ -14,7 +14,7 @@ interface TenturncardApi {
     suspend fun getTenturncards(): List<Tenturncard>
 
     @POST("/api/tenturncard/add/{activationCode}")
-    suspend fun addTenturncard(@Path("activationCode") activationCode: String) : Call<Unit>
+    fun addTenturncard(@Path("activationCode") activationCode: String) : Call<Unit>
 
     @POST("/api/tenturncard/edit")
     suspend fun editTenturncard(@Body toUpdateCard : TenturncardResponse): Call<Unit>
