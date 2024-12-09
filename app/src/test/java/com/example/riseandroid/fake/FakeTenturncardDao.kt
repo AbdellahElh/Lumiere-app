@@ -1,7 +1,7 @@
 package com.example.riseandroid.fake
 
-import com.example.riseandroid.data.entitys.TenturncardDao
-import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardDao
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -10,11 +10,11 @@ class FakeTenturncardDao : TenturncardDao {
         private val tenturncards = MutableStateFlow<List<TenturncardEntity>>(emptyList())
 
         override fun getAllTenturncards(): Flow<List<TenturncardEntity>> {
-            TODO("Not yet implemented")
+            return tenturncards
         }
 
         override suspend fun getTenturncardById(id: Int): TenturncardEntity? {
-            TODO("Not yet implemented")
+            return tenturncards.value.find { card -> card.id == id }
         }
 
         override suspend fun insertTenturncards(cards: List<TenturncardEntity>) {
@@ -26,7 +26,9 @@ class FakeTenturncardDao : TenturncardDao {
         }
 
         override suspend fun updateTenturncard(card: TenturncardEntity) {
-            TODO("Not yet implemented")
+            tenturncards.value = tenturncards.value.map { existingCard ->
+                if (existingCard.id == card.id) card else existingCard
+            }
         }
 
         override suspend fun deleteTenturncard(card: TenturncardEntity) {

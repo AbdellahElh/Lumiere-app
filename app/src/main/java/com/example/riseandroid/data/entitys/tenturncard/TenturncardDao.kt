@@ -1,4 +1,4 @@
-package com.example.riseandroid.data.entitys
+package com.example.riseandroid.data.entitys.tenturncard
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow

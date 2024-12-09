@@ -1,8 +1,7 @@
-package com.example.riseandroid.data.entitys
+package com.example.riseandroid.data.entitys.tenturncard
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDateTime
 
 @Entity(tableName = "tenturncards")
 data class TenturncardEntity(
@@ -13,5 +12,5 @@ data class TenturncardEntity(
     val ActivationCode: String,
     val IsActivated: Boolean = false,
 
-    val UserTenturncardId : Int? = 1,
+    var UserTenturncardId : Int? = 1,
 )
