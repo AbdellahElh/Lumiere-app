@@ -31,7 +31,7 @@ sealed class BottomBarScreen(
         icon = Lucide.Star
     )
     object Account : BottomBarScreen(
-        route = "login",
+        route = "account",
         title = "Account",
         icon = Lucide.CircleUserRound
     )

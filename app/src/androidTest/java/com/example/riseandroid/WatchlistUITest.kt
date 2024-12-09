@@ -77,7 +77,7 @@ class WatchlistUITest {
 
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Your watchlist is empty.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Uw watchlist is leeg.").assertIsDisplayed()
     }
 
     @Test

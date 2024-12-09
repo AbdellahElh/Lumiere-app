@@ -45,3 +45,7 @@ data class ResponseCinema(
     val name: String,
     val showtimes: List<String> = emptyList()
 )
+
+data class MovieApiResponseById(
+    val movie: ResponseMovie
+)

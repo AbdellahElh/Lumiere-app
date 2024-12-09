@@ -42,6 +42,8 @@ class MovieRepo(
             }
 
     }
+    override suspend fun getMovieById(id: Int): ResponseMovie {
+        val movieEntity = movieDao.getMovieById(id)
 
     override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
@@ -59,7 +61,10 @@ class MovieRepo(
             return movieEntity.asResponse().copy(cinemas = cinemas)
         }
         try {
-            val movieFromApi = movieApi.getMovieById(id)
+            val movieApiResponse = movieApi.getMovieById(id)
+
+            val movieFromApi = movieApiResponse.movie
+
             movieDao.insertMovie(movieFromApi.asEntity())
             saveCinemasAndShowtimes(movieFromApi)
             return movieFromApi
@@ -99,7 +104,7 @@ class MovieRepo(
                 saveCinemasAndShowtimes(movie)
             }
         } catch (e: Exception) {
-            Log.e("MovieRepo", "Error refreshing movies")
+            Log.d("MovieRepo", "Network connection failed")
         }
     }
 

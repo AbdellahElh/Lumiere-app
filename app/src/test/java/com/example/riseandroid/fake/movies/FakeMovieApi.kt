@@ -1,6 +1,7 @@
 package com.example.riseandroid.fake.movies
 
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.MovieApiResponseById
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.ResponseMovie
 

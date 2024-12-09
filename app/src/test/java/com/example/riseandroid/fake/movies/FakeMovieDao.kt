@@ -67,7 +67,7 @@ class FakeMovieDao:MovieDao {
         MovieEntity(
             id = 1,
             eventId = 101,
-            title = "Test Movie",
+            title = "Fake Movie1",
             genre = "Drama",
             description = "Test Description",
             duration = 120,
