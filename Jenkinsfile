@@ -5,14 +5,14 @@ pipeline {
         ANDROID_HOME = "/opt/android-sdk"  // Adjust to your actual SDK path
         GRADLE_HOME = "/opt/gradle-8.10.2"        // Adjust to your actual Gradle path
         PATH = "${ANDROID_HOME}/platform-tools:${GRADLE_HOME}/bin:${env.PATH}"  // Add tools to PATH
-        GRADLE_OPTS="-Xmx2048m -Dorg.gradle.jvmargs=-Xmx2048m"
+        GRADLE_OPTS="-Xmx4g -Dorg.gradle.jvmargs=-Xmx4g"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 // Checkout the code from the repository
-                 git branch: 'main', credentialsId: 'keycontainer', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
+                 git branch: 'main', credentialsId: 'keyandroid', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
             }
         }
         
