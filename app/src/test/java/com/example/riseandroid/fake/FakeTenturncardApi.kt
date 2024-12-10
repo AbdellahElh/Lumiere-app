@@ -22,7 +22,7 @@ class FakeTenturncardApi : TenturncardApi {
         }
     }
 
-    override fun editTenturncard(toUpdateCard: Tenturncard): Call<Unit> {
+    override fun editTenturncard(toUpdateCard: TenturncardResponse): Call<Unit> {
         return if(toUpdateCard.amountLeft == 5) {
             Calls.response(Response.success(Unit))
         }

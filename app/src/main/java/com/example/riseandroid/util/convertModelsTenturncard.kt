@@ -10,9 +10,9 @@ fun TenturncardEntity.asResponse() : TenturncardResponse {
         amountLeft = amountLeft,
         purchaseDate = purchaseDate,
         expirationDate = expirationDate,
-        ActivationCode = ActivationCode,
-        IsActivated = IsActivated,
-        UserTenturncardId = UserTenturncardId,
+        activationCode = ActivationCode,
+        isActivated = IsActivated,
+        accountId = UserTenturncardId,
     )
 }
 
@@ -22,8 +22,8 @@ fun Tenturncard.asResponse() : TenturncardResponse {
         amountLeft = amountLeft,
         purchaseDate = purchaseDate,
         expirationDate = expirationDate,
-        ActivationCode = ActivationCode,
-        IsActivated = IsActivated,
-        UserTenturncardId = null
+        activationCode = ActivationCode,
+        isActivated = IsActivated,
+        accountId = null
     )
 }

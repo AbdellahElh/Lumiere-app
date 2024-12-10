@@ -93,16 +93,16 @@ class TenturncardRepository(
         // Create an entity version
         val cardEntity = toUpdateCard.asEntity()
         cardEntity.UserTenturncardId = getLoggedInUserId()
+        // Create a response version
+        val cardResponse = toUpdateCard.asResponse()
+        cardResponse.accountId = getLoggedInUserId()
         try {
             // Update the dao object
             tenturncardDao.updateTenturncard(cardEntity)
             // Send the request to the api
-            val response = tenturncardApi.editTenturncard(toUpdateCard)
+            val response = tenturncardApi.editTenturncard(cardResponse)
             // Emit the correct state based on the api response
             if (response.awaitResponse().isSuccessful) {
-                // Create a response version
-                val cardResponse = toUpdateCard.asResponse()
-                cardResponse.UserTenturncardId = getLoggedInUserId()
                 emit(ApiResource.Success(cardResponse))
             }
             else{
