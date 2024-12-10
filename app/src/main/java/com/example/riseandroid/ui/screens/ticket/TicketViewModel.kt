@@ -69,22 +69,17 @@ open class TicketViewModel(
         }
     }
     fun addTicket(
-        newTicket: AddTicketDTO,
-        onResult: (TicketEntity?) -> Unit
+        newTicket: AddTicketDTO
     ) {
         viewModelScope.launch {
             try {
-                val ticket = ticketRepository.addTicket(newTicket)
-                onResult(ticket)
+               ticketRepository.addTicket(newTicket)
             } catch (e: IOException) {
                 Log.e("TicketViewModel", "Netwerk error toevoegen ticket", e)
-                onResult(null)
             } catch (e: HttpException) {
                 Log.e("TicketViewModel", "HTTP error toevoegen ticket", e)
-                onResult(null)
             } catch (e: Exception) {
                 Log.e("TicketViewModel", "Error toevoegen ticket", e)
-                onResult(null)
             }
         }
     }

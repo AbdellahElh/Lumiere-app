@@ -49,7 +49,6 @@ import com.example.riseandroid.ui.screens.homepage.LoadingScreen
 import com.example.riseandroid.ui.screens.movieDetail.NextStepButton
 import com.example.riseandroid.ui.screens.movieDetail.navigateBack
 import com.example.riseandroid.ui.screens.ticket.TicketViewModel
-import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +64,6 @@ fun EventDetailScreen(
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
-    val email by authViewModel.email.collectAsState()
 
 
     when (val uiState = viewModel.eventDetailUiState) {
@@ -104,9 +102,7 @@ fun EventDetailScreen(
                         eventId= eventId,
                         cinemas = event.cinemas ?: emptyList(),
                         context = context,
-                        navController = navController,
                         event = event,
-                        email = email?: "",
                         onDismiss = { showBottomSheet = false }
                     )
                 }
@@ -115,7 +111,6 @@ fun EventDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailContent(
     event: EventModel,

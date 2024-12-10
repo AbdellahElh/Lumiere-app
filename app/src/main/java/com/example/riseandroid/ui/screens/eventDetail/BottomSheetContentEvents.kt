@@ -3,8 +3,6 @@ package com.example.riseandroid.ui.screens.eventDetail
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.se.omapi.Session
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,35 +31,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.riseandroid.data.entitys.Cinema
-import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.model.EventModel
-import com.example.riseandroid.ui.screens.movieDetail.components.EmailSender
 import com.example.riseandroid.ui.screens.ticket.TicketViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Properties
-import javax.mail.PasswordAuthentication
-import javax.mail.Transport
-import javax.mail.internet.InternetAddress
-import javax.mail.internet.MimeMessage
 
 
 @Composable
 fun BottomSheetContentEvents(
-    ticketViewModel : TicketViewModel,
+    ticketViewModel: TicketViewModel,
     eventId: Int,
     cinemas: List<Cinema>,
     context: Context,
-    navController: NavController,
     event: EventModel,
-    email: String,
     onDismiss: () -> Unit
 ) {
     var selectedCinema by remember { mutableStateOf(cinemas.firstOrNull()?.name ?: "") }
@@ -126,7 +107,15 @@ fun BottomSheetContentEvents(
             Button(
                 onClick = {
                     if (selectedCinema.isNotEmpty() && selectedDate.isNotEmpty() && selectedTime.isNotEmpty()) {
-                        onCheckoutEvent(ticketViewModel , eventId, selectedCinema, selectedDate, selectedTime, event,  context, email)
+                        onCheckoutEvent(
+                            ticketViewModel,
+                            eventId,
+                            selectedCinema,
+                            selectedDate,
+                            selectedTime,
+                            event,
+                            context
+                        )
                         onDismiss()
                     } else {
                         Toast.makeText(context, "Vul alle velden in voordat u doorgaat", Toast.LENGTH_SHORT).show()
@@ -192,7 +181,6 @@ fun DropdownMenuWithLabel(
     }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
 fun onCheckoutEvent(
     ticketViewModel: TicketViewModel,
     eventId: Int,
@@ -200,8 +188,7 @@ fun onCheckoutEvent(
     date: String,
     selectedTime: String,
     event: EventModel,
-    context: Context,
-    email: String
+    context: Context
 ) {
     val url = when (selectedCinema) {
         "Brugge" -> "https://tickets.lumierecinema.be/lumiere/nl/flow_configs/webshop/steps/start/show/${event.id}"
@@ -218,59 +205,7 @@ fun onCheckoutEvent(
             CinemaName = selectedCinema,
             ShowTime = showtime
         )
-        ticketViewModel.addTicket(newTicket) { ticket ->
-            if (ticket != null) {
-                val emailSender = EmailSender(
-                    username = "rise6698@gmail.com",
-                    password = "zkuq squo tgzz kriv"
-                )
-                val ticketID = ticket.id
-
-                val (price, ticketType) = when (ticket.type) {
-                    0 -> 12.00 to "Standaard"
-                    1 -> 11.50 to "Senior"
-                    2 -> 10.00 to "Student"
-                    else -> 12.00 to "Andere"
-                }
-
-                var emailBody = """
-                    <p>Beste Lumiere {Location} bezoeker, <br/><br/>
-                    Bedankt voor je aankoop. De betaling voor je bestelling met nummer {Id} is ontvangen en verwerkt. <br/>
-                    Je kan je e-tickets via de volgende link openen:</p>
-                    <a href='https://localhost:5001/tickets/{Id}'>Open je ticket</a>
-                    <p>Je hoeft ze niet af te drukken, je kan ze gewoon op je smartphone laten zien aan de ingang van de cinema.</p>
-                    <h4>Instructies:</h4>
-                    <ul>
-                        <li>Noteer veiligheidshalve het bestelnummer.</li>
-                        <li>Neem je ticket mee naar de voorstelling.</li>
-                        <li>Gelieve je ticket te tonen aan de medewerker bij het binnenkomen van de cinema. Indien de medewerker niet aanwezig is dan zal de kassamedewerker je ticket valideren. In beide gevallen mag je op vertoon en na scan van je ticket de cinema binnen</li>
-                    </ul>
-                    <h2>Info Tickets:</h2>
-                    <h3>{Title}</h3>
-                    <p>{DateTime}</p>
-                    <p>1X {Type}:{Price}€</p>
-                    <p>Totaal: {Price}€</p>
-                    <p><br/>Veel plezier bij de voorstelling! <br/><br/> vriendelijke groet, <br/><br/> het team van stadsbioscoop Lumiere {Location}</p>
-                """.trimIndent()
-
-                emailBody = emailBody
-                    .replace("{Location}", selectedCinema)
-                    .replace("{Id}", ticketID.toString())
-                    .replace("{Title}", event.title)
-                    .replace("{Type}", ticketType)
-                    .replace("{Price}", price.toString())
-                    .replace("{DateTime}", showtime)
-
-                GlobalScope.launch(Dispatchers.IO) {
-                    emailSender.sendEmail(
-                        to = email,
-                        subject = "Bevestiging van uw aankoop bij stadsbioscoop Lumiere $selectedCinema",
-                        body = emailBody
-                    )
-                }
-
-            }
-        }
+        ticketViewModel.addTicket(newTicket)
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         context.startActivity(intent)

@@ -51,11 +51,9 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
-import com.example.riseandroid.ui.screens.eventDetail.BottomSheetContentEvents
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
 import com.example.riseandroid.ui.screens.movieDetail.components.BottomSheetContent
@@ -81,7 +79,6 @@ fun MovieDetailScreen(
     val context = LocalContext.current
     val isSyncing by watchlistViewModel.isSyncing.collectAsState()
     val isNetworkAvailable = remember { mutableStateOf(isNetworkAvailable(context)) }
-    val email by authViewModel.email.collectAsState()
 
     LaunchedEffect(movieId) {
         watchlistViewModel.syncWatchlist()
@@ -146,9 +143,7 @@ fun MovieDetailScreen(
                         movieId= movieId,
                         cinemas = movie.cinemas,
                         context = context,
-                        navController = navController,
                         movie = movie,
-                        email = email?: "",
                         onDismiss = { showBottomSheet = false }
                     )
                 }
@@ -160,7 +155,6 @@ fun MovieDetailScreen(
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailContent(
     movie: ResponseMovie,

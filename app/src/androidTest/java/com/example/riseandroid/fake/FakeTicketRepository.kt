@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flow
 
 class FakeTicketRepository : ITicketRepository {
 
-    private var fakeTickets = listOf(
+    private var fakeTickets = mutableListOf(
         Ticket(
             id = 1,
             dateTime = "2025-01-01T00:00:00",
@@ -102,8 +102,8 @@ class FakeTicketRepository : ITicketRepository {
 
     override suspend fun addTicket(
         ticket : AddTicketDTO
-    ): TicketEntity {
-        val newTicket = TicketEntity(
+    ) {
+        val newTicket = Ticket(
             id = fakeTickets.size + 1,
             dateTime = ticket.ShowTime,
             location = ticket.CinemaName,
@@ -112,7 +112,7 @@ class FakeTicketRepository : ITicketRepository {
             eventId = ticket.EventId,
             accountId = 1
         )
-        return newTicket
+        fakeTickets.add(newTicket)
     }
 }
 

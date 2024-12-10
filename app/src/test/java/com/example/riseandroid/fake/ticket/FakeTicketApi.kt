@@ -11,7 +11,7 @@ import retrofit2.mock.Calls
 
 class FakeTicketApi : TicketApi {
 
-    private val dummyTickets = listOf(
+    private val dummyTickets = mutableListOf (
         TicketResponse(
             id = 1,
             dateTime = "2025-01-01T00:00:00",
@@ -71,8 +71,8 @@ class FakeTicketApi : TicketApi {
     override suspend fun addTicket(
         ticket : AddTicketDTO
 
-    ): TicketEntity {
-        val newTicket = TicketEntity(
+    ) {
+        val newTicket = TicketResponse(
             id = dummyTickets.size + 1,
             movieId = ticket.MovieId,
             eventId = ticket.EventId,
@@ -96,6 +96,6 @@ class FakeTicketApi : TicketApi {
                 movieLink = "movielink",
             )
         )
-        return newTicket
+        dummyTickets.add(newTicket)
     }
 }

@@ -3,17 +3,12 @@ package com.example.riseandroid.ui.screens.movieDetail.components
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.se.omapi.Session
 import android.widget.Toast
-import androidx.activity.result.launch
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,12 +19,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,44 +29,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.setFrom
-import androidx.compose.ui.semantics.setText
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.data.entitys.Cinema
 import com.example.riseandroid.data.entitys.event.AddTicketDTO
-import com.example.riseandroid.model.EventModel
-import com.example.riseandroid.model.Movie
-import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.model.Program
 import com.example.riseandroid.network.ResponseCinema
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.ticket.TicketViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.Properties
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetContent(
-    ticketViewModel : TicketViewModel,
+    ticketViewModel: TicketViewModel,
     movieId: Int,
     cinemas: List<ResponseCinema>,
     context: Context,
-    navController: NavController,
     movie: ResponseMovie,
-    email: String,
     onDismiss: () -> Unit
 
 ) {
@@ -141,7 +110,15 @@ fun BottomSheetContent(
             Button(
                 onClick = {
                     if (selectedCinema.isNotEmpty() && selectedDate.isNotEmpty() && selectedTime.isNotEmpty()) {
-                        onCheckoutEvent(ticketViewModel , movieId, selectedCinema, selectedDate, selectedTime, movie, email, context)
+                        onCheckoutEvent(
+                            ticketViewModel,
+                            movieId,
+                            selectedCinema,
+                            selectedDate,
+                            selectedTime,
+                            movie,
+                            context
+                        )
                         onDismiss()
                     } else {
                         Toast.makeText(context, "Vul alle velden in voordat u doorgaat", Toast.LENGTH_SHORT).show()
@@ -207,7 +184,6 @@ fun DropdownMenuWithLabel(
     }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
 fun onCheckoutEvent(
     ticketViewModel: TicketViewModel,
     movieId: Int,
@@ -215,7 +191,6 @@ fun onCheckoutEvent(
     date: String,
     selectedTime: String,
     movie: ResponseMovie,
-    email: String,
     context: Context
 ) {
 
@@ -234,61 +209,7 @@ fun onCheckoutEvent(
             CinemaName = selectedCinema,
             ShowTime = showtime
         )
-        ticketViewModel.addTicket(newTicket) { ticket ->
-            if (ticket != null) {
-                val emailSender = EmailSender(
-                    username = "rise6698@gmail.com",
-                    password = "zkuq squo tgzz kriv"
-                )
-                val ticketID = ticket.id;
-                val (price, ticketType) = when (ticket.type) {
-                    0 -> 12.00 to "Standaard"
-                    1 -> 11.50 to "Senior"
-                    2 -> 10.00 to "Student"
-                    else -> 12.00 to "Andere"
-                }
-
-
-                var emailBody = """
-                    <p>Beste Lumiere {Location} bezoeker, <br/><br/>
-                    Bedankt voor je aankoop. De betaling voor je bestelling met nummer {Id} is ontvangen en verwerkt. <br/>
-                    Je kan je e-tickets via de volgende link openen:</p>
-                    <a href='https://localhost:5001/tickets/{Id}'>Open je ticket</a>
-                    <p>Je hoeft ze niet af te drukken, je kan ze gewoon op je smartphone laten zien aan de ingang van de cinema.</p>
-                    <h4>Instructies:</h4>
-                    <ul>
-                        <li>Noteer veiligheidshalve het bestelnummer.</li>
-                        <li>Neem je ticket mee naar de voorstelling.</li>
-                        <li>Gelieve je ticket te tonen aan de medewerker bij het binnenkomen van de cinema. Indien de medewerker niet aanwezig is dan zal de kassamedewerker je ticket valideren. In beide gevallen mag je op vertoon en na scan van je ticket de cinema binnen</li>
-                    </ul>
-                    <h2>Info Tickets:</h2>
-                    <h3>{Title}</h3>
-                    <p>{DateTime}</p>
-                    <p>1X {Type}:{Price}€</p>
-                    <p>Totaal: {Price}€</p>
-                    <p><br/>Veel plezier bij de voorstelling! <br/><br/> vriendelijke groet, <br/><br/> het team van stadsbioscoop Lumiere {Location}</p>
-                """.trimIndent()
-
-                emailBody = emailBody
-                    .replace("{Location}", selectedCinema)
-                    .replace("{Id}", ticketID.toString())
-                    .replace("{Title}", movie.title)
-                    .replace("{Type}", ticketType)
-                    .replace("{Price}", price.toString())
-                    .replace("{DateTime}", showtime)
-
-
-
-                GlobalScope.launch(Dispatchers.IO) {
-                    emailSender.sendEmail(
-                        to = email,
-                        subject = "Bevestiging van uw aankoop bij stadsbioscoop Lumiere $selectedCinema",
-                        body = emailBody
-                    )
-                }
-
-            }
-        }
+        ticketViewModel.addTicket(newTicket)
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         context.startActivity(intent)
     } else {

@@ -21,7 +21,7 @@ interface TicketApi {
     @POST("/api/ticket/add/")
     suspend fun addTicket(
         @Body ticket: AddTicketDTO
-    ): TicketEntity
+    )
 
 
 
