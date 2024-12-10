@@ -1,13 +1,17 @@
-package com.example.riseandroid.model
+package com.example.riseandroid.data.response
 
 import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.example.riseandroid.data.entitys.Account
 import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.MovieEntity
-import com.example.riseandroid.data.entitys.Tickets.TicketType
+import java.time.LocalDateTime
 
 
-data class Ticket(
+
+data class TicketResponse(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val dateTime: String,
     val location: String,

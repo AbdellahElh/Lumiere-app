@@ -1,6 +1,5 @@
 package com.example.riseandroid.mockdata
 
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.ResponseMovie
 
@@ -12,8 +11,8 @@ class MovieListMock {
             MoviePoster(id = 2, cover = "fakeCover", releaseDate = "fakeDate"))
     }
 
-    fun LoadAllMoviesMock(): List<MovieModel> {
-        return listOf(MovieModel(
+    fun LoadAllMoviesMock(): List<ResponseMovie> {
+        return listOf(ResponseMovie(
             id = 1,
             title = "FakeMovie1",
             cinemas = emptyList(),
@@ -30,7 +29,7 @@ class MovieListMock {
             movieLink = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
             eventId = 1
         ),
-            MovieModel(
+            ResponseMovie(
                 id = 2,
                 title = "FakeMovie2",
                 cinemas = emptyList(),

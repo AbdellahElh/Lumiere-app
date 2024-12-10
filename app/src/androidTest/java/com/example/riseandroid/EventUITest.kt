@@ -6,7 +6,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import com.example.riseandroid.fake.FakeEventRepo
-import com.example.riseandroid.fake.FakeProgramRepo
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.ui.screens.homepage.components.EventItem
 import kotlinx.coroutines.runBlocking
@@ -20,12 +19,10 @@ class EventUITest {
     val composeTestRule = createComposeRule()
 
     private lateinit var fakeEventRepo: FakeEventRepo
-    private lateinit var fakeProgramRepo: FakeProgramRepo
 
     @Before
     fun setup() {
         fakeEventRepo = FakeEventRepo()
-        fakeProgramRepo = FakeProgramRepo()
     }
 
     @Test
@@ -46,7 +43,8 @@ class EventUITest {
                         cover = null,
                         location = "Location",
                         eventLink = null,
-                        cinemas = emptyList()
+                        cinemas = emptyList(),
+                        movies = emptyList()
                     ),
                     navController = rememberNavController()
                 )

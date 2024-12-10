@@ -1,0 +1,126 @@
+package com.example.riseandroid.repository
+
+import android.util.Log
+import com.example.riseandroid.data.entitys.EventDao
+import com.example.riseandroid.data.entitys.MovieDao
+import com.example.riseandroid.data.entitys.Tickets.TicketDao
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+import com.example.riseandroid.data.entitys.event.AddTicketDTO
+import com.example.riseandroid.data.response.TicketResponse
+import com.example.riseandroid.model.Ticket
+import com.example.riseandroid.network.TicketApi
+import com.example.riseandroid.util.asEntity
+import com.example.riseandroid.util.asExternalModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
+import retrofit2.awaitResponse
+
+class TicketRepository(
+    private val ticketApi: TicketApi,
+    private val ticketDao: TicketDao,
+    private val authrepo: IAuthRepo,
+    private val movieApi: MovieDao,
+    private val EventApi: EventDao
+) : ITicketRepository {
+
+    override suspend fun getTickets(): Flow<List<Ticket>> {
+        return ticketDao.getTickets()
+            .map { entities -> entities.map { it.asExternalModel() } }
+            .onEach { tickets ->
+                tickets.forEach { ticket ->
+                    saveMovieEvent(ticket)
+                }
+            }
+            .onStart {
+                withContext(Dispatchers.IO) {
+                    refreshTickets()
+                }
+            }
+    }
+
+    private suspend fun refreshTickets() {
+        try {
+
+            val ticketsFromApi: List<TicketResponse> = ticketApi.getTickets()
+            val ticketAsEntities = ticketsFromApi.map { it.asEntity() }
+
+            ticketDao.deleteAllTickets()
+            ticketDao.insertTickets(ticketAsEntities)
+
+        } catch (e: Exception) {
+            Log.e("TicketRepo", "Error refreshing tickets" + e)
+        }
+    }
+    private suspend fun saveMovieEvent(ticket: Ticket) {
+
+        if(ticket.eventId != null){
+            val event = EventApi?.getEventById(ticket.eventId)
+            val eventEntity = event
+            if (eventEntity != null) {
+                ticketDao.insertEvent(eventEntity)
+            }
+        }
+        else{
+            val movie = ticket.movieId?.let { movieApi.getMovieById(it) }
+            val movieEntity = movie
+            if (movie != null) {
+                if (movieEntity != null) {
+                    ticketDao.insertMovie(movieEntity)
+                }
+            }
+        }
+
+    }
+    override suspend fun addTicket(ticket: AddTicketDTO) {
+        val movieId = if (ticket.MovieId == 0) null else ticket.MovieId
+        val eventId = if (ticket.EventId == 0) null else ticket.EventId
+        return withContext(Dispatchers.IO) {
+            val newTicket = TicketEntity(
+                dateTime = ticket.ShowTime,
+                location = ticket.CinemaName,
+                type = 0,
+                movieId = movieId,
+                eventId = eventId,
+                accountId = getLoggedInUserId()
+            )
+
+
+            try {
+                ticketDao.addTicket(newTicket)
+                ticketApi.addTicket(ticket)
+
+            } catch (e: Exception) {
+                ticketDao.deleteTicket(newTicket)
+                throw RuntimeException("gefaald om ticket toe te voegen: ${e.localizedMessage}", e)
+            }
+        }
+    }
+
+
+
+
+
+
+
+    suspend fun getLoggedInUserId(): Int {
+        var accountId: Int? = null
+        authrepo.getLoggedInId().collect { resource ->
+            when (resource) {
+                is ApiResource.Error -> throw IllegalStateException("De gebruiker moet ingelogd zijn")
+                is ApiResource.Initial -> throw IllegalStateException("Unexpected state: ApiResource.Initial")
+                is ApiResource.Loading -> {
+                    // Optionally handle the loading state, or simply ignore it.
+                }
+
+                is ApiResource.Success -> {
+                    accountId = resource.data
+                }
+            }
+        }
+                return accountId ?: throw IllegalStateException("De gebruiker moet ingelogd zijn")
+    }
+}

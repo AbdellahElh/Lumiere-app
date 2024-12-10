@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,16 +31,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.riseandroid.data.entitys.Cinema
+import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.model.EventModel
+import com.example.riseandroid.ui.screens.ticket.TicketViewModel
 
 
 @Composable
 fun BottomSheetContentEvents(
+    ticketViewModel: TicketViewModel,
+    eventId: Int,
     cinemas: List<Cinema>,
     context: Context,
-    navController: NavController,
     event: EventModel,
     onDismiss: () -> Unit
 ) {
@@ -106,7 +107,15 @@ fun BottomSheetContentEvents(
             Button(
                 onClick = {
                     if (selectedCinema.isNotEmpty() && selectedDate.isNotEmpty() && selectedTime.isNotEmpty()) {
-                        onCheckoutEvent(selectedCinema, selectedDate, selectedTime, event, navController, context)
+                        onCheckoutEvent(
+                            ticketViewModel,
+                            eventId,
+                            selectedCinema,
+                            selectedDate,
+                            selectedTime,
+                            event,
+                            context
+                        )
                         onDismiss()
                     } else {
                         Toast.makeText(context, "Vul alle velden in voordat u doorgaat", Toast.LENGTH_SHORT).show()
@@ -153,7 +162,7 @@ fun DropdownMenuWithLabel(
                 .clickable { expanded = true }
                 .padding(8.dp)
         ) {
-            Text(text = selectedOption.ifEmpty { "Selecteer $label" })
+            Text(color = Color.Black, text = selectedOption.ifEmpty { "Selecteer $label" } )
         }
         DropdownMenu(
             expanded = expanded,
@@ -173,11 +182,12 @@ fun DropdownMenuWithLabel(
 }
 
 fun onCheckoutEvent(
+    ticketViewModel: TicketViewModel,
+    eventId: Int,
     selectedCinema: String,
     date: String,
     selectedTime: String,
     event: EventModel,
-    navController: NavController,
     context: Context
 ) {
     val url = when (selectedCinema) {
@@ -187,12 +197,21 @@ fun onCheckoutEvent(
         "Cinema Cartoons" -> "https://tickets.cinemacartoons.be/cartoons/nl/flow_configs/webshop/steps/start/show/${event.id}"
         else -> ""
     }
-
+    val showtime = date + "T" + selectedTime + ":00"
     if (url.isNotEmpty()) {
+        val newTicket = AddTicketDTO(
+            MovieId = 0,
+            EventId = eventId,
+            CinemaName = selectedCinema,
+            ShowTime = showtime
+        )
+        ticketViewModel.addTicket(newTicket)
+
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         context.startActivity(intent)
     } else {
         Toast.makeText(context, "Geen geldige URL gevonden", Toast.LENGTH_SHORT).show()
     }
 }
+
 

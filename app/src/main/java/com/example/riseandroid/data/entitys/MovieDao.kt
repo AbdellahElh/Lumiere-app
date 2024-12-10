@@ -36,6 +36,11 @@ interface MovieDao {
 
     @Query("SELECT * FROM cinemas WHERE name = :name LIMIT 1")
     suspend fun getCinemaByName(name: String): CinemaEntity?
+    @Query("SELECT * FROM cinemas WHERE id IN (SELECT cinemaId FROM showtimes WHERE movieId = :movieId)")
+    suspend fun getCinemasByMovieId(movieId: Int): List<CinemaEntity>
+
+    @Query("SELECT * FROM showtimes WHERE movieId = :movieId AND cinemaId = :cinemaId")
+    suspend fun getShowtimesByMovieAndCinema(movieId: Int, cinemaId: Int): List<ShowtimeEntity>
 
     @Query("""
         SELECT DISTINCT movies.id, movies.eventId, movies.title,movies.coverImageUrl, movies.releaseDate, genre,description,duration,director,movieLink

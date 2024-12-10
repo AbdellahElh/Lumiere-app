@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.riseandroid.model.Ticket
 import com.example.riseandroid.ui.screens.account.AccountPage
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -38,6 +39,7 @@ import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
+import com.example.riseandroid.ui.screens.ticket.TicketViewModel
 import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 import com.example.riseandroid.ui.theme.ThemeViewModel
@@ -48,6 +50,8 @@ fun BottomNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory),
+    ticketViewModel: TicketViewModel = viewModel(factory = TicketViewModel.Factory),
+
     forgotPasswordViewModel: ForgotPasswordViewModel,
     watchlistViewModel: WatchlistViewModel,
     themeViewModel: ThemeViewModel
@@ -150,8 +154,10 @@ fun BottomNavGraph(
                         factory = MovieDetailViewModel.provideFactory(movieId)
                     ),
                     watchlistViewModel = watchlistViewModel,
-                    authViewModel = authViewModel
-                )
+                    authViewModel = authViewModel,
+                    ticketViewModel = ticketViewModel,
+
+                    )
             }
         }
 
@@ -164,6 +170,7 @@ fun BottomNavGraph(
                     navController = navController,
                     viewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId)),
                     authViewModel = authViewModel,
+                    ticketViewModel = ticketViewModel,
                     onBackToEvents = {
                         navController.navigate("homepage?selectedTab=2") {
                             popUpTo(BottomBarScreen.Home.route) { inclusive = true }
@@ -199,7 +206,7 @@ fun ShowLoginRequiredDialog(navController: NavHostController, destination: Strin
                 Button(
                     onClick = {
                         navController.popBackStack()
-                        navController.navigate("account/login")
+                        navController.navigate(BottomBarScreen.Account.route)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFE5CB77),

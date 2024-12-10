@@ -51,6 +51,7 @@ android {
 
     packaging {
         resources {
+            excludes += "/META-INF/NOTICE.md"
             excludes += "/META-INF/LICENSE.md"
             excludes += "/META-INF/LICENSE.txt"
             excludes += "/META-INF/NOTICE"
@@ -127,5 +128,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("com.auth0.android:jwtdecode:2.0.0")
+    //Email
+    implementation ("com.sun.mail:android-mail:1.6.6")
+    implementation ("com.sun.mail:android-activation:1.6.7")
 
 }

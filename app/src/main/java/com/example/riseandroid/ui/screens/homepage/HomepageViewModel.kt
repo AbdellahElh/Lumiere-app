@@ -12,7 +12,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.EventModel
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IEventRepo
@@ -27,7 +26,7 @@ import java.util.Date
 import java.util.Locale
 
 sealed interface HomepageUiState {
-    data class Succes(val allMovies: StateFlow<List<MovieModel>>,
+    data class Succes(val allMovies: StateFlow<List<ResponseMovie>>,
                       val recentMovies: StateFlow<List<MoviePoster>>,
                       val events: StateFlow<List<EventModel>>) : HomepageUiState
     object Error : HomepageUiState
@@ -44,7 +43,7 @@ class HomepageViewModel(
     private val _recentMovies = MutableStateFlow<List<MoviePoster>>(emptyList())
     val recentMovies = _recentMovies.asStateFlow()
 
-    private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
+    private val _allMovies = MutableStateFlow<List<ResponseMovie>>(emptyList())
     val allMovies = _allMovies.asStateFlow()
 
     private val _selectedDate = MutableStateFlow(getCurrentDate())
@@ -122,7 +121,8 @@ class HomepageViewModel(
                 eventRepo.getAllEventsList().collect { eventsList ->
                     _events.value = eventsList
                     _filteredEvents.value = eventsList.filter { event ->
-                        event.cinemas.any { it.name.equals("Brugge", ignoreCase = true) }
+                        var cinema = event.cinemas ?: emptyList()
+                        cinema.any { it.name.equals("Brugge", ignoreCase = true) }
                     }
                     homepageUiState = HomepageUiState.Succes(
                         allMovies = allMovies,
@@ -141,7 +141,8 @@ class HomepageViewModel(
     fun filterEventsByCinema(selectedCinema: String) {
         viewModelScope.launch {
             val filtered = _events.value.filter { event ->
-                event.cinemas.any { it.name.equals(selectedCinema, ignoreCase = true) }
+                var cinema = event.cinemas ?: emptyList()
+                cinema.any { it.name.equals(selectedCinema, ignoreCase = true) }
             }
             _filteredEvents.value = filtered
         }

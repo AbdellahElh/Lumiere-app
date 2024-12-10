@@ -5,10 +5,9 @@ import com.example.riseandroid.data.entitys.CinemaEntity
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.ResponseCinema
 import com.example.riseandroid.network.ResponseMovie
-import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asResponse
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +17,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
-    suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
+    suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<ResponseMovie>>
     suspend fun getMovieById(id: Int): ResponseMovie
     suspend fun insertMovie(MovieEntity: MovieEntity)
 }
@@ -32,11 +31,11 @@ class MovieRepo(
         selectedDate: String,
         selectedCinemas: List<String>,
         searchTitle: String?
-    ): Flow<List<MovieModel>> {
+    ): Flow<List<ResponseMovie>> {
         val searchTitleWithPercent = if (searchTitle.isNullOrEmpty()) "%" else "%$searchTitle%"
 
         return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas,searchTitleWithPercent)
-            .map { entities -> entities.map(MovieEntity::asDomainModel) }
+            .map { entities -> entities.map(MovieEntity::asResponse) }
             .onStart {
                 withContext(Dispatchers.IO) {
                     refreshMovies(selectedDate, selectedCinemas, searchTitle)
@@ -45,19 +44,30 @@ class MovieRepo(
 
     }
 
+
     override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
-
-        if (movieEntity != null && movieEntity.eventId != null && movieEntity.eventId > 0) {
-            return movieEntity.asResponse()
+        if (movieEntity != null) {
+            val cinemas = movieDao.getCinemasByMovieId(id).map { cinemaEntity ->
+                val showtimes = movieDao.getShowtimesByMovieAndCinema(id, cinemaEntity.id).map { showtimeEntity ->
+                    "${showtimeEntity.showDate}T${showtimeEntity.showTime}"
+                }
+                ResponseCinema(
+                    id = cinemaEntity.id,
+                    name = cinemaEntity.name,
+                    showtimes = showtimes
+                )
+            }
+            return movieEntity.asResponse().copy(cinemas = cinemas)
         }
 
         try {
             val movieApiResponse = movieApi.getMovieById(id)
 
-            val movieFromApi = movieApiResponse.movie
+            val movieFromApi = movieApiResponse
 
             movieDao.insertMovie(movieFromApi.asEntity())
+            saveCinemasAndShowtimes(movieFromApi)
             return movieFromApi
         } catch (e: Exception) {
             Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")

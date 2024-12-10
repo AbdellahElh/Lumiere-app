@@ -1,5 +1,6 @@
 package com.example.riseandroid.fake
 
+import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IMovieRepo
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 class FakeMovieRepo : IMovieRepo {
 
     private val fakeMoviesResponse = listOf(
-        MovieModel(
+        ResponseMovie(
             id = 1,
             title = "Fake Movie1",
             cinemas = emptyList(),
@@ -26,7 +27,7 @@ class FakeMovieRepo : IMovieRepo {
             movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             eventId = 1
         ),
-        MovieModel(
+        ResponseMovie(
             id = 2,
             title = "Fake Movie2",
             cinemas = emptyList(),
@@ -49,7 +50,7 @@ class FakeMovieRepo : IMovieRepo {
         selectedDate: String,
         selectedCinemas: List<String>,
         searchTitle: String?
-    ): Flow<List<MovieModel>> {
+    ): Flow<List<ResponseMovie>> {
         return flow {
             emit(fakeMoviesResponse)
         }
@@ -73,6 +74,10 @@ class FakeMovieRepo : IMovieRepo {
             movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             eventId = 1
         )
+    }
+
+    override suspend fun insertMovie(MovieEntity: MovieEntity) {
+        TODO("Not yet implemented")
     }
 
 

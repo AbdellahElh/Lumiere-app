@@ -53,6 +53,7 @@ import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
 import com.example.riseandroid.ui.screens.movieDetail.NextStepButton
 import com.example.riseandroid.ui.screens.movieDetail.navigateBack
+import com.example.riseandroid.ui.screens.ticket.TicketViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,11 +63,13 @@ fun EventDetailScreen(
     navController: NavController,
     viewModel: EventDetailViewModel = viewModel(factory = EventDetailViewModel.provideFactory(eventId)),
     authViewModel: AuthViewModel,
+    ticketViewModel: TicketViewModel,
     onBackToEvents: () -> Unit
 ) {
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsState()
     val isUserLoggedIn = authState is AuthState.Authenticated
+
 
     when (val uiState = viewModel.eventDetailUiState) {
         is EventDetailUiState.Loading -> LoadingScreen()
@@ -100,9 +103,10 @@ fun EventDetailScreen(
                     containerColor = Color(0xFFE5CB77)
                 ) {
                     BottomSheetContentEvents(
-                        cinemas = event.cinemas,
+                        ticketViewModel = ticketViewModel,
+                        eventId= eventId,
+                        cinemas = event.cinemas ?: emptyList(),
                         context = context,
-                        navController = navController,
                         event = event,
                         onDismiss = { showBottomSheet = false }
                     )
@@ -112,7 +116,6 @@ fun EventDetailScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailContent(
     event: EventModel,

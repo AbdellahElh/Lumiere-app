@@ -25,7 +25,8 @@ class EventListMock {
                         showtimes = listOf("2023-10-01T18:00:00", "2023-10-01T20:00:00")
                     )
                 ),
-                location = "Brugge"
+                location = "Brugge",
+                movies = emptyList()
             )
         )
     }

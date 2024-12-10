@@ -18,7 +18,7 @@ interface MoviesApi {
     suspend fun getMoviePosters(): List<MoviePoster>
 
     @GET("api/Movie/{id}")
-    suspend fun getMovieById(@Path("id") movieId: Int): MovieApiResponseById
+    suspend fun getMovieById(@Path("id") movieId: Int): ResponseMovie
 }
 
 

@@ -41,7 +41,8 @@ class NavigationTest {
                     navController = navController, paddingValues = paddingValues,
                     account = mockAuth0,
                     authViewModel = TODO(),
-                    forgotPasswordViewModel = TODO()
+                    forgotPasswordViewModel = TODO(),
+                    themeViewModel = TODO()
                 )
             }
         }

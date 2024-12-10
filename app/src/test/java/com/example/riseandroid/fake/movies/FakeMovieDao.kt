@@ -40,6 +40,17 @@ class FakeMovieDao:MovieDao {
         return cinemas.find { it.name == name }
     }
 
+    override suspend fun getCinemasByMovieId(movieId: Int): List<CinemaEntity> {
+        return cinemas.find { it.id == movieId }?.let { listOf(it) } ?: emptyList()
+    }
+
+    override suspend fun getShowtimesByMovieAndCinema(
+        movieId: Int,
+        cinemaId: Int
+    ): List<ShowtimeEntity> {
+        return emptyList()
+    }
+
     override fun getFilteredMoviesByCinemaAndDate(
         selectedDate: String,
         selectedCinemas: List<String>,
@@ -56,10 +67,10 @@ class FakeMovieDao:MovieDao {
         MovieEntity(
             id = 1,
             eventId = 101,
-            title = "Fake Movie1",
+            title = "Test Movie",
             genre = "Drama",
             description = "Test Description",
-            duration = 100,
+            duration = 120,
             director = "Director Name",
             videoPlaceholderUrl = "video_placeholder_url",
             coverImageUrl = "cover_url",

@@ -10,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IMovieRepo
 import com.example.riseandroid.util.getTodayDate
@@ -23,7 +22,7 @@ import java.io.IOException
 
 
 sealed interface ProgramUiState {
-    data class Succes(val movieList: StateFlow<List<MovieModel>>) : ProgramUiState
+    data class Succes(val movieList: StateFlow<List<ResponseMovie>>) : ProgramUiState
     object Error : ProgramUiState
     object Loading : ProgramUiState
 }
@@ -36,7 +35,7 @@ class MovieProgramViewModel(
     var programUiState: ProgramUiState by mutableStateOf(ProgramUiState.Loading)
         private set
 
-    private val _movieList = MutableStateFlow<List<MovieModel>>(emptyList())
+    private val _movieList = MutableStateFlow<List<ResponseMovie>>(emptyList())
     val movieList = _movieList.asStateFlow()
 
     private val _selectedDate = MutableStateFlow(getTodayDate())

@@ -19,8 +19,8 @@ class FakeMovieApi : MoviesApi {
         return moviePostersResponse
     }
 
-    override suspend fun getMovieById(movieId: Int): MovieApiResponseById {
-        return MovieApiResponseById(movie = movieResponse)
+    override suspend fun getMovieById(movieId: Int): ResponseMovie {
+        return movieResponse;
     }
 
     private var movieResponse: ResponseMovie = ResponseMovie(

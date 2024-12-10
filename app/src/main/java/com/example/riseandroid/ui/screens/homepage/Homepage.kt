@@ -44,8 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.riseandroid.R
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.homepage.components.CinemaDropdownMenu
 import com.example.riseandroid.ui.screens.homepage.components.EventItem
 import com.example.riseandroid.ui.screens.homepage.components.ListAllMovies
@@ -93,7 +93,7 @@ fun ResultScreen(
     goToMovieDetail: (id: String) -> Unit,
     navController: NavHostController,
     recentMovieList: List<MoviePoster>,
-    allMoviesNonRecent: List<MovieModel>,
+    allMoviesNonRecent: List<ResponseMovie>,
     modifier: Modifier = Modifier,
     homepageViewModel: HomepageViewModel = viewModel(
         factory = HomepageViewModel.Factory
