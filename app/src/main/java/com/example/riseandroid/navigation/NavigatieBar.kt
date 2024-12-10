@@ -41,7 +41,9 @@ fun NavHostWrapper(
         factory = WatchlistViewModelFactory(
             watchlistRepo = application.container.watchlistRepo,
             userManager = application.userManager,
-            application = application
+            application = application,
+            movieDao = application.container.movieDao,
+            movieRepo = application.container.movieRepo,
         )
     )
 

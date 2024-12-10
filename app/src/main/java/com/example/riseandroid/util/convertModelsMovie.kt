@@ -9,7 +9,7 @@ import com.example.riseandroid.network.ResponseMovie
 fun MovieEntity.asExternalModel(): MovieModel {
     return MovieModel(
         id = id,
-        eventId = eventId ?: 0,
+        eventId = eventId,
         title = title,
         coverImageUrl = coverImageUrl,
         genre = genre,
@@ -29,7 +29,7 @@ fun MovieEntity.asExternalModel(): MovieModel {
 fun MovieEntity.asDomainModel(): MovieModel {
     return MovieModel(
         id = id,
-        eventId = eventId ?: 0,
+        eventId = eventId,
         title = title,
         coverImageUrl = coverImageUrl,
         genre = genre,
@@ -49,7 +49,7 @@ fun MovieEntity.asDomainModel(): MovieModel {
 fun MovieEntity.asResponse(): ResponseMovie {
     return ResponseMovie(
         id = id,
-        eventId = eventId ?: 0,
+        eventId = eventId,
         title = title,
         coverImageUrl = coverImageUrl,
         genre = genre,
@@ -87,7 +87,7 @@ fun MovieModel.asEntity(): MovieEntity {
 fun ResponseMovie.asDomainModel(): MovieModel {
     return MovieModel(
         id = id,
-        eventId = eventId ?: 0,
+        eventId = eventId,
         title = title,
         coverImageUrl = coverImageUrl,
         genre = genre,
@@ -107,7 +107,7 @@ fun ResponseMovie.asDomainModel(): MovieModel {
 fun ResponseMovie.asEntity(): MovieEntity {
     return MovieEntity(
         id = id,
-        eventId = eventId ?: 0,
+        eventId = eventId,
         title = title,
         coverImageUrl = coverImageUrl,
         genre = genre,

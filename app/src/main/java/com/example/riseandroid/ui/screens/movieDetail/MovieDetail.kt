@@ -174,7 +174,7 @@ fun MovieDetailContent(
                 MovieDescription(movie, isExpanded) { isExpanded = !isExpanded }
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (movie.eventId != 0) {
+                if (movie.eventId != null && movie.eventId > 0) {
                     Button(
                         onClick = {
                             navController.navigate("eventDetail/${movie.eventId}")

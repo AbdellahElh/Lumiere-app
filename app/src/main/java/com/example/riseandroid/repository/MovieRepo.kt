@@ -10,7 +10,6 @@ import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
-import com.example.riseandroid.util.asExternalModel
 import com.example.riseandroid.util.asResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -44,12 +43,14 @@ class MovieRepo(
             }
 
     }
+
     override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
 
-        if (movieEntity != null) {
+        if (movieEntity != null && movieEntity.eventId != null && movieEntity.eventId > 0) {
             return movieEntity.asResponse()
         }
+
         try {
             val movieApiResponse = movieApi.getMovieById(id)
 
@@ -57,10 +58,9 @@ class MovieRepo(
 
             movieDao.insertMovie(movieFromApi.asEntity())
             return movieFromApi
-
         } catch (e: Exception) {
             Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
-            return ResponseMovie(
+            return movieEntity?.asResponse() ?: ResponseMovie(
                 id = 0,
                 eventId = 0,
                 title = "",
@@ -79,6 +79,7 @@ class MovieRepo(
             )
         }
     }
+
 
     suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>,searchTitle:String?) {
         try {
