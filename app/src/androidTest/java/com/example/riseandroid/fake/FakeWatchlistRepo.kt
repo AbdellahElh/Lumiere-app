@@ -6,7 +6,7 @@ import com.example.riseandroid.repository.IWatchlistRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class FakeWatchlistRepo : IWatchlistRepo {
+open class FakeWatchlistRepo : IWatchlistRepo {
 
     private val fakeMovies = mutableListOf(
         MovieModel(

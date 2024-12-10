@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
+import com.example.riseandroid.repository.IMovieRepo
 import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.util.asEntity
@@ -29,7 +30,7 @@ import java.io.IOException
 
 open class WatchlistViewModel(
     private val watchlistRepo: IWatchlistRepo,
-    private val movieRepo: MovieRepo,
+    private val movieRepo: IMovieRepo,
     private val userManager: UserManager,
     private val context: Context
 ) : ViewModel() {
@@ -162,7 +163,7 @@ open class WatchlistViewModel(
 class WatchlistViewModelFactory(
     private val watchlistRepo: IWatchlistRepo,
     private val userManager: UserManager,
-    private val movieRepo: MovieRepo,
+    private val movieRepo: IMovieRepo,
     private val application: Application
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")

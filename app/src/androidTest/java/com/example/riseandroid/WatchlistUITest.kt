@@ -9,12 +9,14 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
+import com.example.riseandroid.fake.FakeMovieRepo
 import com.example.riseandroid.fake.FakeUserManager
 import com.example.riseandroid.fake.FakeWatchlistRepo
 import com.example.riseandroid.fake.FakeWatchlistViewModel
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IWatchlistRepo
+import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,10 +34,11 @@ class WatchlistUITest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val fakeRepo = FakeWatchlistRepo()
     private val fakeUserManager = FakeUserManager()
+    private val FakeMovieRepo = FakeMovieRepo()
 
     @Test
     fun watchlistScreen_DisplaysMovies_WhenWatchlistIsNotEmpty() {
-        val viewModel = FakeWatchlistViewModel(fakeRepo, fakeUserManager, context)
+        val viewModel = FakeWatchlistViewModel(fakeRepo,FakeMovieRepo, fakeUserManager, context)
 
         composeTestRule.setContent {
             val navController = rememberNavController()
@@ -54,7 +57,7 @@ class WatchlistUITest {
 
     @Test
     fun watchlistScreen_DisplaysEmptyMessage_WhenWatchlistIsEmpty() {
-        val emptyRepo = object : IWatchlistRepo {
+        val emptyRepo = object : FakeWatchlistRepo() {
             override fun getMoviesInWatchlist(userId: Int): Flow<List<MovieModel>> {
                 return flowOf(emptyList())
             }
@@ -64,7 +67,7 @@ class WatchlistUITest {
             override suspend fun syncWatchlistWithBackend(userId: Int) {}
         }
 
-        val viewModel = FakeWatchlistViewModel(emptyRepo, fakeUserManager, context)
+        val viewModel = FakeWatchlistViewModel(emptyRepo,FakeMovieRepo, fakeUserManager, context)
 
         composeTestRule.setContent {
             val navController = rememberNavController()
@@ -83,7 +86,7 @@ class WatchlistUITest {
     @Test
     fun watchlistScreen_NavigatesToMovieDetail_OnMovieClick() {
         var clickedMovieId: Int? = null
-        val viewModel = FakeWatchlistViewModel(fakeRepo, fakeUserManager, context)
+        val viewModel = FakeWatchlistViewModel(fakeRepo,FakeMovieRepo, fakeUserManager, context)
 
         composeTestRule.setContent {
             val navController = rememberNavController()

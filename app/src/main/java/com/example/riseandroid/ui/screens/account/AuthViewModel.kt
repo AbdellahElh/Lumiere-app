@@ -13,6 +13,7 @@ import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.IAuthRepo
+import com.example.riseandroid.repository.IMovieRepo
 import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.ui.screens.signup.SignUpState
@@ -28,7 +29,7 @@ class AuthViewModel(
     private val watchlistRepo: IWatchlistRepo,
     private val userManager: UserManager,
     private val application: Application,
-    private val movieRepo: MovieRepo,
+    private val movieRepo: IMovieRepo,
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
