@@ -10,7 +10,7 @@ import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
-import com.example.riseandroid.util.asExternalModel
+import com.example.riseandroid.util.asResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
     suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
-    suspend fun getMovieById(id: Int): MovieModel
+    suspend fun getMovieById(id: Int): ResponseMovie
 }
 
 class MovieRepo(
@@ -44,34 +44,42 @@ class MovieRepo(
 
     }
 
-    override suspend fun getMovieById(id: Int): MovieModel {
+    override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
-        if (movieEntity != null) {
-            return movieEntity.asDomainModel()
-        }
-        try {
-            val movieFromApi = movieApi.getMovieById(id)
-            movieDao.insertMovie(movieFromApi.asEntity())
 
+        if (movieEntity != null && movieEntity.eventId != null && movieEntity.eventId > 0) {
+            return movieEntity.asResponse()
+        }
+
+        try {
+            val movieApiResponse = movieApi.getMovieById(id)
+
+            val movieFromApi = movieApiResponse.movie
+
+            movieDao.insertMovie(movieFromApi.asEntity())
             return movieFromApi
         } catch (e: Exception) {
             Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
-            return MovieModel(
+            return movieEntity?.asResponse() ?: ResponseMovie(
                 id = 0,
                 eventId = 0,
                 title = "",
                 coverImageUrl = "",
                 genre = "",
-                duration = "",
+                duration = 0,
                 director = "",
                 description = "",
-                video = "",
                 videoPlaceholderUrl = "",
                 cast = emptyList(),
-                cinemas = emptyList()
+                cinemas = emptyList(),
+                releaseDate = "",
+                bannerImageUrl = "",
+                posterImageUrl = "",
+                movieLink = ""
             )
         }
     }
+
 
     suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>,searchTitle:String?) {
         try {
@@ -87,7 +95,7 @@ class MovieRepo(
                 saveCinemasAndShowtimes(movie)
             }
         } catch (e: Exception) {
-            Log.e("MovieRepo", "Error refreshing movies")
+            Log.d("MovieRepo", "Network connection failed")
         }
     }
 
@@ -119,4 +127,3 @@ class MovieRepo(
     }
 
 }
-

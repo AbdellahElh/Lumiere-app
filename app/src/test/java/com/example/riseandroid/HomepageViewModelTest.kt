@@ -7,6 +7,7 @@ import com.example.riseandroid.fake.FakeMovieRepo
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.rules.MainDispatcherRule
 import com.example.riseandroid.ui.screens.homepage.HomepageUiState
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
@@ -36,17 +37,20 @@ class HomepageViewModelTest {
         val fakeMovies = listOf(
             MovieModel(
                 id = 1,
-                eventId = 1,
-                title = "Test Movie 1",
-                coverImageUrl = "https://example.com/poster1.jpg",
-                genre = "Action",
-                duration = "120 min",
-                director = "John Doe",
-                description = "An action-packed adventure.",
-                video = null,
-                videoPlaceholderUrl = null,
-                cast = listOf("Actor 1", "Actor 2"),
-                cinemas = emptyList()
+                title = "Fake Movie1",
+                cinemas = emptyList(),
+                cast = emptyList(),
+                coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
+                genre = "",
+                duration = 100,
+                director = "",
+                description = "",
+                videoPlaceholderUrl = "",
+                releaseDate = "12-12-2021",
+                bannerImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+                posterImageUrl = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+                movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
+                eventId = 1
             )
         )
 

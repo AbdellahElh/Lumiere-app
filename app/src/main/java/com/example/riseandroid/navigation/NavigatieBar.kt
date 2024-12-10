@@ -1,6 +1,5 @@
 package com.example.riseandroid.navigation
 
-import android.app.Application
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -10,7 +9,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,11 +20,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.auth0.android.Auth0
+import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
-import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModel
-import com.example.riseandroid.ui.screens.movieDetail.MoviesViewModelFactory
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModelFactory
 
 
 @Composable
@@ -38,18 +36,23 @@ fun NavHostWrapper(
     forgotPasswordViewModel: ForgotPasswordViewModel,
 ) {
     val context = LocalContext.current
-    val moviesViewModel: MoviesViewModel = viewModel(factory = MoviesViewModelFactory(context.applicationContext as Application))
-    val watchlistViewModel: WatchlistViewModel = viewModel()
+    val application = context.applicationContext as LumiereApplication
+    val watchlistViewModel: WatchlistViewModel = viewModel(
+        factory = WatchlistViewModelFactory(
+            watchlistRepo = application.container.watchlistRepo,
+            userManager = application.userManager,
+            application = application,
+            movieDao = application.container.movieDao,
+            movieRepo = application.container.movieRepo,
+        )
+    )
 
-    val allMovies by moviesViewModel.allMovies.collectAsState()
 
     BottomNavGraph(
         navController = navController,
-        account = account,
         modifier = Modifier.padding(paddingValues),
         authViewModel = authViewModel,
         forgotPasswordViewModel = forgotPasswordViewModel,
-        allMovies = allMovies,
         watchlistViewModel = watchlistViewModel
     )
 }
@@ -61,6 +64,7 @@ fun BottomBar(navController: NavHostController) {
         BottomBarScreen.Home,
 
         BottomBarScreen.Tickets,
+        BottomBarScreen.Watchlist,
         BottomBarScreen.Account
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -98,7 +102,7 @@ fun RowScope.AddItem(
             )
         },
         selected = currentDestination?.hierarchy?.any {
-            it.route == screen.route
+            it.route?.startsWith(screen.route) == true
         } == true,
         colors = NavigationBarItemDefaults.colors(
             indicatorColor = Color.Blue

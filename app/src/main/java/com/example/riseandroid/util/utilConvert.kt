@@ -2,35 +2,16 @@ package com.example.riseandroid.util
 
 import com.example.riseandroid.data.entitys.Cinema
 import com.example.riseandroid.data.entitys.EventEntity
-import com.example.riseandroid.data.entitys.MovieEntity
-import com.example.riseandroid.data.entitys.MoviePosterEntity
 import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.model.EventModel
-import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.model.Tenturncard
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 val gson = Gson()
-
-fun MovieModel.asEntity(): MovieEntity {
-    return MovieEntity(
-        id = id,
-        eventId = eventId ?: 0,
-        title = title,
-        genre = genre ?: "",
-        description = description ?: "",
-        duration = duration ?: "",
-        director = director ?: "",
-        videoPlaceholderUrl = videoPlaceholderUrl,
-        coverImageUrl = coverImageUrl,
-        bannerImageUrl= coverImageUrl,
-        posterImageUrl = coverImageUrl,
-        movieLink = video ?: ""
-    )
-}
 
 fun TenturncardEntity.asExternalModel(): Tenturncard {
     return Tenturncard(
@@ -51,7 +32,7 @@ fun Tenturncard.asEntity(): TenturncardEntity {
         IsActivated = IsActivated?: false,
         ActivationCode = ActivationCode?: "",
 
-    )
+        )
 }
 
 fun EventEntity.asExternalModel(): EventModel {
@@ -141,6 +122,20 @@ fun EventResponse.toEntity(): EventEntity {
         eventLink = eventLink ?: "",
         cinemasJson = cinemasJson,
         location = location ?: ""
+    )
+}
+
+fun MovieWatchlistEntity.asExternalModel(): MovieWatchlistModel {
+    return MovieWatchlistModel(
+        watchlistId = this.watchlistId,
+        movieId = this.movieId
+    )
+}
+
+fun MovieWatchlistModel.asEntity(): MovieWatchlistEntity {
+    return MovieWatchlistEntity(
+        watchlistId = this.watchlistId,
+        movieId = this.movieId
     )
 }
 

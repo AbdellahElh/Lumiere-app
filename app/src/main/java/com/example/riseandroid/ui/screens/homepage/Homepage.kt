@@ -249,12 +249,12 @@ fun LoadingScreen(
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize() // Ensure the box takes up the full screen
+            .fillMaxSize()
     ) {
         Image(
             modifier = Modifier
                 .size(200.dp)
-                .align(Alignment.Center) // Center the image in the Box
+                .align(Alignment.Center)
                 .testTag("LoadingImage"),
             painter = painterResource(R.drawable.loading_img),
             contentDescription = stringResource(R.string.loading)

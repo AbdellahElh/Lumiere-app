@@ -14,6 +14,7 @@ import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IEventRepo
 import com.example.riseandroid.repository.IMoviePosterRepo
 import com.example.riseandroid.repository.IMovieRepo
@@ -21,8 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -47,7 +46,6 @@ class HomepageViewModel(
 
     private val _allMovies = MutableStateFlow<List<MovieModel>>(emptyList())
     val allMovies = _allMovies.asStateFlow()
-
 
     private val _selectedDate = MutableStateFlow(getCurrentDate())
     val selectedDate= _selectedDate.asStateFlow()

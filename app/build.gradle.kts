@@ -47,6 +47,17 @@ android {
         viewBinding = true
         compose = true
     }
+
+
+    packaging {
+        resources {
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE.txt"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/NOTICE.txt"
+            excludes += "/META-INF/LICENSE-notice.md"
+        }
+    }
 }
 
 dependencies {
@@ -73,7 +84,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.espresso.core)
-    implementation(libs.androidx.espresso.core)
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
@@ -82,11 +92,16 @@ dependencies {
     androidTestImplementation(libs.androidx.junit.v115)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.core.testing)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.kotlinx.coroutines.test)
     implementation (libs.coil.compose)
     implementation (libs.androidx.navigation.compose.v253)
+    androidTestImplementation ("junit:junit:4.13.2")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    androidTestImplementation ("io.mockk:mockk-android:1.13.5")
+    androidTestImplementation ("androidx.arch.core:core-testing:2.2.0")
 
     implementation ("com.google.dagger:hilt-android:2.44")
 
@@ -111,4 +126,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.auth0.android:jwtdecode:2.0.0")
+
 }

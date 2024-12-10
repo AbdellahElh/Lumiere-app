@@ -1,7 +1,5 @@
 package com.example.riseandroid.network
 
-import com.example.riseandroid.model.Cinema
-import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -20,22 +18,25 @@ interface MoviesApi {
     suspend fun getMoviePosters(): List<MoviePoster>
 
     @GET("api/Movie/{id}")
-    suspend fun getMovieById(@Path("id") movieId: Int): MovieModel
+    suspend fun getMovieById(@Path("id") movieId: Int): MovieApiResponseById
 }
 
 
 data class ResponseMovie(
     val id: Int,
-    val eventId:Int,
+    val eventId: Int?,
     val title: String,
-    val coverImageUrl: String?,
-    val genre: String?,
-    val duration: String?,
-    val director: String?,
-    val description: String?,
-    val video: String?,
-    val videoPlaceholderUrl: String?,
+    val genre: String,
+    val description: String,
+    val duration: Int,
+    val director: String,
     val cast: List<String> = emptyList(),
+    val releaseDate: String,
+    val videoPlaceholderUrl: String?,
+    val coverImageUrl: String?,
+    val bannerImageUrl: String?,
+    val posterImageUrl: String?,
+    val movieLink: String,
     val cinemas: List<ResponseCinema> = emptyList()
 )
 
@@ -43,4 +44,8 @@ data class ResponseCinema(
     val id:Int,
     val name: String,
     val showtimes: List<String> = emptyList()
+)
+
+data class MovieApiResponseById(
+    val movie: ResponseMovie
 )

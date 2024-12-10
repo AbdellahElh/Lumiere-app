@@ -1,11 +1,15 @@
 package com.example.riseandroid.data
 
+import android.app.Application
 import android.content.Context
+import android.util.Base64
 import android.util.Log
 import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.riseandroid.data.entitys.MovieDao
+import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkProgramRepository
@@ -17,19 +21,24 @@ import com.example.riseandroid.network.LumiereApiService
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.SignUpApi
 import com.example.riseandroid.network.TenturncardApi
+import com.example.riseandroid.network.WatchlistApi
 import com.example.riseandroid.network.auth0.Auth0Api
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.Auth0Repo
 import com.example.riseandroid.repository.EventRepo
 import com.example.riseandroid.repository.IAuthRepo
+import com.example.riseandroid.repository.IWatchlistRepo
 import com.example.riseandroid.repository.MoviePosterRepo
 import com.example.riseandroid.repository.MovieRepo
 import com.example.riseandroid.repository.TenturncardRepository
+import com.example.riseandroid.repository.WatchlistRepo
+import com.example.riseandroid.ui.screens.account.AuthState
+import com.example.riseandroid.ui.screens.account.AuthViewModel
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.runBlocking
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -42,22 +51,31 @@ interface AppContainer {
     val moviesRepository: MoviesRepository
     val authApiService: Auth0Api
     val ticketRepository: TicketRepository
-
     val authRepo: IAuthRepo
-//    val accountRepository: AccountRepository
     val tenturncardRepository : TenturncardRepository
     val eventRepo: EventRepo
+    val userManager: UserManager
+    val authViewModel: AuthViewModel
+    val watchlistRepo: IWatchlistRepo
+    val movieDao: MovieDao
+    val userId: Int
 }
 
-class DefaultAppContainer(private val context: Context) : AppContainer {
+class DefaultAppContainer(private val context: Context,
+                          override val userManager: UserManager
+) : AppContainer {
     private val BASE_URL = "https://dev-viwl48rh7lran3ul.us.auth0.com"
     private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
-    private val movieDao = riseDatabase.movieDao()
+    override val movieDao = riseDatabase.movieDao()
     private val moviePosterDao = riseDatabase.moviePosterDao()
     private val tenturncardDao = riseDatabase.tenturncardDao()
     private val eventDao = riseDatabase.eventDao()
+    private val watchlistDao = riseDatabase.watchlistDao()
+
+
+    private val auth0 = Auth0(context)
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -92,6 +110,12 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         .baseUrl(BASE_URL)
         .build()
 
+    private val authApi: Auth0Api = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(Auth0Api::class.java)
+
 
     private val moviesApi: MoviesApi by lazy {
         retrofitBackend.create(MoviesApi::class.java)
@@ -102,6 +126,14 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
             moviesApi = moviesApi,
             moviePosterDao = moviePosterDao
         )
+    }
+
+    private val watchlistApi: WatchlistApi by lazy {
+        retrofitBackend.create(WatchlistApi::class.java)
+    }
+
+    override val watchlistRepo: IWatchlistRepo by lazy {
+        WatchlistRepo(watchlistDao, watchlistApi)
     }
 
     private val eventsApi: EventsApi by lazy {
@@ -160,14 +192,13 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         retrofit.create(Auth0Api::class.java)
     }
 
-    var auth0: Auth0 = Auth0(context)
     var authentication: AuthenticationAPIClient = AuthenticationAPIClient(auth0)
+    private val authenticationApiClient = AuthenticationAPIClient(auth0)
 
     private val credentialsManager: CredentialsManager by lazy {
         val storage = SharedPreferencesStorage(context)
         CredentialsManager(authentication, storage)
     }
-
 
     override val authRepo: IAuthRepo by lazy {
         Auth0Repo(
@@ -179,8 +210,55 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         )
     }
 
+    override val authViewModel: AuthViewModel = AuthViewModel(
+        authRepo = authRepo,
+        watchlistRepo = watchlistRepo,
+        userManager = userManager,
+        application = context.applicationContext as Application,
+        movieRepo = movieRepo,
+        movieDao = movieDao
+    )
+
+    override val userId: Int
+        get() {
+            val state = authViewModel.authState.value
+            return if (state is AuthState.Authenticated) {
+                val idToken = state.credentials.idToken
+                idToken?.let { token ->
+                    try {
+                        val payload = decodeJWT(token)
+                        val authId = payload?.getString("sub")
+                        val userId = authId?.split("|")?.getOrNull(1)?.toIntOrNull() ?: 0
+                        Log.d("DefaultAppContainer", "userId resolved: $userId")
+                        userId
+                    } catch (e: Exception) {
+                        Log.e("DefaultAppContainer", "Error parsing userId from token", e)
+                        0
+                    }
+                } ?: run {
+                    Log.w("DefaultAppContainer", "idToken is null")
+                    0
+                }
+            } else {
+                Log.d("DefaultAppContainer", "User not authenticated, defaulting userId to 0")
+                0
+            }
+        }
+
+    private fun decodeJWT(jwt: String): JSONObject? {
+        return try {
+            val parts = jwt.split(".")
+            if (parts.size < 2) return null
+            val payload = String(Base64.decode(parts[1], Base64.URL_SAFE))
+            JSONObject(payload)
+        } catch (e: Exception) {
+            null
+        }
+    }
+}
+
+
 //    override val accountRepository : AccountRepository by lazy {
 //        OfflineAccountRepository(Database.getDatabase(context))
 //    }
 
-}

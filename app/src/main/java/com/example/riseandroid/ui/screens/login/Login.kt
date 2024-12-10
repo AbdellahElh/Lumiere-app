@@ -158,7 +158,7 @@ fun LoginScreen(
                 .padding(top = 8.dp)
                 .align(Alignment.CenterHorizontally)
                 .clickable {
-                    navController.navigate("signup")
+                    navController.navigate("account/signup")
                 },
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.primary

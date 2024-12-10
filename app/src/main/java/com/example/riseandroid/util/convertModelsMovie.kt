@@ -6,37 +6,139 @@ import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.ResponseMovie
 
-fun MovieEntity.asDomainModel(): MovieModel {
+fun MovieEntity.asExternalModel(): MovieModel {
     return MovieModel(
         id = id,
-        eventId=eventId,
+        eventId = eventId,
         title = title,
         coverImageUrl = coverImageUrl,
         genre = genre,
         duration = duration,
         director = director,
         description = description,
-        video = movieLink,
+        movieLink = movieLink,
         videoPlaceholderUrl = videoPlaceholderUrl,
         cast = emptyList(),
-        cinemas = emptyList()
+        cinemas = emptyList(),
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl,
+    )
+}
+
+fun MovieEntity.asDomainModel(): MovieModel {
+    return MovieModel(
+        id = id,
+        eventId = eventId,
+        title = title,
+        coverImageUrl = coverImageUrl,
+        genre = genre,
+        duration = duration,
+        director = director,
+        description = description,
+        movieLink = movieLink,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        cast = emptyList(),
+        cinemas = emptyList(),
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl
+    )
+}
+
+fun MovieEntity.asResponse(): ResponseMovie {
+    return ResponseMovie(
+        id = id,
+        eventId = eventId,
+        title = title,
+        coverImageUrl = coverImageUrl,
+        genre = genre,
+        duration = duration,
+        director = director,
+        description = description,
+        movieLink = movieLink,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        cast = emptyList(),
+        cinemas = emptyList(),
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl
+    )
+}
+
+fun MovieModel.asEntity(): MovieEntity {
+    return MovieEntity(
+        id = id,
+        eventId = eventId,
+        title = title,
+        coverImageUrl = coverImageUrl,
+        genre = genre,
+        duration = duration,
+        director = director,
+        description = description,
+        movieLink = movieLink,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl,
+    )
+}
+
+fun ResponseMovie.asDomainModel(): MovieModel {
+    return MovieModel(
+        id = id,
+        eventId = eventId,
+        title = title,
+        coverImageUrl = coverImageUrl,
+        genre = genre,
+        duration = duration,
+        director = director,
+        description = description,
+        movieLink = movieLink,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        cast = emptyList(),
+        cinemas = emptyList(),
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl,
     )
 }
 
 fun ResponseMovie.asEntity(): MovieEntity {
     return MovieEntity(
         id = id,
-        eventId= eventId,
+        eventId = eventId,
         title = title,
-        genre = genre ?: "",
-        description = description ?: "",
-        duration = duration ?: "",
-        director = director ?: "",
-        videoPlaceholderUrl = videoPlaceholderUrl,
         coverImageUrl = coverImageUrl,
-        bannerImageUrl= coverImageUrl,
-        posterImageUrl = coverImageUrl,
-        movieLink = video ?: ""
+        genre = genre,
+        duration = duration,
+        director = director,
+        description = description,
+        movieLink = movieLink,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl,
+    )
+}
+
+fun MovieModel.asResponseModel(): ResponseMovie {
+    return ResponseMovie(
+        id = id,
+        eventId = eventId,
+        title = title,
+        coverImageUrl = coverImageUrl,
+        genre = genre,
+        duration = duration,
+        director = director,
+        description = description,
+        movieLink = movieLink,
+        videoPlaceholderUrl = videoPlaceholderUrl,
+        cast = emptyList(),
+        cinemas = emptyList(),
+        releaseDate = releaseDate,
+        bannerImageUrl = bannerImageUrl,
+        posterImageUrl = posterImageUrl,
     )
 }
 
@@ -55,3 +157,4 @@ fun MoviePoster.asEntity(): MoviePosterEntity {
         releaseDate = releaseDate
     )
 }
+

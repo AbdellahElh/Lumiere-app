@@ -85,7 +85,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
     }
 
     IconButton(
-        onClick = { navController.navigate("login") },
+        onClick = { navController.navigate("account/login") },
         modifier = Modifier.padding(bottom = 20.dp)
     ) {
         Icon(
