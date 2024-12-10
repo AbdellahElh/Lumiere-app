@@ -137,14 +137,12 @@ fun TicketsScreenContent(
                             text = "E-Tickets",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
                         )
                     } else {
                         Text(
                             text = "Beurtenkaarten",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -157,14 +155,12 @@ fun TicketsScreenContent(
                         text = "Instructies",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Kom naar de bioscoop, toon en scan de barcode naar de daarvoor bestemde ruimte. Blijf de gezondheidsprotocollen naleven.",
                         fontSize = 19.sp,
                         fontWeight = FontWeight.Light,
-                        color = Color(0xFFB2B5BB)
                     )
                     Spacer(modifier = Modifier.height(40.dp))
                     if (isEmptyTickets) {
@@ -176,7 +172,6 @@ fun TicketsScreenContent(
                                 text = "Geen Tickets",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color.White,
                             )
                             Box(
                                 modifier = Modifier

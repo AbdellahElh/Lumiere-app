@@ -59,6 +59,7 @@ class MovieRepo(
             }
             return movieEntity.asResponse().copy(cinemas = cinemas)
         }
+
         try {
             val movieApiResponse = movieApi.getMovieById(id)
 
@@ -69,7 +70,7 @@ class MovieRepo(
             return movieFromApi
         } catch (e: Exception) {
             Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
-            return ResponseMovie(
+            return movieEntity?.asResponse() ?: ResponseMovie(
                 id = 0,
                 eventId = 0,
                 title = "",
@@ -88,6 +89,7 @@ class MovieRepo(
             )
         }
     }
+
 
     suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>,searchTitle:String?) {
         try {

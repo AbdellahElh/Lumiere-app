@@ -28,7 +28,7 @@ interface MovieDao {
     @Query("DELETE FROM showtimes WHERE movieId = :movieId")
     suspend fun deleteShowtimesForMovie(movieId: Int)
 
-    @Query("""SELECT DISTINCT movies.id, movies.title, movies.releaseDate, movies.coverImageUrl,genre,description,duration,director,movieLink,cinemaId
+    @Query("""SELECT DISTINCT movies.id, movies.eventId, movies.title, movies.releaseDate, movies.coverImageUrl,genre,description,duration,director,movieLink,cinemaId
         FROM movies
         INNER JOIN showtimes ON movies.id = showtimes.movieId
         INNER JOIN cinemas ON showtimes.cinemaId = cinemas.id """)
@@ -43,7 +43,7 @@ interface MovieDao {
     suspend fun getShowtimesByMovieAndCinema(movieId: Int, cinemaId: Int): List<ShowtimeEntity>
 
     @Query("""
-        SELECT DISTINCT movies.id, movies.title,movies.coverImageUrl, movies.releaseDate, genre,description,duration,director,movieLink
+        SELECT DISTINCT movies.id, movies.eventId, movies.title,movies.coverImageUrl, movies.releaseDate, genre,description,duration,director,movieLink
         FROM movies
         INNER JOIN showtimes ON movies.id = showtimes.movieId
         INNER JOIN cinemas ON showtimes.cinemaId = cinemas.id

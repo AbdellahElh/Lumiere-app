@@ -25,6 +25,7 @@ import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModelFactory
+import com.example.riseandroid.ui.theme.ThemeViewModel
 
 
 @Composable
@@ -34,6 +35,7 @@ fun NavHostWrapper(
     account: Auth0,
     authViewModel: AuthViewModel,
     forgotPasswordViewModel: ForgotPasswordViewModel,
+    themeViewModel: ThemeViewModel
 ) {
     val context = LocalContext.current
     val application = context.applicationContext as LumiereApplication
@@ -41,7 +43,9 @@ fun NavHostWrapper(
         factory = WatchlistViewModelFactory(
             watchlistRepo = application.container.watchlistRepo,
             userManager = application.userManager,
-            application = application
+            application = application,
+            movieDao = application.container.movieDao,
+            movieRepo = application.container.movieRepo,
         )
     )
 
@@ -51,7 +55,8 @@ fun NavHostWrapper(
         modifier = Modifier.padding(paddingValues),
         authViewModel = authViewModel,
         forgotPasswordViewModel = forgotPasswordViewModel,
-        watchlistViewModel = watchlistViewModel
+        watchlistViewModel = watchlistViewModel,
+        themeViewModel = themeViewModel
     )
 }
 

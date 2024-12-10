@@ -144,6 +144,7 @@ fun ResultScreen(
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
+                        TitleText("Binnenkort")
                         LazyRow(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -234,7 +235,7 @@ fun Header() {
         Spacer(modifier = Modifier.weight(1f))
 
         Image(
-            painter = painterResource(id = R.drawable.lumiere_logo),
+            painter = painterResource(id = R.drawable.logo),
             contentDescription = "logo",
             modifier = Modifier.size(100.dp)
         )
@@ -295,7 +296,6 @@ fun TitleText(title: String, modifier: Modifier = Modifier) {
         fontSize = 28.sp,
         //fontFamily = Fontfamily.inter,
         fontWeight = FontWeight.SemiBold,
-        color = Color.White,
         modifier = modifier.padding(16.dp)
     )
 }

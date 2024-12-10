@@ -84,6 +84,16 @@ fun MovieDetailScreen(
         watchlistViewModel.syncWatchlist()
     }
 
+    LaunchedEffect(watchlistViewModel) {
+        watchlistViewModel.eventFlow.collect { event ->
+            when (event) {
+                is WatchlistViewModel.WatchlistEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     val isInWatchlist = remember(watchlistState, movieId) {
         watchlistState.any { it.id == movieId }
     }
@@ -197,7 +207,7 @@ fun MovieDetailContent(
                 MovieDescription(movie, isExpanded) { isExpanded = !isExpanded }
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (movie.eventId != 0) {
+                if (movie.eventId != null && movie.eventId > 0) {
                     Button(
                         onClick = {
                             navController.navigate("eventDetail/${movie.eventId}")
@@ -255,7 +265,7 @@ fun MovieItem(movie: Movie, onClick: () -> Unit) {
         Text(
             text = movie.title,
             fontSize = 16.sp,
-            color = Color.White,
+//            color = Color.White,
             modifier = Modifier.weight(1f)
         )
     }
@@ -289,7 +299,6 @@ fun MovieDetailHeader(
             text = "Details Movie",
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.White,
         )
         Spacer(modifier = Modifier.weight(1f))
 
@@ -303,7 +312,7 @@ fun MovieDetailHeader(
                 if (isSyncing) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = Color.White
+//                        color = Color.White
                     )
                 } else {
                     Image(
@@ -348,7 +357,6 @@ fun MovieInfo(movie: ResponseMovie) {
         text = movie.title,
         fontSize = 28.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White
     )
 
     Spacer(modifier = Modifier.height(10.dp))
@@ -361,7 +369,7 @@ fun MovieInfo(movie: ResponseMovie) {
             text = "Directeur: ${movie.director.orEmpty()}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
-            color = Color(0xFFBABFC9)
+//            color = Color(0xFFBABFC9)
         )
     }
 
@@ -399,7 +407,6 @@ fun MovieDescription(movie: ResponseMovie, isExpanded: Boolean, onToggleExpand: 
         text = "Beschrijving",
         fontSize = 28.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
         modifier = Modifier.padding(top = 14.dp)
     )
 
@@ -410,7 +417,6 @@ fun MovieDescription(movie: ResponseMovie, isExpanded: Boolean, onToggleExpand: 
         text = if (isExpanded) displayedDescription else "$displayedDescription...",
         fontSize = 15.sp,
         fontWeight = FontWeight.Light,
-        color = Color(0xFF696D74),
         modifier = Modifier.padding(top = 16.dp)
     )
 
