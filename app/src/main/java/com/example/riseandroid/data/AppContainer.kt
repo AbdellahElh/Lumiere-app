@@ -54,7 +54,6 @@ interface AppContainer {
     val userManager: UserManager
     val authViewModel: AuthViewModel
     val watchlistRepo: IWatchlistRepo
-    val movieDao: MovieDao
     val userId: Int
 }
 
@@ -221,7 +220,6 @@ class DefaultAppContainer(private val context: Context,
         userManager = userManager,
         application = context.applicationContext as Application,
         movieRepo = movieRepo,
-        movieDao = movieDao
     )
 
     override val userId: Int
