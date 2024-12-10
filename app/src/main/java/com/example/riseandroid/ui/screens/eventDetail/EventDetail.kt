@@ -15,7 +15,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -158,22 +163,23 @@ fun EventDetailHeader(navController: NavController, onBackClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.btn_back),
-            contentDescription = "Back",
-            modifier = Modifier
-                .size(24.dp)
-                .clickable {
-                    navController.popBackStack()
-                    navController.navigate("homepage?selectedTab=2")
-                }
-        )
+        IconButton(
+            onClick = {
+                navController.popBackStack()
+                navController.navigate("homepage?selectedTab=2")
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBackIosNew,
+                contentDescription = "Back",
+                modifier = Modifier.size(24.dp)
+            )
+        }
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "Event Details",
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.White,
         )
         Spacer(modifier = Modifier.weight(1f))
     }
@@ -207,7 +213,7 @@ fun EventInfo(event: EventModel) {
         text = event.title,
         fontSize = 28.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White
+
     )
 
     Spacer(modifier = Modifier.height(10.dp))
@@ -220,7 +226,6 @@ fun EventInfo(event: EventModel) {
             text = "Genre: ${event.genre}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
-            color = Color(0xFFBABFC9)
         )
     }
 
@@ -233,7 +238,6 @@ fun EventDescription(event: EventModel, isExpanded: Boolean, onToggleExpand: () 
         text = "Beschrijving",
         fontSize = 28.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
         modifier = Modifier.padding(top = 14.dp)
     )
 
@@ -244,16 +248,15 @@ fun EventDescription(event: EventModel, isExpanded: Boolean, onToggleExpand: () 
         text = if (isExpanded) displayedDescription else "$displayedDescription...",
         fontSize = 15.sp,
         fontWeight = FontWeight.Light,
-        color = Color(0xFF696D74),
         modifier = Modifier.padding(top = 16.dp)
     )
 
     if (event.description.length > 100) {
         Text(
             text = if (isExpanded) "Lees Minder" else "Lees Meer",
+            color = Color(0xFF8D7E39),
             fontSize = 15.sp,
             fontWeight = FontWeight.Light,
-            color = Color(0xFFE5CB77),
             modifier = Modifier
                 .clickable { onToggleExpand() }
         )

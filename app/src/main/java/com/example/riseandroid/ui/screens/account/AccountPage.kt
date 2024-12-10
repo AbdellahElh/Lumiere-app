@@ -1,42 +1,32 @@
+// AccountPage.kt
 package com.example.riseandroid.ui.screens.account
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.riseandroid.R
+import com.example.riseandroid.ui.theme.ThemeToggle
+import com.example.riseandroid.ui.theme.ThemeViewModel
 
 @Composable
 fun AccountPage(
     context: Context,
     navController: NavHostController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    themeViewModel: ThemeViewModel // Receive it here
 ) {
+    // Collect the theme state as Compose State
+    val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+
     var notificationsEnabled by remember { mutableStateOf(false) }
 
     val authState by authViewModel.authState.collectAsState()
@@ -44,7 +34,9 @@ fun AccountPage(
 
     LaunchedEffect(authState) {
         if (authState is AuthState.Unauthenticated) {
-            navController.navigate("login")
+            navController.navigate("login") {
+                popUpTo("account") { inclusive = true }
+            }
         }
     }
 
@@ -60,7 +52,6 @@ fun AccountPage(
             style = MaterialTheme.typography.headlineMedium,
             fontSize = 32.sp,
             modifier = Modifier.padding(bottom = 32.dp),
-            color = Color.White
         )
 
         Image(
@@ -71,18 +62,31 @@ fun AccountPage(
                 .padding(bottom = 16.dp)
         )
 
-        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp, color = Color.White)
+        Text(text = email ?: "Geen e-mail beschikbaar", fontSize = 24.sp)
 
         Spacer(modifier = Modifier.weight(1f))
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        // Integrate ThemeToggle with Switch
+        ThemeToggle(
+            isDarkTheme = isDarkTheme,
+            onThemeChange = { isDark ->
+                themeViewModel.toggleTheme(isDark)
+            }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Checkbox(
                 checked = notificationsEnabled,
                 onCheckedChange = { notificationsEnabled = it }
             )
-            Text("Ik wil graag notificaties ontvangen voor nieuwe films en events", color = Color.White)
+            Text("Ik wil graag notificaties ontvangen voor nieuwe films en events")
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -97,6 +101,3 @@ fun AccountPage(
         }
     }
 }
-
-
-

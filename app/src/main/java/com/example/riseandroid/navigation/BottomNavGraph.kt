@@ -40,6 +40,7 @@ import com.example.riseandroid.ui.screens.signup.SignUp
 import com.example.riseandroid.ui.screens.ticket.TicketScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistScreen
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+import com.example.riseandroid.ui.theme.ThemeViewModel
 
 
 @Composable
@@ -49,6 +50,7 @@ fun BottomNavGraph(
     authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory),
     forgotPasswordViewModel: ForgotPasswordViewModel,
     watchlistViewModel: WatchlistViewModel,
+    themeViewModel: ThemeViewModel
 ) {
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsState()
@@ -102,7 +104,8 @@ fun BottomNavGraph(
                 AccountPage(
                     navController = navController,
                     context = context,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+                    themeViewModel = themeViewModel
                 )
             }
         }

@@ -14,10 +14,11 @@ import com.example.riseandroid.navigation.NavHostWrapper
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModelFactory
 import com.example.riseandroid.ui.screens.account.AuthViewModel
+import com.example.riseandroid.ui.theme.ThemeViewModel
 
 
 @Composable
-fun LumiereApp(account: Auth0) {
+fun LumiereApp(account: Auth0, themeViewModel: ThemeViewModel) {
     val navController = rememberNavController()
     val applicationContext = LocalContext.current.applicationContext as Application
     val extras = remember {
@@ -35,9 +36,12 @@ fun LumiereApp(account: Auth0) {
         bottomBar = { BottomBar(navController = navController) }
     ) { paddingValues ->
         NavHostWrapper(
-            navController = navController, paddingValues = paddingValues, account = account,
+            navController = navController,
+            paddingValues = paddingValues,
+            account = account,
             authViewModel = authViewModel,
-            forgotPasswordViewModel = forgotPasswordViewModel
+            forgotPasswordViewModel = forgotPasswordViewModel,
+            themeViewModel = themeViewModel
         )
     }
 }

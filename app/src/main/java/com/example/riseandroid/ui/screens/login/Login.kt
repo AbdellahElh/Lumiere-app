@@ -136,8 +136,7 @@ fun LoginScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
-                    .padding(top = 8.dp)
-                    .border(width = 2.dp, color = Color.White),
+                    .padding(top = 8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White
