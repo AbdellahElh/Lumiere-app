@@ -1,6 +1,5 @@
 package com.example.riseandroid.network
 
-import com.example.riseandroid.data.entitys.tenturncard.TenturncardResponse
 import com.example.riseandroid.model.Tenturncard
 import retrofit2.Call
 import retrofit2.http.Body
@@ -17,5 +16,5 @@ interface TenturncardApi {
     fun addTenturncard(@Path("activationCode") activationCode: String) : Call<Unit>
 
     @POST("/api/tenturncard/edit")
-    suspend fun editTenturncard(@Body toUpdateCard : TenturncardResponse): Call<Unit>
+    fun editTenturncard(@Body toUpdateCard: Tenturncard): Call<Unit>
 }

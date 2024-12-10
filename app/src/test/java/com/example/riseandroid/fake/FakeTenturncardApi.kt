@@ -13,7 +13,7 @@ class FakeTenturncardApi : TenturncardApi {
         TODO("Not yet implemented")
     }
 
-    override suspend fun addTenturncard(activationCode: String): Call<Unit> {
+    override fun addTenturncard(activationCode: String): Call<Unit> {
         return if(activationCode == "testCode") {
             Calls.response(Response.success(Unit))
         }
@@ -22,7 +22,7 @@ class FakeTenturncardApi : TenturncardApi {
         }
     }
 
-    override suspend fun editTenturncard(toUpdateCard: TenturncardResponse): Call<Unit> {
+    override fun editTenturncard(toUpdateCard: Tenturncard): Call<Unit> {
         return if(toUpdateCard.amountLeft == 5) {
             Calls.response(Response.success(Unit))
         }

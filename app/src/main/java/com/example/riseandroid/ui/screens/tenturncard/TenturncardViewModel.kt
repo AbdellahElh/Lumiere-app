@@ -1,4 +1,3 @@
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,15 +8,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.riseandroid.LumiereApplication
-import com.example.riseandroid.model.MovieModel
-import com.example.riseandroid.model.Program
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.ITenturncardRepository
-import com.example.riseandroid.repository.TenturncardRepository
-import com.example.riseandroid.ui.screens.homepage.HomepageUiState
-import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -114,7 +107,7 @@ class TenturncardViewModel(
         }
     }
 
-    fun updateTenturncard(card : Tenturncard) {
+    fun editTenturncard(card : Tenturncard) {
         viewModelScope.launch {
             tenturncardUiState = TenturncardUiState.Loading
             try {

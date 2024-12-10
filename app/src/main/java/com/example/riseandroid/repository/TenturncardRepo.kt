@@ -88,21 +88,21 @@ class TenturncardRepository(
     override suspend fun editTenturncard(toUpdateCard: Tenturncard): Flow<ApiResource<TenturncardResponse>> = flow {
         // Emit the loading state
         emit(ApiResource.Loading())
-        // Grab the card before updating it incease you need to reverse the action
+        // Grab the card before updating it in case you need to reverse the action
         val backupCard = tenturncardDao.getTenturncardById(toUpdateCard.id)
         // Create an entity version
         val cardEntity = toUpdateCard.asEntity()
         cardEntity.UserTenturncardId = getLoggedInUserId()
-        // Create a response version
-        val cardResponse = toUpdateCard.asResponse()
-        cardResponse.UserTenturncardId = getLoggedInUserId()
         try {
             // Update the dao object
             tenturncardDao.updateTenturncard(cardEntity)
             // Send the request to the api
-            val response = tenturncardApi.editTenturncard(cardResponse)
+            val response = tenturncardApi.editTenturncard(toUpdateCard)
             // Emit the correct state based on the api response
-            if (response.awaitResponse().isSuccessful()) {
+            if (response.awaitResponse().isSuccessful) {
+                // Create a response version
+                val cardResponse = toUpdateCard.asResponse()
+                cardResponse.UserTenturncardId = getLoggedInUserId()
                 emit(ApiResource.Success(cardResponse))
             }
             else{
@@ -114,6 +114,7 @@ class TenturncardRepository(
 
         }catch (e : Exception) {
             if (backupCard != null) {
+                emit(ApiResource.Error("Bewerken van kaart gefaald"))
                 tenturncardDao.updateTenturncard(backupCard)
             }
             emit(ApiResource.Error("Bewerken van kaart gefaald"))

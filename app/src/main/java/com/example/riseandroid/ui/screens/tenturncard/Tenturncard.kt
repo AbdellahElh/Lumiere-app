@@ -228,9 +228,15 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
         Button(
             onClick = {
                 if (isEditing) {
-                    viewModel.updateTenturncard(
-                        card.copy(amountLeft = amountLeftState.toIntOrNull() ?: card.amountLeft)
-                    )
+                    var newAmount = amountLeftState.toIntOrNull()
+                    if (newAmount == null) {
+                        Toast.makeText(context, "Nieuwe waarde moet een geldig getal zijn", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        viewModel.editTenturncard(
+                            card.copy(amountLeft = newAmount )
+                        )
+                    }
                 }
                 isEditing = !isEditing // Toggle editing state
             },
@@ -249,6 +255,7 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
             Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
         }
         is TenturncardUiState.Error -> {
+            amountLeftState = card.amountLeft.toString()
             Toast.makeText(context, uiState.message ?: "Er ging iets fout", Toast.LENGTH_SHORT).show()
         }
         else -> Unit // No action for other states
