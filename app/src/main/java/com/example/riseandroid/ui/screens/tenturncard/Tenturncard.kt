@@ -1,5 +1,3 @@
-import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -127,7 +129,6 @@ fun inputActivationCodeField(
 
 @Composable
 fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel) {
-    var isEditing by remember { mutableStateOf(false) }
     Card(
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -138,6 +139,7 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel) {
             .padding(16.dp)
             .height(350.dp)
             .width(250.dp)
+            .verticalScroll(rememberScrollState()) //Allow scrolling to ensure the CardEditor does not disappear beneath the cardItem
 
     ) {
         Column(
@@ -200,24 +202,26 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel) {
 fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
     val context = LocalContext.current
     var isEditing by remember { mutableStateOf(false) }
-    var amountLeft by remember { mutableStateOf(card.amountLeft.toString()) }
+    var amountLeftState by remember { mutableStateOf(card.amountLeft.toString()) }
     val uiState = viewModel.tenturncardUiState
 
 
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         if (!isEditing) {
             Text(
-                text = "$amountLeft",
+                text = "$amountLeftState",
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         } else {
             TextField(
-                value = amountLeft,
-                onValueChange = { amountLeft = it },
+                value = amountLeftState,
+                onValueChange = { amountLeftState = it },
                 modifier = Modifier.fillMaxWidth().testTag("EditTextField"),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -225,7 +229,7 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
             onClick = {
                 if (isEditing) {
                     viewModel.updateTenturncard(
-                        card.copy(amountLeft = amountLeft.toIntOrNull() ?: card.amountLeft)
+                        card.copy(amountLeft = amountLeftState.toIntOrNull() ?: card.amountLeft)
                     )
                 }
                 isEditing = !isEditing // Toggle editing state
