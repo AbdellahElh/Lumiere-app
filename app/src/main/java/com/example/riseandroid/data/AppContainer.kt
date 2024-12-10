@@ -8,6 +8,7 @@ import com.auth0.android.Auth0
 import com.auth0.android.authentication.AuthenticationAPIClient
 import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.data.lumiere.MoviesRepository
 import com.example.riseandroid.data.lumiere.NetworkMoviesRepository
@@ -56,6 +57,7 @@ interface AppContainer {
     val userManager: UserManager
     val authViewModel: AuthViewModel
     val watchlistRepo: IWatchlistRepo
+    val movieDao: MovieDao
     val userId: Int
 }
 
@@ -66,7 +68,7 @@ class DefaultAppContainer(private val context: Context,
     private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
-    private val movieDao = riseDatabase.movieDao()
+    override val movieDao = riseDatabase.movieDao()
     private val moviePosterDao = riseDatabase.moviePosterDao()
     private val tenturncardDao = riseDatabase.tenturncardDao()
     private val eventDao = riseDatabase.eventDao()
@@ -212,7 +214,9 @@ class DefaultAppContainer(private val context: Context,
         authRepo = authRepo,
         watchlistRepo = watchlistRepo,
         userManager = userManager,
-        application = context.applicationContext as Application
+        application = context.applicationContext as Application,
+        movieRepo = movieRepo,
+        movieDao = movieDao
     )
 
     override val userId: Int
