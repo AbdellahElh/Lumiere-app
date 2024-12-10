@@ -65,7 +65,7 @@ class DefaultAppContainer(private val context: Context,
     private val BASE_URL_BACKEND = "https://10.0.2.2:5001/"
 
     private val riseDatabase = RiseDatabase.getDatabase(context)
-    private val movieDao = riseDatabase.movieDao()
+    override val movieDao = riseDatabase.movieDao()
     private val ticketDao = riseDatabase.ticketDao()
     private val moviePosterDao = riseDatabase.moviePosterDao()
     private val tenturncardDao = riseDatabase.tenturncardDao()

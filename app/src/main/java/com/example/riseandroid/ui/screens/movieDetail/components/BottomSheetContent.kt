@@ -165,7 +165,7 @@ fun DropdownMenuWithLabel(
                 .clickable { expanded = true }
                 .padding(8.dp)
         ) {
-            Text(text = selectedOption.ifEmpty { "Selecteer $label" })
+            Text(color = Color.Black, text = selectedOption.ifEmpty { "Selecteer $label" } )
         }
         DropdownMenu(
             expanded = expanded,
