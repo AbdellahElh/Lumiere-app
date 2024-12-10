@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
@@ -31,7 +30,6 @@ import java.io.IOException
 open class WatchlistViewModel(
     private val watchlistRepo: IWatchlistRepo,
     private val movieRepo: MovieRepo,
-    private val movieDao: MovieDao,
     private val userManager: UserManager,
     private val context: Context
 ) : ViewModel() {
@@ -135,7 +133,7 @@ open class WatchlistViewModel(
                         watchlistRepo.addToWatchlist(movie, userId)
 
                         if (existingMovieEntity != null) {
-                            movieDao.insertMovie(existingMovieEntity)
+                            movieRepo.insertMovie(existingMovieEntity)
                         }
                     } catch (e: HttpException) {
                         if (e.code() == 409) {
@@ -164,7 +162,6 @@ open class WatchlistViewModel(
 class WatchlistViewModelFactory(
     private val watchlistRepo: IWatchlistRepo,
     private val userManager: UserManager,
-    private val movieDao: MovieDao,
     private val movieRepo: MovieRepo,
     private val application: Application
 ) : ViewModelProvider.Factory {
@@ -172,7 +169,7 @@ class WatchlistViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WatchlistViewModel::class.java)) {
             return WatchlistViewModel(
-                watchlistRepo, movieRepo, movieDao, userManager, application
+                watchlistRepo, movieRepo, userManager, application
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

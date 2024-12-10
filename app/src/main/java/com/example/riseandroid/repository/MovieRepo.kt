@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 interface IMovieRepo {
     suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
     suspend fun getMovieById(id: Int): ResponseMovie
+    suspend fun insertMovie(MovieEntity: MovieEntity)
 }
 
 class MovieRepo(
@@ -124,6 +125,10 @@ class MovieRepo(
             )
         }
         movieDao.insertShowtimes(showtimeEntities)
+    }
+
+    override suspend fun insertMovie(MovieEntity: MovieEntity) {
+        movieDao.insertMovie(MovieEntity)
     }
 
 }

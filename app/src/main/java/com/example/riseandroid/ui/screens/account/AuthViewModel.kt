@@ -29,7 +29,6 @@ class AuthViewModel(
     private val userManager: UserManager,
     private val application: Application,
     private val movieRepo: MovieRepo,
-    private val movieDao: MovieDao
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
@@ -45,7 +44,7 @@ class AuthViewModel(
     val authToken: StateFlow<String?> get() = _authToken
     private val _watchlistViewModel: WatchlistViewModel by lazy {
         WatchlistViewModelFactory(
-            watchlistRepo, userManager, movieDao, movieRepo, application
+            watchlistRepo, userManager, movieRepo, application
         ).create(WatchlistViewModel::class.java)
     }
 
@@ -132,13 +131,11 @@ class AuthViewModel(
                 val userManager = application.userManager
                 val watchlistRepo = application.container.watchlistRepo
                     ?: throw IllegalStateException("WatchlistRepo not found")
-                val movieDao = application.container.movieDao
                 val movieRepo = application.container.movieRepo
 
                 AuthViewModel(
                     authRepo = authRepo, userManager = userManager,
                     watchlistRepo = watchlistRepo,
-                    movieDao = movieDao,
                     movieRepo = movieRepo,
                     application = application
                 )
