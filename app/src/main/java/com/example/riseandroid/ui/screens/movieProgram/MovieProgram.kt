@@ -61,7 +61,7 @@ fun MovieProgram(
     val programUiState = programViewModel.programUiState
 
     when (programUiState) {
-        is ProgramUiState.Succes -> {
+        is ProgramUiState.Success -> {
             val allMoviesList by programUiState.movieList.collectAsState()
 
           ProgramResult(

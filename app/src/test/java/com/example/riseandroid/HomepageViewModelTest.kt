@@ -7,6 +7,7 @@ import com.example.riseandroid.fake.FakeMovieRepo
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.ResponseMoviePoster
 import com.example.riseandroid.rules.MainDispatcherRule
 import com.example.riseandroid.ui.screens.homepage.HomepageUiState
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
@@ -26,7 +27,7 @@ class HomepageViewModelTest {
     @Test
     fun homepageViewModel_getMoviesAndEvents_verifyHomepageUiStateSuccess() = runTest {
         val fakeMoviePosters = listOf(
-            MoviePoster(
+            ResponseMoviePoster(
                 id = 1,
                 cover = "https://example.com/poster1.jpg",
                 releaseDate = "2023-10-01T00:00:00"
@@ -82,7 +83,7 @@ class HomepageViewModelTest {
 
         val actualState = homepageViewModel.homepageUiState
 
-        if (actualState is HomepageUiState.Succes) {
+        if (actualState is HomepageUiState.Success) {
             Assert.assertEquals(fakeMoviePosters, actualState.recentMovies.value)
             Assert.assertEquals(fakeMovies, actualState.allMovies.value)
             Assert.assertEquals(fakeEvents, actualState.events.value)

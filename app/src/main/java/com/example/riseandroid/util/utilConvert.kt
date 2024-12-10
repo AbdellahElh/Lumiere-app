@@ -26,7 +26,7 @@ fun MovieModel.asEntity(): MovieEntity {
         director = director ?: "",
         videoPlaceholderUrl = videoPlaceholderUrl,
         coverImageUrl = coverImageUrl,
-        bannerImageUrl= coverImageUrl,
+        bannerImageUrl= videoPlaceholderUrl,
         posterImageUrl = coverImageUrl,
         movieLink = video ?: ""
     )

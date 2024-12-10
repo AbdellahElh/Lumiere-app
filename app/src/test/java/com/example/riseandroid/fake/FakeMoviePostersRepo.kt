@@ -1,6 +1,7 @@
 package com.example.riseandroid.fake
 
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.ResponseMoviePoster
 import com.example.riseandroid.repository.IMoviePosterRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

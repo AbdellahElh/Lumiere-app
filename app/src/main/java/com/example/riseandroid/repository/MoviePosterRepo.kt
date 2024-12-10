@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.riseandroid.data.entitys.MoviePosterDao
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.ResponseMoviePoster
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
 import kotlinx.coroutines.Dispatchers
@@ -33,9 +34,9 @@ class MoviePosterRepo(
         try {
             val postersFromApi = moviesApi.getMoviePosters()
             Log.d("MoviePosterRepo", "Fetched ${postersFromApi.size} posters from API")
-            val posterEntities = postersFromApi.map { it.asEntity() }
-            moviePosterDao.insertMoviePosters(posterEntities)
-            Log.d("MoviePosterRepo", "Inserted ${posterEntities.size} posters into the database")
+            val responsePosterEntities = postersFromApi.map { it }
+            moviePosterDao.insertMoviePosters(responsePosterEntities.map{ it.asEntity() })
+            Log.d("MoviePosterRepo", "Inserted ${responsePosterEntities.size} posters into the database")
         } catch (e: Exception) {
             Log.e("MoviePosterRepo", "Error refreshing movie posters: ${e.message}", e)
         }

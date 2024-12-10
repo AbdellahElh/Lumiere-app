@@ -26,7 +26,7 @@ import java.io.IOException
 
 
 sealed interface ProgramUiState {
-    data class Succes(val movieList: StateFlow<List<MovieModel>>) : ProgramUiState
+    data class Success(val movieList: StateFlow<List<MovieModel>>) : ProgramUiState
     object Error : ProgramUiState
     object Loading : ProgramUiState
 }
@@ -88,7 +88,7 @@ class MovieProgramViewModel(
             movieRepo.getAllMoviesList(selectedDate.value, cinemas,searchTitle.value)
                 .collect { movies ->
                     _movieList.value = movies
-                    programUiState = ProgramUiState.Succes(
+                    programUiState = ProgramUiState.Success(
                         movieList = _movieList,)
                 }
         }

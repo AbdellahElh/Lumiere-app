@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 sealed interface TenturncardUiState {
-    data class Succes(val allTenturncards: StateFlow<List<Tenturncard>>,
+    data class Success(val allTenturncards: StateFlow<List<Tenturncard>>,
 
     ) : TenturncardUiState
     data class Error(val message: String?) : TenturncardUiState
@@ -50,7 +50,7 @@ class TenturncardViewModel(
                 val cards = tenturncardRepository.getTenturncards()
                     .collect { cards ->
                         _tenturncards.value = cards
-                        tenturncardUiState  = TenturncardUiState.Succes(
+                        tenturncardUiState  = TenturncardUiState.Success(
                             allTenturncards = tenturncards
                         )
 
@@ -84,7 +84,7 @@ class TenturncardViewModel(
                                 tenturncardUiState = TenturncardUiState.Loading
                             }
                             is ApiResource.Success -> {
-                                tenturncardUiState = TenturncardUiState.Succes(
+                                tenturncardUiState = TenturncardUiState.Success(
                                     allTenturncards = tenturncards
                                 )
                                 updateInputText("Tienbeurtenkaart succesvol toegevoegd")

@@ -54,4 +54,7 @@ interface MovieDao {
 
     @Query("SELECT * FROM movies WHERE id = :movieId LIMIT 1")
     suspend fun getMovieById(movieId: Int): MovieEntity?
+
+    @Query("SELECT * FROM movies")
+    suspend fun getEveryMovie(): List<MovieEntity>
 }

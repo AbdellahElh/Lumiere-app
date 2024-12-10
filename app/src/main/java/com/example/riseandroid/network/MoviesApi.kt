@@ -16,8 +16,11 @@ interface MoviesApi {
         @Query("title") title:String?
     ):  List<ResponseMovie>
 
+    @GET("api/Movie/all")
+    suspend fun getEveryMovie(): List<ResponseMovie>
+
     @GET("api/Movie/future-posters")
-    suspend fun getMoviePosters(): List<MoviePoster>
+    suspend fun getMoviePosters(): List<ResponseMoviePoster>
 
     @GET("api/Movie/{id}")
     suspend fun getMovieById(@Path("id") movieId: Int): MovieModel
@@ -35,6 +38,9 @@ data class ResponseMovie(
     val description: String?,
     val video: String?,
     val videoPlaceholderUrl: String?,
+    val bannerImageUrl: String?,
+    val posterImageUrl: String?,
+    val movieLink: String?,
     val cast: List<String> = emptyList(),
     val cinemas: List<ResponseCinema> = emptyList()
 )
@@ -43,4 +49,10 @@ data class ResponseCinema(
     val id:Int,
     val name: String,
     val showtimes: List<String> = emptyList()
+)
+
+data class ResponseMoviePoster(
+    val id: Int,
+    val cover: String,
+    val releaseDate: String
 )

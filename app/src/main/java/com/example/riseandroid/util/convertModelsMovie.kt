@@ -5,6 +5,7 @@ import com.example.riseandroid.data.entitys.MoviePosterEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.ResponseMovie
+import com.example.riseandroid.network.ResponseMoviePoster
 
 fun MovieEntity.asDomainModel(): MovieModel {
     return MovieModel(
@@ -27,15 +28,15 @@ fun ResponseMovie.asEntity(): MovieEntity {
     return MovieEntity(
         id = id,
         eventId= eventId,
-        title = title,
+        title = title ?: "",
         genre = genre ?: "",
         description = description ?: "",
         duration = duration ?: "",
         director = director ?: "",
-        videoPlaceholderUrl = videoPlaceholderUrl,
-        coverImageUrl = coverImageUrl,
-        bannerImageUrl= coverImageUrl,
-        posterImageUrl = coverImageUrl,
+        videoPlaceholderUrl = videoPlaceholderUrl ?: "",
+        coverImageUrl = coverImageUrl ?: "",
+        bannerImageUrl= videoPlaceholderUrl ?: "",
+        posterImageUrl = coverImageUrl ?: "",
         movieLink = video ?: ""
     )
 }
@@ -48,7 +49,7 @@ fun MoviePosterEntity.asExternalModel(): MoviePoster {
     )
 }
 
-fun MoviePoster.asEntity(): MoviePosterEntity {
+fun ResponseMoviePoster.asEntity(): MoviePosterEntity {
     return MoviePosterEntity(
         id = id,
         cover = cover,

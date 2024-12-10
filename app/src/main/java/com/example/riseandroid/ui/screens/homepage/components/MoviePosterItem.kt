@@ -1,5 +1,7 @@
 package com.example.riseandroid.ui.screens.homepage.components
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,9 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.example.riseandroid.data.RiseDatabase
+import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.ResponseMoviePoster
+import com.example.riseandroid.repository.MovieRepo
+import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -21,12 +32,18 @@ import java.util.Locale
 fun MoviePosterItem(
     moviePoster: MoviePoster,
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    homepageViewModel: HomepageViewModel = viewModel(factory = HomepageViewModel.Factory),
 ) {
     Column(
         modifier = modifier
             .clickable {
-                navController.navigate("movieDetail/${moviePoster.id}")
+                homepageViewModel.viewModelScope.launch {
+                    val movieId = homepageViewModel.getEveryMovie().first {
+                        it.id == moviePoster.id
+                    }.id
+                    navController.navigate("movieDetail/${movieId}")
+                }
             }
             .padding(8.dp)
     ) {

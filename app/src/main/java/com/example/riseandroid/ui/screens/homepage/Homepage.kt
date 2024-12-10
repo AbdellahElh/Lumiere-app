@@ -46,6 +46,7 @@ import androidx.navigation.NavHostController
 import com.example.riseandroid.R
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
+import com.example.riseandroid.network.ResponseMoviePoster
 import com.example.riseandroid.ui.screens.homepage.components.CinemaDropdownMenu
 import com.example.riseandroid.ui.screens.homepage.components.EventItem
 import com.example.riseandroid.ui.screens.homepage.components.ListAllMovies
@@ -67,7 +68,7 @@ fun Homepage(
     val homepageUiState = homepageViewModel.homepageUiState
 
     when (homepageUiState) {
-        is HomepageUiState.Succes -> {
+        is HomepageUiState.Success -> {
             val recentMovies by homepageViewModel.recentMovies.collectAsState()
             val allMoviesNonRecent by homepageViewModel.allMovies.collectAsState()
 
@@ -293,7 +294,6 @@ fun TitleText(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
         fontSize = 28.sp,
-        //fontFamily = Fontfamily.inter,
         fontWeight = FontWeight.SemiBold,
         color = Color.White,
         modifier = modifier.padding(16.dp)
