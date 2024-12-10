@@ -44,7 +44,6 @@ fun NavHostWrapper(
             watchlistRepo = application.container.watchlistRepo,
             userManager = application.userManager,
             application = application,
-            movieDao = application.container.movieDao,
             movieRepo = application.container.movieRepo,
         )
     )
