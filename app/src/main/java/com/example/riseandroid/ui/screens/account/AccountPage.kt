@@ -12,22 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.riseandroid.R
 import com.example.riseandroid.ui.theme.ThemeToggle
 import com.example.riseandroid.ui.theme.ThemeViewModel
 
-
 @Composable
 fun AccountPage(
     context: Context,
     navController: NavHostController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    themeViewModel: ThemeViewModel // Receive it here
 ) {
-    // Obtain the shared ThemeViewModel scoped to the Activity
-    val themeViewModel: ThemeViewModel = viewModel()
-
     // Collect the theme state as Compose State
     val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
 

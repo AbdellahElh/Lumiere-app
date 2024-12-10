@@ -21,6 +21,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import androidx.activity.viewModels
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
@@ -37,17 +38,16 @@ class MainActivity : ComponentActivity() {
             // Obtain the ThemeViewModel scoped to the Activity
             val themeViewModel: ThemeViewModel = viewModel()
 
-            // Collect the theme state as Compose State
             val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
 
-            // Apply the theme based on the isDarkTheme state
             RiseAndroidTheme(
                 darkTheme = isDarkTheme
             ) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     LumiereApp(
-                        account = appContainer.authRepo.auth0
-                        // No need to pass theme parameters here
+                        account = appContainer.authRepo.auth0,
+                        themeViewModel = themeViewModel
+
                     )
                 }
             }
@@ -60,7 +60,8 @@ class MainActivity : ComponentActivity() {
 fun AppPreview() {
     RiseAndroidTheme(darkTheme = false) {
         LumiereApp(
-            account = Auth0("UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9", "dev-viwl48rh7lran3ul.us.auth0.com")
+            account = Auth0("UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9", "dev-viwl48rh7lran3ul.us.auth0.com"),
+            themeViewModel = ThemeViewModel()
         )
     }
 }
