@@ -5,6 +5,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -46,9 +51,8 @@ class ScannerViewModel(
     private val _scannerState = MutableStateFlow<ScannerState>(ScannerState.Loading)
     val scannerState = _scannerState.asStateFlow()
 
-    private val _actionState = MutableStateFlow<ScannerAction>(ScannerAction.RequestCameraPermission)
-    val actionFlowState = _actionState.asStateFlow()
-
+    var _actionState : ScannerAction by mutableStateOf(ScannerAction.RequestCameraPermission)
+        private set
     // Handle the scan result
     fun onScanResult(contents: String?) {
         if (contents == null) {
@@ -86,9 +90,9 @@ class ScannerViewModel(
     // Handle camera permission check (received from the UI)
     fun checkCameraPermission(isPermissionGranted: Boolean) {
         if (isPermissionGranted) {
-            _actionState.value = ScannerAction.LaunchScanner
+            _actionState = ScannerAction.LaunchScanner
         } else {
-            _actionState.value = ScannerAction.RequestCameraPermission
+            _actionState = ScannerAction.RequestCameraPermission
         }
     }
 
@@ -104,7 +108,7 @@ class ScannerViewModel(
 
     // Trigger scanner launch
     fun launchScanner() {
-        _actionState.value = ScannerAction.LaunchScanner
+        _actionState = ScannerAction.LaunchScanner
     }
 
     companion object {

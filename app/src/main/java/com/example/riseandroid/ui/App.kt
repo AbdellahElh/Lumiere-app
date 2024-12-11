@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.MutableCreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.auth0.android.Auth0
+import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.navigation.BottomBar
 import com.example.riseandroid.navigation.NavHostWrapper
 import com.example.riseandroid.ui.screens.login.ForgotPasswordViewModel
@@ -17,9 +18,10 @@ import com.example.riseandroid.ui.screens.account.AuthViewModel
 
 
 @Composable
-fun LumiereApp(account: Auth0) {
+fun LumiereApp() {
     val navController = rememberNavController()
-    val applicationContext = LocalContext.current.applicationContext as Application
+    val applicationContext = LocalContext.current.applicationContext as LumiereApplication
+    val account: Auth0 = applicationContext.container.authRepo.auth0
     val extras = remember {
         MutableCreationExtras().apply {
             set(AuthViewModel.APPLICATION_KEY, applicationContext)

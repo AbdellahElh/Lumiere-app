@@ -19,31 +19,33 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.riseandroid.ui.screens.scanner.ScannerAction
-import com.example.riseandroid.ui.screens.scanner.ScannerState
 import com.example.riseandroid.ui.screens.scanner.ScannerViewModel
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import com.journeyapps.barcodescanner.ScanOptions
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var appContainer: AppContainer
-    private val scannerViewModel: ScannerViewModel by viewModels (factoryProducer = { ScannerViewModel.Factory })
+    //private lateinit var appContainer: AppContainer
+    private val scannerViewModel: ScannerViewModel by viewModels(factoryProducer = { ScannerViewModel.Factory })
 
-    private val scanLauncher = registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
-        scannerViewModel.onScanResult(result.contents)
-    }
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-        scannerViewModel.checkCameraPermission(false)
-    }
+    private val scanLauncher =
+        registerForActivityResult(ScanContract()) { result: ScanIntentResult ->
+            scannerViewModel.onScanResult(result.contents)
+        }
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            scannerViewModel.checkCameraPermission(false)
+        }
 
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -59,7 +61,7 @@ class MainActivity : ComponentActivity() {
     private fun initializeApp() {
         createNotificationChannel(this)
         enableEdgeToEdge()
-        appContainer = (application as LumiereApplication).container
+        //appContainer = (application as LumiereApplication).container
     }
 
 
@@ -68,29 +70,23 @@ class MainActivity : ComponentActivity() {
     private fun MainContent() {
         RiseAndroidTheme {
             Scaffold(modifier = Modifier.fillMaxSize()) {
-                LumiereApp(account = appContainer.authRepo.auth0)
-            }
-        }
-        observeScannerActions()
-    }
+                val scannerActionState = scannerViewModel._actionState
 
-    private fun observeScannerActions() {
-        lifecycleScope.launch {
-            scannerViewModel.actionFlowState.collect { action ->
-                when (action) {
+                when (scannerActionState) {
                     ScannerAction.RequestCameraPermission -> {
                         requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
                     }
+
                     ScannerAction.LaunchScanner -> {
                         println("Launch scanner")
                         launchScanner()
                     }
                 }
+
+                LumiereApp()
             }
         }
     }
-
-
 
 
     fun launchScanner() {
@@ -114,7 +110,9 @@ class MainActivity : ComponentActivity() {
 fun AppPreview() {
     RiseAndroidTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            LumiereApp(account = Auth0("UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9", "dev-viwl48rh7lran3ul.us.auth0.com"))
+            LumiereApp(
+
+            )
         }
     }
 }
@@ -130,7 +128,8 @@ private fun createNotificationChannel(context: Context) {
         }
 
         // Get the NotificationManager from the provided context
-        val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 }
