@@ -1,5 +1,7 @@
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.model.Tenturncard
-
+import com.example.riseandroid.ui.screens.ticket.generateQRCode
 
 
 @Composable
@@ -69,7 +72,9 @@ fun TenturncardScreen(
                         .padding(16.dp)
                 ) {
                     items(cards) { card ->
-                        TenturnCardItem(card, viewModel = tenTurnCardViewModel)
+                        TenturnCardItem(card, viewModel = tenTurnCardViewModel,  onQrCodeClick = { cardActivationCode ->
+                            tenTurnCardViewModel.updateCardById(cardActivationCode)
+                        })
                     }
                 }
             }
@@ -128,7 +133,7 @@ fun inputActivationCodeField(
 }
 
 @Composable
-fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel) {
+fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeClick: (String) -> Unit) {
     Card(
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -156,7 +161,23 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel) {
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // QR Code Section
+            val qrData = "ID: ${card.id} Set AANTALBEURTENOVER -=1"
+            val qrCodeBitmap = generateQRCode(qrData)
+            if (qrCodeBitmap != null) {
+                Image(
+                    bitmap = qrCodeBitmap.asImageBitmap(),
+                    contentDescription = "QR Code",
+                    modifier = Modifier
+                        .height(100.dp)
+                        .width(100.dp)
+                        .clickable { onQrCodeClick(card.ActivationCode) }
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "Vervaldatum:",
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),

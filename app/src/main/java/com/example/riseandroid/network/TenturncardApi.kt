@@ -11,11 +11,14 @@ import retrofit2.http.Path
 interface TenturncardApi {
 
     @GET("/api/tenturncard")
-    suspend fun getTenturncards(): List<Tenturncard>
+    suspend fun getTenturncards(): List<TenturncardResponse>
 
     @POST("/api/tenturncard/add/{activationCode}")
     fun addTenturncard(@Path("activationCode") activationCode: String) : Call<Unit>
 
     @POST("/api/tenturncard/edit")
     fun editTenturncard(@Body toUpdateCard: TenturncardResponse): Call<Unit>
+
+    @POST("/api/Tenturncard/update/{activationCode}")
+    fun updateTenturncard(@Path("activationCode") activationCode : String) : Call<Unit>
 }

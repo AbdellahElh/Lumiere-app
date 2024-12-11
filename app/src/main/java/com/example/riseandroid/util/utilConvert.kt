@@ -6,6 +6,8 @@ import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardResponse
+
 import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.EventModel
@@ -21,11 +23,22 @@ fun TenturncardEntity.asExternalModel(): Tenturncard {
     return Tenturncard(
         id = id,
         amountLeft = amountLeft,
-        purchaseDate = purchaseDate?: "",
-        expirationDate = expirationDate?:"",
-        IsActivated = IsActivated?: false,
-        ActivationCode = ActivationCode?: "",
+        purchaseDate = purchaseDate ?: "",
+        expirationDate = expirationDate ?: "",
+        IsActivated = IsActivated ?: false,
+        ActivationCode = ActivationCode ?: "",
     )
+}
+fun TenturncardResponse.asEntity(): TenturncardEntity {
+    return TenturncardEntity(
+        id = id,
+        amountLeft = amountLeft,
+        purchaseDate = purchaseDate,
+        expirationDate = expirationDate,
+        IsActivated = isActivated?: false,
+        ActivationCode = activationCode?: "",
+
+        )
 }
 fun Tenturncard.asEntity(): TenturncardEntity {
     return TenturncardEntity(
@@ -38,6 +51,7 @@ fun Tenturncard.asEntity(): TenturncardEntity {
 
         )
 }
+
 fun TicketEntity.asExternalModel(): Ticket {
     return Ticket(
         id = id,
@@ -50,7 +64,7 @@ fun TicketEntity.asExternalModel(): Ticket {
         movie = movie,
         event = event
 
-        )
+    )
 }
 
 fun Ticket.asEntity(): TicketEntity {
@@ -208,4 +222,3 @@ fun MovieWatchlistModel.asEntity(): MovieWatchlistEntity {
         movieId = this.movieId
     )
 }
-
