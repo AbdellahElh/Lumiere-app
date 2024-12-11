@@ -12,6 +12,7 @@ import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.model.Ticket
+import com.example.riseandroid.network.ResponseTenturncard
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
