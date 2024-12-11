@@ -161,21 +161,7 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeC
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            Spacer(modifier = Modifier.height(20.dp))
 
-            // QR Code Section
-            val qrData = "ID: ${card.id} Set AANTALBEURTENOVER -=1"
-            val qrCodeBitmap = generateQRCode(qrData)
-            if (qrCodeBitmap != null) {
-                Image(
-                    bitmap = qrCodeBitmap.asImageBitmap(),
-                    contentDescription = "QR Code",
-                    modifier = Modifier
-                        .height(100.dp)
-                        .width(100.dp)
-                        .clickable { onQrCodeClick(card.ActivationCode) }
-                )
-            }
 
             Spacer(modifier = Modifier.height(20.dp))
                 Text(
@@ -214,13 +200,13 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeC
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            CardEditor(card, viewModel)
+            CardEditor(card, viewModel,onQrCodeClick)
         }
     }
 }
 
 @Composable
-fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
+fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeClick: (String) -> Unit) {
     val context = LocalContext.current
     var isEditing by remember { mutableStateOf(false) }
     var amountLeftState by remember { mutableStateOf(card.amountLeft.toString()) }
@@ -248,7 +234,21 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
             )
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // QR Code Section
+        val qrData = "ID: ${card.id} Set AANTALBEURTENOVER -=1"
+        val qrCodeBitmap = generateQRCode(qrData)
+        if (qrCodeBitmap != null) {
+            Image(
+                bitmap = qrCodeBitmap.asImageBitmap(),
+                contentDescription = "QR Code",
+                modifier = Modifier
+                    .height(100.dp)
+                    .width(100.dp)
+                    .clickable { onQrCodeClick(card.ActivationCode) }
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(

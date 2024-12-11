@@ -107,7 +107,7 @@ class TenturncardRepository(
 
                 tenturncardDao.updateTenturncard(
                     existingCard.ActivationCode,
-                    amountLeft = existingCard.amountLeft
+                    amountLeft = (existingCard.amountLeft -1)
                 )
 
                 emit(ApiResource.Success(existingCard))

@@ -24,7 +24,7 @@ interface TenturncardDao {
     suspend fun addTenturncard(card : TenturncardEntity)
 
 
-    @Query("UPDATE tenturncards SET amountLeft = (:amountLeft -1) WHERE ActivationCode = :ActivationCode")
+    @Query("UPDATE tenturncards SET amountLeft = :amountLeft  WHERE ActivationCode = :ActivationCode")
     suspend fun updateTenturncard(ActivationCode:  String , amountLeft: Int)
 
     @Delete
