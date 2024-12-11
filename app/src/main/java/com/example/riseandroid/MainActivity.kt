@@ -26,14 +26,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
 class MainActivity : ComponentActivity() {
-    private lateinit var appContainer: AppContainer
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         createNotificationChannel(this)
         enableEdgeToEdge()
-        appContainer = (application as LumiereApplication).container
         setContent {
             // Obtain the ThemeViewModel scoped to the Activity
             val themeViewModel: ThemeViewModel = viewModel()
@@ -45,7 +43,6 @@ class MainActivity : ComponentActivity() {
             ) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     LumiereApp(
-                        account = appContainer.authRepo.auth0,
                         themeViewModel = themeViewModel
 
                     )
@@ -60,7 +57,6 @@ class MainActivity : ComponentActivity() {
 fun AppPreview() {
     RiseAndroidTheme(darkTheme = false) {
         LumiereApp(
-            account = Auth0("UVn7L1s6FcWogUb9Y8gLm9HoJQzS5xK9", "dev-viwl48rh7lran3ul.us.auth0.com"),
             themeViewModel = ThemeViewModel()
         )
     }

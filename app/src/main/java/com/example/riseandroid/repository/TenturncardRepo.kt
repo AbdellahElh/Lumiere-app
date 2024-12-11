@@ -17,6 +17,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
+import org.json.JSONException
+import org.json.JSONObject
+import retrofit2.Response
 import retrofit2.awaitResponse
 
 class TenturncardRepository(
@@ -86,8 +89,6 @@ class TenturncardRepository(
         }.flowOn(Dispatchers.IO)
 
     override suspend fun editTenturncard(toUpdateCard: Tenturncard): Flow<ApiResource<TenturncardResponse>> = flow {
-        // Emit the loading state
-        emit(ApiResource.Loading())
         // Grab the card before updating it in case you need to reverse the action
         val backupCard = tenturncardDao.getTenturncardById(toUpdateCard.id)
         // Create an entity version
@@ -96,28 +97,45 @@ class TenturncardRepository(
         // Create a response version
         val cardResponse = toUpdateCard.asResponse()
         cardResponse.accountId = getLoggedInUserId()
+        // Emit the loading state
+        emit(ApiResource.Loading())
         try {
             // Update the dao object
             tenturncardDao.updateTenturncard(cardEntity)
             // Send the request to the api
-            val response = tenturncardApi.editTenturncard(cardResponse)
+            val response = tenturncardApi.editTenturncard(cardResponse).awaitResponse()
             // Emit the correct state based on the api response
-            if (response.awaitResponse().isSuccessful) {
+            if (response.isSuccessful) {
                 emit(ApiResource.Success(cardResponse))
             }
             else{
-                emit(ApiResource.Error("Bewerken van kaart gefaald"))
+                emit(ApiResource.Error(getErrorMessage(response)?: "Bewerken van kaart gefaald"))
                 if (backupCard != null) {
                     tenturncardDao.updateTenturncard(backupCard)
                 }
             }
 
         }catch (e : Exception) {
+            emit(ApiResource.Error(e.message ?: "Bewerken van kaart gefaald"))
             if (backupCard != null) {
-                emit(ApiResource.Error("Bewerken van kaart gefaald"))
                 tenturncardDao.updateTenturncard(backupCard)
             }
-            emit(ApiResource.Error("Bewerken van kaart gefaald"))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    private fun getErrorMessage(response : Response<Unit>): String? {
+        val errorBody = response.errorBody()
+        if (errorBody != null) {
+            val errorBodyString = errorBody.string() // Convert the error body to a string
+            try {
+                val jsonObject = JSONObject(errorBodyString)
+                val message = jsonObject.getString("Message") // Extract the "Message" field
+                return message
+            } catch (e: JSONException) {
+                return null
+            }
+        } else {
+            return null
         }
     }
 

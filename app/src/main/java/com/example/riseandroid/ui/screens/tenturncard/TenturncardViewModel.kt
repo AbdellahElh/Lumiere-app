@@ -24,6 +24,8 @@ sealed interface TenturncardUiState {
     data class Error(val message: String?) : TenturncardUiState
     object Loading : TenturncardUiState
     data class EditSucces(val message : String?) : TenturncardUiState
+    data class ShowToast(val message : String?) : TenturncardUiState
+
 }
 
 class TenturncardViewModel(
@@ -32,6 +34,8 @@ class TenturncardViewModel(
 ) : ViewModel() {
     var tenturncardUiState: TenturncardUiState by mutableStateOf(TenturncardUiState.Loading)
         private set
+
+    var mutableToastMessage by mutableStateOf("")
 
     private val _tenturncards = MutableStateFlow<List<Tenturncard>>(emptyList())
     val tenturncards = _tenturncards.asStateFlow()
@@ -108,26 +112,33 @@ class TenturncardViewModel(
     }
 
     fun editTenturncard(card : Tenturncard) {
+        clearToast()
         viewModelScope.launch {
-            tenturncardUiState = TenturncardUiState.Loading
             try {
                 tenturncardRepository.editTenturncard(card).collect {
                     resource ->
                     when(resource) {
                         is ApiResource.Error -> {
-                            tenturncardUiState = TenturncardUiState.Error(resource.message ?: "Er ging iets fout")
+                            mutableToastMessage = resource.message ?: "Er ging iets fout"
+                            //fetchTenturncards()
                         }
                         is ApiResource.Initial -> null
                         is ApiResource.Loading -> null
                         is ApiResource.Success -> {
-                            tenturncardUiState = TenturncardUiState.EditSucces("Kaart succesvol aangepast")
+                            tenturncardUiState = TenturncardUiState.ShowToast("Kaart succesvol aangepast")
+                            //fetchTenturncards()
                         }
                     }
                 }
             }catch (e : Exception) {
-                tenturncardUiState = TenturncardUiState.Error(e.message ?: "Er ging iets fout")
+                tenturncardUiState = TenturncardUiState.ShowToast(e.message ?: "Er ging iets fout")
             }
         }
+    }
+
+    fun clearToast() {
+        mutableToastMessage = ""
+        tenturncardUiState = TenturncardUiState.Loading
     }
 
 

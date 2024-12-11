@@ -206,10 +206,13 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
     val uiState = viewModel.tenturncardUiState
 
 
-    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)) {
         if (!isEditing) {
             Text(
                 text = "$amountLeftState",
+                modifier = Modifier.align(Alignment.CenterHorizontally),
                 style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -217,7 +220,9 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
             TextField(
                 value = amountLeftState,
                 onValueChange = { amountLeftState = it },
-                modifier = Modifier.fillMaxWidth().testTag("EditTextField"),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("EditTextField"),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )
         }
@@ -238,9 +243,12 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
                         )
                     }
                 }
+                viewModel.clearToast()
                 isEditing = !isEditing // Toggle editing state
             },
-            modifier = Modifier.fillMaxWidth().testTag("editCardBtn"),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("editCardBtn"),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Text(
@@ -250,15 +258,8 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
         }
     }
     // React to state changes
-    when (uiState) {
-        is TenturncardUiState.EditSucces -> {
-            Toast.makeText(context, uiState.message, Toast.LENGTH_SHORT).show()
-        }
-        is TenturncardUiState.Error -> {
-            amountLeftState = card.amountLeft.toString()
-            Toast.makeText(context, uiState.message ?: "Er ging iets fout", Toast.LENGTH_SHORT).show()
-        }
-        else -> Unit // No action for other states
+    if (!viewModel.mutableToastMessage.isEmpty()) {
+        Toast.makeText(context, viewModel.mutableToastMessage, Toast.LENGTH_SHORT).show()
     }
 }
 
