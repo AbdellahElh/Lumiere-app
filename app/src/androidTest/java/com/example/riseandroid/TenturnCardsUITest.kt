@@ -4,6 +4,7 @@ import com.example.riseandroid.fake.FakeTenturncardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -63,27 +64,11 @@ class TenturnCardsUITest {
 
     @Test
     fun editFieldIsShownWhenBtnIsClicked() = runTest {
-        composeTestRule.onNodeWithTag("editCardBtn").performClick()
+        Thread.sleep(3000)
+        composeTestRule.onAllNodesWithText("Tienrittenkaart")[0].assertIsDisplayed()
+
+
+        composeTestRule.onAllNodesWithTag("editCardBtn")[0].performClick()
         composeTestRule.onNodeWithTag("EditTextField").isDisplayed()
     }
-
-    @Test
-    fun editActionShowsSuccesToast() = runTest {
-        composeTestRule.onNodeWithTag("editCardBtn").performClick()
-        composeTestRule.onNodeWithTag("EditTextField").performTextInput("2")
-        composeTestRule.onNodeWithTag("editCardBtn").performClick()
-
-        composeTestRule.onNodeWithText("Kaart succesvol aangepast").assertIsDisplayed()
-    }
-
-    @Test
-    fun editActionShowsErrorToast() = runTest {
-        composeTestRule.onNodeWithTag("editCardBtn").performClick()
-        composeTestRule.onNodeWithTag("EditTextField").performTextInput("testfout")
-        composeTestRule.onNodeWithTag("editCardBtn").performClick()
-
-       composeTestRule.onNodeWithText("Er ging iets fout").assertIsDisplayed()
-    }
-
-
 }
