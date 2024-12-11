@@ -35,6 +35,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.riseandroid.mockdata.EventListMock
 import com.example.riseandroid.mockdata.MovieListMock
 import com.example.riseandroid.model.EventModel
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.homepage.Header
@@ -130,7 +131,7 @@ fun FakeResultScreen(
     goToMovieDetail: (id: String) -> Unit,
     navController: NavHostController,
     recentMovieList: List<MoviePoster>,
-    allMoviesNonRecent: List<ResponseMovie>,
+    allMoviesNonRecent: List<MovieModel>,
     eventsList: List<EventModel>,
     selectedTab: Int
 ) {

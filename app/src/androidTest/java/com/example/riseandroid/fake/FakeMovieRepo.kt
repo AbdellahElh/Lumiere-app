@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flow
 class FakeMovieRepo : IMovieRepo {
 
     private val fakeMoviesResponse = listOf(
-        ResponseMovie(
+        MovieModel(
             id = 1,
             title = "Fake Movie1",
             cinemas = emptyList(),
@@ -27,7 +27,7 @@ class FakeMovieRepo : IMovieRepo {
             movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             eventId = 1
         ),
-        ResponseMovie(
+        MovieModel(
             id = 2,
             title = "Fake Movie2",
             cinemas = emptyList(),
@@ -50,7 +50,7 @@ class FakeMovieRepo : IMovieRepo {
         selectedDate: String,
         selectedCinemas: List<String>,
         searchTitle: String?
-    ): Flow<List<ResponseMovie>> {
+    ): Flow<List<MovieModel>> {
         return flow {
             emit(fakeMoviesResponse)
         }

@@ -5,9 +5,11 @@ import com.example.riseandroid.data.entitys.CinemaEntity
 import com.example.riseandroid.data.entitys.MovieDao
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.MoviesApi
 import com.example.riseandroid.network.ResponseCinema
 import com.example.riseandroid.network.ResponseMovie
+import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asResponse
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +19,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 
 interface IMovieRepo {
-    suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<ResponseMovie>>
+    suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
     suspend fun getMovieById(id: Int): ResponseMovie
     suspend fun insertMovie(MovieEntity: MovieEntity)
 }
@@ -31,11 +33,11 @@ class MovieRepo(
         selectedDate: String,
         selectedCinemas: List<String>,
         searchTitle: String?
-    ): Flow<List<ResponseMovie>> {
+    ): Flow<List<MovieModel>> {
         val searchTitleWithPercent = if (searchTitle.isNullOrEmpty()) "%" else "%$searchTitle%"
 
         return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas,searchTitleWithPercent)
-            .map { entities -> entities.map(MovieEntity::asResponse) }
+            .map { entities -> entities.map(MovieEntity::asDomainModel) }
             .onStart {
                 withContext(Dispatchers.IO) {
                     refreshMovies(selectedDate, selectedCinemas, searchTitle)
@@ -64,7 +66,8 @@ class MovieRepo(
         try {
             val movieApiResponse = movieApi.getMovieById(id)
 
-            val movieFromApi = movieApiResponse
+            val movieFromApi = movieApiResponse.movie
+            movieDao.insertMovie(movieFromApi.asEntity())
 
             movieDao.insertMovie(movieFromApi.asEntity())
             saveCinemasAndShowtimes(movieFromApi)

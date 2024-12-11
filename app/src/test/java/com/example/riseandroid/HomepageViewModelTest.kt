@@ -5,6 +5,7 @@ import com.example.riseandroid.fake.FakeEventRepo
 import com.example.riseandroid.fake.FakeMoviePosterRepo
 import com.example.riseandroid.fake.FakeMovieRepo
 import com.example.riseandroid.model.EventModel
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.rules.MainDispatcherRule
@@ -34,7 +35,7 @@ class HomepageViewModelTest {
         )
 
         val fakeMovies = listOf(
-            ResponseMovie(
+            MovieModel(
                 id = 1,
                 title = "Fake Movie1",
                 cinemas = emptyList(),

@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
@@ -59,7 +60,7 @@ fun MovieProgram(
 @Composable
 fun ProgramResult(
     programViewModel: MovieProgramViewModel,
-    allMoviesList: List<ResponseMovie>,
+    allMoviesList: List<MovieModel>,
     goToMovieDetail: (id: String) -> Unit,
 ){
     var areFiltersVisible by remember { mutableStateOf(false) }
