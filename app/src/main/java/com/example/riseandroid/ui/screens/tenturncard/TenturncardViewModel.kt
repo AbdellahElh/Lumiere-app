@@ -70,6 +70,34 @@ class TenturncardViewModel(
     fun updateInputText(newText: String) {
         _inputText.value = newText
     }
+    fun updateCardById(cardId: Int) {
+        viewModelScope.launch {
+            tenturncardUiState = TenturncardUiState.Loading
+            try {
+                tenturncardRepository.updateTenturncard(cardId).collect { resource ->
+                    when (resource) {
+                        is ApiResource.Loading -> {
+                            tenturncardUiState = TenturncardUiState.Loading
+                        }
+                        is ApiResource.Success -> {
+                            tenturncardUiState = TenturncardUiState.Succes(
+                                allTenturncards = tenturncards
+                            )
+                            Log.d("TenturncardViewModel", "Kaart succesvol geüpdatet: ${resource.data}")
+                        }
+                        is ApiResource.Error -> {
+                            tenturncardUiState = TenturncardUiState.Error(resource.message)
+                            Log.e("TenturncardViewModel", "Fout bij updaten kaart: ${resource.message}")
+                        }
+                        else -> {}
+                    }
+                }
+            } catch (e: Exception) {
+                tenturncardUiState = TenturncardUiState.Error(e.message)
+                Log.e("TenturncardViewModel", "Onverwachte fout bij updaten kaart", e)
+            }
+        }
+    }
 
     fun submitActivationCode(
         activationCode: String) {

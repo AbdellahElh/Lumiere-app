@@ -1,5 +1,7 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +39,7 @@ import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.HomepageViewModel
+import com.example.riseandroid.ui.screens.ticket.generateQRCode
 import java.util.prefs.NodeChangeEvent
 
 @Composable
@@ -63,7 +67,12 @@ fun TenturncardScreen(
                     modifier = Modifier.fillMaxSize().padding(16.dp)
                 ) {
                     items(cards) { card ->
-                        TenturnCardItem(card)
+                        TenturnCardItem(
+                            card = card,
+                            onQrCodeClick = { cardId ->
+                                tenTurnCardViewModel.updateCardById(cardId)
+                            }
+                        )
                     }
                 }
             }
@@ -120,9 +129,8 @@ fun inputActivationCodeField(
         }
     }
 }
-
 @Composable
-fun TenturnCardItem(card: Tenturncard) {
+fun TenturnCardItem(card: Tenturncard,onQrCodeClick: (Int) -> Unit) {
     Card(
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -131,67 +139,63 @@ fun TenturnCardItem(card: Tenturncard) {
         elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
             .padding(16.dp)
-            .height(350.dp)
+            .height(400.dp) // Extra hoogte voor de QR-code
             .width(250.dp)
-
     ) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxSize()
-            ,
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            Text(
+                text = "Tienrittenkaart",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.height(20.dp))
 
-                Text(
-                    text = "Tienrittenkaart",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Vervaldatum:",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = if (card.expirationDate == "") {
-                        "-"
-                    } else {
-                        formatDate(card.expirationDate)
-                    },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Aankoopdatum:",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = if (card.purchaseDate == "") {
-                        "-"
-                    } else {
-                        formatDate(card.purchaseDate)
-                    },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            Text(
+                text = "Vervaldatum:",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Text(
+                text = if (card.expirationDate.isEmpty()) "-" else formatDate(card.expirationDate),
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.height(20.dp))
 
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Beurten over:",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = "${card.amountLeft}",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            Text(
+                text = "Beurten over:",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Text(
+                text = "${card.amountLeft}",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
 
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // QR Code Section
+            val qrData = "ID: ${card.id} Set AANTALBEURTENOVER -=1"
+            val qrCodeBitmap = generateQRCode(qrData)
+            if (qrCodeBitmap != null) {
+                Image(
+                    bitmap = qrCodeBitmap.asImageBitmap(),
+                    contentDescription = "QR Code",
+                    modifier = Modifier
+                        .height(100.dp)
+                        .width(100.dp)
+                        .clickable { onQrCodeClick(card.id) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = { /* Voeg functionaliteit toe voor bewerken */ },
@@ -206,3 +210,5 @@ fun TenturnCardItem(card: Tenturncard) {
         }
     }
 }
+
+

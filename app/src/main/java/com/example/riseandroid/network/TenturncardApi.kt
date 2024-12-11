@@ -5,6 +5,7 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface TenturncardApi {
@@ -14,4 +15,7 @@ interface TenturncardApi {
 
     @POST("/api/tenturncard/add/{activationCode}")
     fun addTenturncard(@Path("activationCode") activationCode: String) : Call<Unit>
+
+    @PUT("/api/Tenturncard/update/{id}")
+    fun updateTenturncard(@Path("id") id : Int) : Call<Unit>
 }

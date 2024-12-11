@@ -84,6 +84,34 @@ class TenturncardRepository(
             }
         }.flowOn(Dispatchers.IO)
 
+    override fun updateTenturncard(id: Int): Flow<ApiResource<TenturncardEntity>> = flow {
+        emit(ApiResource.Loading())
+
+        try {
+
+            val existingCard = tenturncardDao.getTenturncardById(id)
+
+            if (existingCard == null) {
+                emit(ApiResource.Error("Tenturncard niet gevonden"))
+                return@flow
+            }
+
+
+            val apiResponse = tenturncardApi.updateTenturncard(id).awaitResponse()
+
+            if (apiResponse.isSuccessful) {
+
+                tenturncardDao.updateTenturncard(existingCard)
+
+                emit(ApiResource.Success(existingCard))
+            } else {
+                emit(ApiResource.Error<TenturncardEntity>("API-update mislukt met status: ${apiResponse.code()}"))
+            }
+        } catch (e: Exception) {
+            emit(ApiResource.Error<TenturncardEntity>("Er is een fout opgetreden: ${e.localizedMessage}"))
+        }
+    }.flowOn(Dispatchers.IO)
+
 
     suspend fun getLoggedInUserId(): Int {
         var accountId: Int? = null
