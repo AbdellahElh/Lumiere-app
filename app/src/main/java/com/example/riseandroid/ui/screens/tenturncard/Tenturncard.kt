@@ -260,6 +260,7 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
     // React to state changes
     if (!viewModel.mutableToastMessage.isEmpty()) {
         Toast.makeText(context, viewModel.mutableToastMessage, Toast.LENGTH_SHORT).show()
+        amountLeftState = card.amountLeft.toString()
     }
 }
 
