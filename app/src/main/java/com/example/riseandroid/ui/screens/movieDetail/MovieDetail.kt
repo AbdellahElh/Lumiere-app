@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,7 +55,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.riseandroid.R
 import com.example.riseandroid.model.Movie
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.account.AuthState
@@ -287,6 +288,8 @@ fun MovieDetailHeader(
     onWatchlistClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    val darkYellow = Color(0xFFFFC107)
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -311,24 +314,22 @@ fun MovieDetailHeader(
         Spacer(modifier = Modifier.weight(1f))
 
         if (isUserLoggedIn && isNetworkAvailable) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clickable(enabled = !isSyncing) { onWatchlistClick() },
-                contentAlignment = Alignment.Center
+            IconButton(
+                onClick = {
+                    if (!isSyncing) onWatchlistClick()
+                },
+                enabled = !isSyncing
             ) {
                 if (isSyncing) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-//                        color = Color.White
+                        modifier = Modifier.size(24.dp)
                     )
                 } else {
-                    Image(
-                        painter = painterResource(
-                            id = if (isInWatchlist) R.drawable.btn_bookmark_filled else R.drawable.btn_bookmark_outline
-                        ),
+                    Icon(
+                        imageVector = if (isInWatchlist) Icons.Filled.Star else Icons.Outlined.StarBorder,
                         contentDescription = "Bookmark",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
+                        tint = darkYellow
                     )
                 }
             }
