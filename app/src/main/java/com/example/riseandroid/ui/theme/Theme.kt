@@ -8,8 +8,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.riseandroid.R
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -45,11 +47,18 @@ fun RiseAndroidTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        shapes = Shapes,
-        content = content
+    val customTheme = CustomTheme(
+        logoImg = if (darkTheme) R.drawable.lumiere_logo else R.drawable.lumiere_logo_lightmode
     )
+
+    CompositionLocalProvider(LocalCustomTheme provides customTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            shapes = Shapes,
+            content = content
+        )
+    }
 }
+
 
