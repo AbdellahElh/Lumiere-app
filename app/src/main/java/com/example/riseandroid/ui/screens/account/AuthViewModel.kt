@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
-class AuthViewModel(
+open class AuthViewModel(
     private val authRepo: IAuthRepo,
     private val watchlistRepo: IWatchlistRepo,
     private val userManager: UserManager,
