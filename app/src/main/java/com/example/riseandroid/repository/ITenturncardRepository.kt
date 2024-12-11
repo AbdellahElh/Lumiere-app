@@ -9,4 +9,5 @@ interface ITenturncardRepository {
     suspend fun getTenturncards(): Flow<List<Tenturncard>>
     fun addTenturncard(activationCode : String): Flow<ApiResource<TenturncardEntity>>
     suspend fun editTenturncard(toUpdateCard : Tenturncard) : Flow<ApiResource<TenturncardResponse>>
+    fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>>
 }

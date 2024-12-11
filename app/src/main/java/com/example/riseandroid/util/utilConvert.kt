@@ -6,12 +6,14 @@ import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+
 import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.model.Ticket
+import com.example.riseandroid.network.ResponseTenturncard
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -21,11 +23,22 @@ fun TenturncardEntity.asExternalModel(): Tenturncard {
     return Tenturncard(
         id = id,
         amountLeft = amountLeft,
-        purchaseDate = purchaseDate?: "",
-        expirationDate = expirationDate?:"",
-        IsActivated = IsActivated?: false,
-        ActivationCode = ActivationCode?: "",
+        purchaseDate = purchaseDate ?: "",
+        expirationDate = expirationDate ?: "",
+        IsActivated = IsActivated ?: false,
+        ActivationCode = ActivationCode ?: "",
     )
+}
+fun ResponseTenturncard.asEntity(): TenturncardEntity {
+    return TenturncardEntity(
+        id = id,
+        amountLeft = amountLeft,
+        purchaseDate = purchaseDate,
+        expirationDate = expirationDate,
+        IsActivated = isActivated?: false,
+        ActivationCode = activationCode?: "",
+
+        )
 }
 fun Tenturncard.asEntity(): TenturncardEntity {
     return TenturncardEntity(
@@ -38,6 +51,7 @@ fun Tenturncard.asEntity(): TenturncardEntity {
 
         )
 }
+
 fun TicketEntity.asExternalModel(): Ticket {
     return Ticket(
         id = id,

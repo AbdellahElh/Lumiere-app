@@ -5,6 +5,7 @@ import com.example.riseandroid.data.entitys.tenturncard.TenturncardDao
 import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import com.example.riseandroid.data.entitys.tenturncard.TenturncardResponse
 import com.example.riseandroid.model.Tenturncard
+import com.example.riseandroid.network.ResponseTenturncard
 import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
@@ -87,6 +88,36 @@ class TenturncardRepository(
                 tenturncardDao.deleteTenturncard(newTenturncard)
             }
         }.flowOn(Dispatchers.IO)
+    override fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
+        emit(ApiResource.Loading())
+
+        try {
+
+            val existingCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
+
+            if (existingCard == null) {
+                emit(ApiResource.Error("Tenturncard niet gevonden"))
+                return@flow
+            }
+
+
+            val apiResponse = tenturncardApi.updateTenturncard(activationCode).awaitResponse()
+
+            if (apiResponse.isSuccessful) {
+
+                tenturncardDao.updateTenturncard(
+                    existingCard.ActivationCode,
+                    amountLeft = existingCard.amountLeft
+                )
+
+                emit(ApiResource.Success(existingCard))
+            } else {
+                emit(ApiResource.Error<TenturncardEntity>("API-update mislukt met status: ${apiResponse.code()}"))
+            }
+        } catch (e: Exception) {
+            emit(ApiResource.Error<TenturncardEntity>("Er is een fout opgetreden: ${e.localizedMessage}"))
+        }
+    }.flowOn(Dispatchers.IO)
 
     override suspend fun editTenturncard(toUpdateCard: Tenturncard): Flow<ApiResource<TenturncardResponse>> = flow {
         // Grab the card before updating it in case you need to reverse the action
@@ -101,7 +132,10 @@ class TenturncardRepository(
         emit(ApiResource.Loading())
         try {
             // Update the dao object
-            tenturncardDao.updateTenturncard(cardEntity)
+            tenturncardDao.updateTenturncard(
+                cardEntity.ActivationCode,
+                amountLeft = cardEntity.amountLeft,
+            )
             // Send the request to the api
             val response = tenturncardApi.editTenturncard(cardResponse).awaitResponse()
             // Emit the correct state based on the api response
@@ -111,14 +145,14 @@ class TenturncardRepository(
             else{
                 emit(ApiResource.Error(getErrorMessage(response)?: "Bewerken van kaart gefaald"))
                 if (backupCard != null) {
-                    tenturncardDao.updateTenturncard(backupCard)
+                    tenturncardDao.updateTenturncard(backupCard.ActivationCode,backupCard.amountLeft)
                 }
             }
 
         }catch (e : Exception) {
             emit(ApiResource.Error(e.message ?: "Bewerken van kaart gefaald"))
             if (backupCard != null) {
-                tenturncardDao.updateTenturncard(backupCard)
+                tenturncardDao.updateTenturncard(backupCard.ActivationCode,backupCard.amountLeft)
             }
         }
     }.flowOn(Dispatchers.IO)
