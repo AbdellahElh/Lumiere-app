@@ -29,6 +29,7 @@ auth0="2.+"
 jwtdecode="2.0.0"
 junitKtx = "1.2.1"
 playServicesMlkitBarcodeScanning = "18.3.1"
+runtimeLivedata = "1.7.5"
 zxingAndroidEmbeddedVersion = "4.3.0"
 scanner = "4.3.0"
 
@@ -42,6 +43,7 @@ androidx-camera-video = { module = "androidx.camera:camera-video", version.ref =
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCore" }
 androidx-junit-v115 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-navigation-compose-v253 = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
+androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 core-x-x-x = { module = "com.google.zxing:core.3.4.1" }
 journeyapps-zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbeddedVersion" }

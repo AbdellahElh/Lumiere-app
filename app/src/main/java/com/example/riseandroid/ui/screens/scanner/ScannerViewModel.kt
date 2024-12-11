@@ -51,7 +51,7 @@ class ScannerViewModel(
     private val _scannerState = MutableStateFlow<ScannerState>(ScannerState.Loading)
     val scannerState = _scannerState.asStateFlow()
 
-    var _actionState : ScannerAction by mutableStateOf(ScannerAction.RequestCameraPermission)
+    var _actionState = mutableStateOf<ScannerAction>(ScannerAction.RequestCameraPermission)
         private set
     // Handle the scan result
     fun onScanResult(contents: String?) {
@@ -90,9 +90,9 @@ class ScannerViewModel(
     // Handle camera permission check (received from the UI)
     fun checkCameraPermission(isPermissionGranted: Boolean) {
         if (isPermissionGranted) {
-            _actionState = ScannerAction.LaunchScanner
+            _actionState.value = ScannerAction.LaunchScanner
         } else {
-            _actionState = ScannerAction.RequestCameraPermission
+            _actionState.value = ScannerAction.RequestCameraPermission
         }
     }
 
@@ -108,7 +108,7 @@ class ScannerViewModel(
 
     // Trigger scanner launch
     fun launchScanner() {
-        _actionState = ScannerAction.LaunchScanner
+        _actionState.value = ScannerAction.LaunchScanner
     }
 
     companion object {

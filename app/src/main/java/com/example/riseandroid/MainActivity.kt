@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.ui.screens.scanner.ScannerAction
 import com.example.riseandroid.ui.screens.scanner.ScannerViewModel
 import com.journeyapps.barcodescanner.ScanContract
@@ -67,10 +68,10 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
-    private fun MainContent() {
+    private fun MainContent(scannerViewModel: ScannerViewModel = viewModel(factory = ScannerViewModel.Factory)) {
         RiseAndroidTheme {
             Scaffold(modifier = Modifier.fillMaxSize()) {
-                val scannerActionState = scannerViewModel._actionState
+                val scannerActionState =  scannerViewModel._actionState.value
 
                 when (scannerActionState) {
                     ScannerAction.RequestCameraPermission -> {

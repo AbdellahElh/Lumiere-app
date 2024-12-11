@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     // Kotlin serialization
     implementation(libs.kotlinx.serialization.json)
+    //Live data
+    implementation(libs.androidx.runtime.livedata)
     // Retrofit
     implementation(libs.retrofit)
     // Retrofit with Kotlin serialization Converter
