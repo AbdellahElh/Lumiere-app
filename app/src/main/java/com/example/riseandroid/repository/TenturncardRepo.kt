@@ -5,7 +5,6 @@ import com.example.riseandroid.data.entitys.tenturncard.TenturncardDao
 import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import com.example.riseandroid.data.entitys.tenturncard.TenturncardResponse
 import com.example.riseandroid.model.Tenturncard
-import com.example.riseandroid.network.ResponseTenturncard
 import com.example.riseandroid.network.TenturncardApi
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asExternalModel
@@ -187,6 +186,6 @@ class TenturncardRepository(
                 }
             }
         }
-                return accountId ?: throw IllegalStateException("De gebruiker moet ingelogd zijn")
+        return accountId ?: throw IllegalStateException("De gebruiker moet ingelogd zijn")
     }
 }

@@ -6,6 +6,7 @@ import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardResponse
 
 import com.example.riseandroid.data.response.EventResponse
 import com.example.riseandroid.data.response.TicketResponse
@@ -13,7 +14,6 @@ import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.model.Ticket
-import com.example.riseandroid.network.ResponseTenturncard
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -29,7 +29,7 @@ fun TenturncardEntity.asExternalModel(): Tenturncard {
         ActivationCode = ActivationCode ?: "",
     )
 }
-fun ResponseTenturncard.asEntity(): TenturncardEntity {
+fun TenturncardResponse.asEntity(): TenturncardEntity {
     return TenturncardEntity(
         id = id,
         amountLeft = amountLeft,
@@ -64,7 +64,7 @@ fun TicketEntity.asExternalModel(): Ticket {
         movie = movie,
         event = event
 
-        )
+    )
 }
 
 fun Ticket.asEntity(): TicketEntity {
@@ -222,4 +222,3 @@ fun MovieWatchlistModel.asEntity(): MovieWatchlistEntity {
         movieId = this.movieId
     )
 }
-
