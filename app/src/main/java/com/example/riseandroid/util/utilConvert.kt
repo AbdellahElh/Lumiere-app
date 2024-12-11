@@ -27,14 +27,14 @@ fun TenturncardEntity.asExternalModel(): Tenturncard {
         ActivationCode = ActivationCode?: "",
     )
 }
-fun Tenturncard.asEntity(): TenturncardEntity {
+fun ResponseTenturncard.asEntity(): TenturncardEntity {
     return TenturncardEntity(
         id = id,
         amountLeft = amountLeft,
         purchaseDate = purchaseDate,
         expirationDate = expirationDate,
-        IsActivated = IsActivated?: false,
-        ActivationCode = ActivationCode?: "",
+        IsActivated = isActivated?: false,
+        ActivationCode = activationCode?: "",
 
         )
 }
