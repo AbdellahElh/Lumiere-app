@@ -13,8 +13,8 @@ import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.MoviePosterDao
 import com.example.riseandroid.data.entitys.MoviePosterEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
-import com.example.riseandroid.data.entitys.TenturncardDao
-import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardDao
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.watchlist.WatchlistDao
 import com.example.riseandroid.data.entitys.watchlist.WatchlistEntity

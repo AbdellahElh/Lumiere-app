@@ -2,8 +2,8 @@ package com.example.riseandroid.util
 
 import com.example.riseandroid.data.entitys.Cinema
 import com.example.riseandroid.data.entitys.EventEntity
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import com.example.riseandroid.data.entitys.MovieEntity
-import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.response.EventResponse

@@ -4,6 +4,7 @@ import com.example.riseandroid.fake.FakeTenturncardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -21,15 +22,14 @@ class TenturnCardsUITest {
     fun setup() {
         fakeRepository = FakeTenturncardRepository()
         viewModel = TenturncardViewModel(tenturncardRepository=fakeRepository)
+        composeTestRule.setContent {
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
+        }
     }
 
 
     @Test
     fun testCardsAreDisplayed() = runTest {
-
-        composeTestRule.setContent {
-            TenturncardScreen(tenTurnCardViewModel = viewModel)
-        }
         Thread.sleep(3000)
 
         composeTestRule.onAllNodesWithText("Tienrittenkaart")[0].assertIsDisplayed()
@@ -42,18 +42,12 @@ class TenturnCardsUITest {
 
     @Test
     fun addTenturncardFieldIsDisplayed() = runTest {
-        composeTestRule.setContent {
-            TenturncardScreen(tenTurnCardViewModel = viewModel)
-        }
         composeTestRule.onNodeWithTag("codeInputField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("addBtn").assertIsDisplayed()
     }
 
     @Test
     fun succesMessageIsShown() = runTest {
-        composeTestRule.setContent {
-            TenturncardScreen( tenTurnCardViewModel = viewModel)
-        }
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("succesCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
 
@@ -62,14 +56,19 @@ class TenturnCardsUITest {
 
     @Test
     fun errorMessageIsShown() = runTest {
-        composeTestRule.setContent {
-            TenturncardScreen(tenTurnCardViewModel = viewModel)
-        }
         composeTestRule.onNodeWithTag("codeInputField").performTextInput("errorCode")
         composeTestRule.onNodeWithTag("addBtn").performClick()
 
         composeTestRule.onNodeWithTag("codeInputField").assertTextContains("Deze kaart behoort al tot iemand")
     }
 
+    @Test
+    fun editFieldIsShownWhenBtnIsClicked() = runTest {
+        Thread.sleep(3000)
+        composeTestRule.onAllNodesWithText("Tienrittenkaart")[0].assertIsDisplayed()
 
+
+        composeTestRule.onAllNodesWithTag("editCardBtn")[0].performClick()
+        composeTestRule.onNodeWithTag("EditTextField").isDisplayed()
+    }
 }

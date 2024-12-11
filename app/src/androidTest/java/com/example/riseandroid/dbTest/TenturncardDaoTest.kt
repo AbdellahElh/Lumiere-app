@@ -2,12 +2,12 @@ package com.example.riseandroid.dbTest
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.riseandroid.data.RiseDatabase
-import com.example.riseandroid.data.entitys.TenturncardDao
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardDao
 import org.junit.runner.RunWith
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.example.riseandroid.data.entitys.TenturncardEntity
+import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -24,6 +24,15 @@ class TenturncardDaoTest {
     private var toAddTenturncard = TenturncardEntity(
         id = 1,
         amountLeft = 10,
+        ActivationCode = "activationCode",
+        UserTenturncardId = 1,
+        purchaseDate = null,
+        expirationDate = null
+    )
+
+    private var toUpdateCard = TenturncardEntity(
+        id = 1,
+        amountLeft = 5,
         ActivationCode = "activationCode",
         UserTenturncardId = 1,
         purchaseDate = null,
@@ -54,5 +63,16 @@ class TenturncardDaoTest {
         tenturncardDao.addTenturncard(toAddTenturncard)
         val allTenturncards = tenturncardDao.getAllTenturncards().first()
         assertEquals(allTenturncards.first(), toAddTenturncard)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun daoAdd_editTenturncardToDb() = runBlocking {
+        tenturncardDao.addTenturncard(toAddTenturncard)
+        tenturncardDao.updateTenturncard(toUpdateCard)
+        val updatedCard = tenturncardDao.getTenturncardById(toAddTenturncard.id)
+        if (updatedCard != null) {
+            assertEquals(updatedCard.amountLeft, toUpdateCard.amountLeft)
+        }
     }
 }
