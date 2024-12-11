@@ -19,6 +19,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 
 
 class TenturncardRepositoryTest {
@@ -78,4 +79,68 @@ class TenturncardRepositoryTest {
             assert(emissions[0] is ApiResource.Loading)
             assert(emissions[1] is ApiResource.Error)
         }
+
+
+    @Test
+    fun tenturncardRepository_updateTenturncard_emits_successTest() = runTest {
+        // Prepare the Fake DAO with initial data
+        tenturncardDao.addTenturncard(toAddTenturncard)
+
+        // Execute the code to be tested
+        val flow = tenturncardRepo.updateTenturncard(activationCode)
+
+        // Collect emissions
+        val emissions = flow.toList()
+
+        // Assert
+        assertTrue(emissions[0] is ApiResource.Loading)
+        assertTrue(emissions[1] is ApiResource.Success)
+        val updatedCard = (emissions[1] as ApiResource.Success).data
+        if (updatedCard != null) {
+            assertEquals(toAddTenturncard.id, updatedCard.id)
+        }
+        if (updatedCard != null) {
+            assertEquals(toAddTenturncard.amountLeft, updatedCard.amountLeft)
+        }
+    }
+
+    @Test
+    fun tenturncardRepository_updateTenturncard_emits_errorTest() = runTest {
+        // Execute the code to be tested with an invalid activation code
+        val flow = tenturncardRepo.updateTenturncard("invalidCode")
+
+        // Collect emissions
+        val emissions = flow.toList()
+
+        // Assert
+        assertTrue(emissions[0] is ApiResource.Loading)
+        assertTrue(emissions[1] is ApiResource.Error)
+    }
+
+    @Test
+    fun tenturncardRepository_getTenturncards_emits_successTest() = runTest {
+        // Prepare the Fake DAO with initial data
+        tenturncardDao.addTenturncard(toAddTenturncard)
+
+        // Execute the code to be tested
+        val flow = tenturncardRepo.getTenturncards()
+
+        // Collect emissions
+        val cards = flow.toList()
+
+        // Assert
+        assertEquals(1, cards.size)
+    }
+
+    @Test
+    fun tenturncardRepository_getTenturncards_emits_emptyListTest() = runTest {
+        // Execute the code to be tested when DAO is empty
+        val flow = tenturncardRepo.getTenturncards()
+
+        // Collect emissions
+        val cards = flow.toList()
+
+        // Assert
+        assertTrue(cards.isEmpty())
+    }
 }

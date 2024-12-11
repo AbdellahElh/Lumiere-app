@@ -72,4 +72,17 @@ class TenturnCardsUITest {
     }
 
 
+    @Test
+    fun qrCodeIsDisplayedAndClickable() = runTest {
+        composeTestRule.setContent {
+            TenturncardScreen(tenTurnCardViewModel = viewModel)
+        }
+
+
+        composeTestRule.onNodeWithContentDescription("QR Code")
+            .assertIsDisplayed()
+            .performClick()
+
+
+    }
 }

@@ -61,4 +61,8 @@ class FakeTenturncardRepository : ITenturncardRepository {
             }
         }
     }
+
+    override fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> {
+        TODO("Not yet implemented")
+    }
 }
