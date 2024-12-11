@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import com.example.riseandroid.fake.FakeAuthRepo
+import com.example.riseandroid.fake.FakeMovieRepo
 import com.example.riseandroid.fake.FakeUserManager
 import com.example.riseandroid.fake.FakeWatchlistRepo
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -23,6 +24,7 @@ class SignUpUITest {
     val signUpTestRule = createComposeRule()
     lateinit var navController: TestNavHostController
     lateinit var authViewModel: AuthViewModel
+    
 
     @Before
     fun setup() {
@@ -31,7 +33,8 @@ class SignUpUITest {
             authRepo = FakeAuthRepo(),
             watchlistRepo = FakeWatchlistRepo(),
             userManager = FakeUserManager(),
-            application = ApplicationProvider.getApplicationContext()
+            application = ApplicationProvider.getApplicationContext(),
+            movieRepo = FakeMovieRepo()
         )
     }
 

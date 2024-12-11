@@ -77,12 +77,12 @@ class MovieRepoTest {
 
     private val movieModel = MovieModel(
         id = 1,
-        title = "Fake Movie1",
+        title = "Test Movie",
         cinemas = emptyList(),
         cast = emptyList(),
         coverImageUrl = "https://cdn.atwilltech.com/flowerdatabase/p/perfect-love-bouquet-fresh-flowers-VA00707.425.jpg",
         genre = "",
-        duration = 100,
+        duration = 120,
         director = "",
         description = "",
         videoPlaceholderUrl = "",

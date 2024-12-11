@@ -20,13 +20,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,9 +60,12 @@ import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
+import com.example.riseandroid.ui.screens.movieDetail.components.BottomSheetContent
+import com.example.riseandroid.ui.screens.ticket.TicketViewModel
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
 import com.example.riseandroid.util.isNetworkAvailable
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailScreen(
     movieId: Int,
@@ -64,6 +73,7 @@ fun MovieDetailScreen(
     viewModel: MovieDetailViewModel = viewModel(
         factory = MovieDetailViewModel.provideFactory(movieId)
     ),
+    ticketViewModel: TicketViewModel,
     watchlistViewModel: WatchlistViewModel,
     authViewModel: AuthViewModel,
 ) {
@@ -78,6 +88,16 @@ fun MovieDetailScreen(
         watchlistViewModel.syncWatchlist()
     }
 
+    LaunchedEffect(watchlistViewModel) {
+        watchlistViewModel.eventFlow.collect { event ->
+            when (event) {
+                is WatchlistViewModel.WatchlistEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     val isInWatchlist = remember(watchlistState, movieId) {
         watchlistState.any { it.id == movieId }
     }
@@ -87,6 +107,7 @@ fun MovieDetailScreen(
         is MovieDetailUiState.Error -> ErrorScreen()
         is MovieDetailUiState.Success -> {
             val movie = uiState.specificMovie
+            var showBottomSheet by remember { mutableStateOf(false) }
 
             MovieDetailContent(
                 movie = movie,
@@ -112,8 +133,35 @@ fun MovieDetailScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                } ,
+                onReserveClick = {
+                    if (isUserLoggedIn) {
+                        showBottomSheet = true
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "U moet ingelogd zijn om door te gaan naar de volgende stap",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             )
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = rememberModalBottomSheetState(),
+                    containerColor = Color(0xFFE5CB77)
+                ) {
+                    BottomSheetContent(
+                        ticketViewModel = ticketViewModel,
+                        movieId= movieId,
+                        cinemas = movie.cinemas,
+                        context = context,
+                        movie = movie,
+                        onDismiss = { showBottomSheet = false }
+                    )
+                }
+            }
         }
     }
 }
@@ -121,7 +169,6 @@ fun MovieDetailScreen(
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailContent(
     movie: ResponseMovie,
@@ -130,10 +177,10 @@ fun MovieDetailContent(
     isUserLoggedIn: Boolean,
     isSyncing: Boolean,
     isNetworkAvailable: Boolean,
-    onWatchlistClick: () -> Unit
-) {
+    onWatchlistClick: () -> Unit,
+    onReserveClick: () -> Unit
+    ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var showBottomSheet by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier
@@ -164,7 +211,7 @@ fun MovieDetailContent(
                 MovieDescription(movie, isExpanded) { isExpanded = !isExpanded }
                 Spacer(modifier = Modifier.height(20.dp))
 
-                if (movie.eventId != 0) {
+                if (movie.eventId != null && movie.eventId > 0) {
                     Button(
                         onClick = {
                             navController.navigate("eventDetail/${movie.eventId}")
@@ -189,7 +236,7 @@ fun MovieDetailContent(
                 Spacer(modifier = Modifier.height(20.dp))
                 NextStepButton(
                     isUserLoggedIn = isUserLoggedIn,
-                    onClick = { showBottomSheet = true }
+                    onClick = onReserveClick
                 )
                 Spacer(modifier = Modifier.height(18.dp))
             }
@@ -222,7 +269,7 @@ fun MovieItem(movie: Movie, onClick: () -> Unit) {
         Text(
             text = movie.title,
             fontSize = 16.sp,
-            color = Color.White,
+//            color = Color.White,
             modifier = Modifier.weight(1f)
         )
     }
@@ -244,19 +291,22 @@ fun MovieDetailHeader(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.btn_back),
-            contentDescription = "Back",
-            modifier = Modifier
-                .size(24.dp)
-                .clickable { onBackClick() }
-        )
+        IconButton(
+            onClick = {
+                onBackClick()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBackIosNew,
+                contentDescription = "Back",
+                modifier = Modifier.size(24.dp)
+            )
+        }
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "Details Movie",
             fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.White,
         )
         Spacer(modifier = Modifier.weight(1f))
 
@@ -270,7 +320,7 @@ fun MovieDetailHeader(
                 if (isSyncing) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
-                        color = Color.White
+//                        color = Color.White
                     )
                 } else {
                     Image(
@@ -315,7 +365,6 @@ fun MovieInfo(movie: ResponseMovie) {
         text = movie.title,
         fontSize = 28.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White
     )
 
     Spacer(modifier = Modifier.height(10.dp))
@@ -328,7 +377,7 @@ fun MovieInfo(movie: ResponseMovie) {
             text = "Directeur: ${movie.director.orEmpty()}",
             fontSize = 14.sp,
             fontWeight = FontWeight.Light,
-            color = Color(0xFFBABFC9)
+//            color = Color(0xFFBABFC9)
         )
     }
 
@@ -366,7 +415,6 @@ fun MovieDescription(movie: ResponseMovie, isExpanded: Boolean, onToggleExpand: 
         text = "Beschrijving",
         fontSize = 28.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White,
         modifier = Modifier.padding(top = 14.dp)
     )
 
@@ -377,7 +425,6 @@ fun MovieDescription(movie: ResponseMovie, isExpanded: Boolean, onToggleExpand: 
         text = if (isExpanded) displayedDescription else "$displayedDescription...",
         fontSize = 15.sp,
         fontWeight = FontWeight.Light,
-        color = Color(0xFF696D74),
         modifier = Modifier.padding(top = 16.dp)
     )
 

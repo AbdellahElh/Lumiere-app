@@ -46,6 +46,7 @@ fun WatchlistScreen(
             watchlistRepo = (LocalContext.current.applicationContext as LumiereApplication).container.watchlistRepo,
             userManager = (LocalContext.current.applicationContext as LumiereApplication).container.userManager,
             application = LocalContext.current.applicationContext as Application,
+            movieRepo = (LocalContext.current.applicationContext as LumiereApplication).container.movieRepo,
         )
     )
 ) {

@@ -7,10 +7,10 @@ import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.ShowtimeEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.MoviesApi
+import com.example.riseandroid.network.ResponseCinema
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
-import com.example.riseandroid.util.asExternalModel
 import com.example.riseandroid.util.asResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 interface IMovieRepo {
     suspend fun getAllMoviesList(selectedDate: String, selectedCinemas: List<String>,searchTitle: String?): Flow<List<MovieModel>>
     suspend fun getMovieById(id: Int): ResponseMovie
+    suspend fun insertMovie(MovieEntity: MovieEntity)
 }
 
 class MovieRepo(
@@ -44,23 +45,36 @@ class MovieRepo(
             }
 
     }
+
+
     override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
-
         if (movieEntity != null) {
-            return movieEntity.asResponse()
+            val cinemas = movieDao.getCinemasByMovieId(id).map { cinemaEntity ->
+                val showtimes = movieDao.getShowtimesByMovieAndCinema(id, cinemaEntity.id).map { showtimeEntity ->
+                    "${showtimeEntity.showDate}T${showtimeEntity.showTime}"
+                }
+                ResponseCinema(
+                    id = cinemaEntity.id,
+                    name = cinemaEntity.name,
+                    showtimes = showtimes
+                )
+            }
+            return movieEntity.asResponse().copy(cinemas = cinemas)
         }
+
         try {
             val movieApiResponse = movieApi.getMovieById(id)
 
             val movieFromApi = movieApiResponse.movie
+            movieDao.insertMovie(movieFromApi.asEntity())
 
             movieDao.insertMovie(movieFromApi.asEntity())
+            saveCinemasAndShowtimes(movieFromApi)
             return movieFromApi
-
         } catch (e: Exception) {
             Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
-            return ResponseMovie(
+            return movieEntity?.asResponse() ?: ResponseMovie(
                 id = 0,
                 eventId = 0,
                 title = "",
@@ -79,6 +93,7 @@ class MovieRepo(
             )
         }
     }
+
 
     suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>,searchTitle:String?) {
         try {
@@ -123,6 +138,10 @@ class MovieRepo(
             )
         }
         movieDao.insertShowtimes(showtimeEntities)
+    }
+
+    override suspend fun insertMovie(MovieEntity: MovieEntity) {
+        movieDao.insertMovie(MovieEntity)
     }
 
 }

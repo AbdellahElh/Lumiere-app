@@ -2,6 +2,7 @@ package com.example.riseandroid.data.entitys
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.riseandroid.model.Movie
 
 @Entity(tableName = "event")
 data class EventEntity(
@@ -16,8 +17,10 @@ data class EventEntity(
     val videoPlaceholderUrl: String?,
     val cover: String?,
     val location: String?,
-    val eventLink: String,
-    val cinemasJson: String
+    val eventLink: String?,
+    val cinemasJson: String?,
+    val moviesJson: String?
+
 )
 
 data class Cinema(

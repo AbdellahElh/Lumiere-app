@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.homepage.ErrorScreen
 import com.example.riseandroid.ui.screens.homepage.LoadingScreen
 import com.example.riseandroid.ui.screens.homepage.TitleText
@@ -107,8 +108,8 @@ fun FiltersButtonToggle(
         Icon(
             imageVector = if (!areFiltersVisible) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp,
             contentDescription = "Show filters",
-            modifier = Modifier.padding(start = 2.dp).size(40.dp),
-            tint = Color.White
+            modifier = Modifier.padding(start = 2.dp).size(40.dp)
+
             )
     }
 }

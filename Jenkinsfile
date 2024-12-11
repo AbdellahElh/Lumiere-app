@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from the repository
-                 git branch: 'main', credentialsId: 'keycontainer', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
+                 git branch: 'main', credentialsId: 'keyandroid', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
             }
         }
         
@@ -22,7 +22,13 @@ pipeline {
                 sh 'chmod +x ./gradlew'
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
-                // Use Gradle to clean and build the APK
+                  // Test android lint
+               // sh './gradlew lint'
+                  // Kotlin code analyse
+                //sh './gradlew test'
+                  // Unit Tests
+                //sh './gradlew testDebugUnitTest'
+                  // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
             }
         }
@@ -66,4 +72,3 @@ pipeline {
         }
     }
 }
-

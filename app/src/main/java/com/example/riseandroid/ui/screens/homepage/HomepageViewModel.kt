@@ -122,7 +122,8 @@ class HomepageViewModel(
                 eventRepo.getAllEventsList().collect { eventsList ->
                     _events.value = eventsList
                     _filteredEvents.value = eventsList.filter { event ->
-                        event.cinemas.any { it.name.equals("Brugge", ignoreCase = true) }
+                        var cinema = event.cinemas ?: emptyList()
+                        cinema.any { it.name.equals("Brugge", ignoreCase = true) }
                     }
                     homepageUiState = HomepageUiState.Succes(
                         allMovies = allMovies,
@@ -141,7 +142,8 @@ class HomepageViewModel(
     fun filterEventsByCinema(selectedCinema: String) {
         viewModelScope.launch {
             val filtered = _events.value.filter { event ->
-                event.cinemas.any { it.name.equals(selectedCinema, ignoreCase = true) }
+                var cinema = event.cinemas ?: emptyList()
+                cinema.any { it.name.equals(selectedCinema, ignoreCase = true) }
             }
             _filteredEvents.value = filtered
         }

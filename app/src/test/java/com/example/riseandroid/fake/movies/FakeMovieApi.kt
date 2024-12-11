@@ -1,5 +1,6 @@
 package com.example.riseandroid.fake.movies
 
+import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.model.MoviePoster
 import com.example.riseandroid.network.MovieApiResponseById
 import com.example.riseandroid.network.MoviesApi
@@ -40,6 +41,7 @@ class FakeMovieApi : MoviesApi {
         movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
         eventId = 1
     )
+
 
     private val allMoviesResponse: List<ResponseMovie> = listOf(
         ResponseMovie(

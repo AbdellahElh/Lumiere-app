@@ -1,6 +1,8 @@
 package com.example.riseandroid.data.response
 
 import com.example.riseandroid.data.entitys.Cinema
+import com.example.riseandroid.data.entitys.MovieEntity
+import com.example.riseandroid.model.Movie
 
 data class EventResponse(
     val id: Int,
@@ -15,5 +17,6 @@ data class EventResponse(
     val cover: String?,
     val location: String?,
     val eventLink: String?,
-    val cinemas: List<Cinema>?
+    val cinemas: List<Cinema>?,
+    val movies: List<MovieEntity>?
 )

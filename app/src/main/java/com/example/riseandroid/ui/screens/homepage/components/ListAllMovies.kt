@@ -11,6 +11,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.example.riseandroid.R
 import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 
 
 @Composable
@@ -26,7 +27,6 @@ fun ListAllMovies(
                 .fillMaxWidth()
                 .padding(16.dp),
             style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
-            color = androidx.compose.ui.graphics.Color.White,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     } else {

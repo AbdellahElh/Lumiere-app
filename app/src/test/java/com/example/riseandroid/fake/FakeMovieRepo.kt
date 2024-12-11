@@ -1,5 +1,6 @@
 package com.example.riseandroid.fake
 
+import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.repository.IMovieRepo
@@ -18,6 +19,7 @@ class FakeMovieRepo(private val movies: List<MovieModel>) : IMovieRepo {
     }
 
     override suspend fun getMovieById(id: Int): ResponseMovie {
+
         return ResponseMovie(
             id = 1,
             title = "Fake Movie1",
@@ -35,5 +37,9 @@ class FakeMovieRepo(private val movies: List<MovieModel>) : IMovieRepo {
             movieLink = "https://i.pinimg.com/736x/2e/cf/06/2ecf067a2069128f44d75d25a32e219e.jpg",
             eventId = 1
         )
+    }
+
+    override suspend fun insertMovie(MovieEntity: MovieEntity) {
+
     }
 }

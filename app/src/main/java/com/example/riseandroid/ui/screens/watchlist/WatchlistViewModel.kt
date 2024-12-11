@@ -10,7 +10,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.watchlist.UserManager
 import com.example.riseandroid.model.MovieModel
 import com.example.riseandroid.network.ResponseMovie
+import com.example.riseandroid.repository.IMovieRepo
 import com.example.riseandroid.repository.IWatchlistRepo
+import com.example.riseandroid.repository.MovieRepo
+import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.isNetworkAvailable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,9 +26,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import java.io.IOException
 
 open class WatchlistViewModel(
     private val watchlistRepo: IWatchlistRepo,
+    private val movieRepo: IMovieRepo,
     private val userManager: UserManager,
     private val context: Context
 ) : ViewModel() {
@@ -99,7 +104,6 @@ open class WatchlistViewModel(
         viewModelScope.launch {
             try {
                 Log.d("WatchlistViewModel", "Offline watchlist geladen voor user $userId")
-                // Hier kun je meer logica toevoegen als caching belangrijk is.
             } catch (e: Exception) {
                 Log.e("WatchlistViewModel", "Fout bij offline laden: ${e.message}", e)
             }
@@ -111,6 +115,8 @@ open class WatchlistViewModel(
         viewModelScope.launch {
             val userId = userManager.currentUserId.value
             if (userId != null) {
+                val existingMovieEntity = movieRepo.getMovieById(movie.id)?.asEntity()
+
                 if (isInWatchlist(movie.id)) {
                     try {
                         watchlistRepo.removeFromWatchlist(movie.id, userId)
@@ -120,22 +126,29 @@ open class WatchlistViewModel(
                         } else {
                             throw e
                         }
+                    } catch (e: IOException) {
+                        _eventFlow.emit(WatchlistEvent.ShowToast("Kon de server niet bereiken. Probeer later opnieuw."))
                     }
                 } else {
                     try {
                         watchlistRepo.addToWatchlist(movie, userId)
+
+                        if (existingMovieEntity != null) {
+                            movieRepo.insertMovie(existingMovieEntity)
+                        }
                     } catch (e: HttpException) {
                         if (e.code() == 409) {
                             _eventFlow.emit(WatchlistEvent.ShowToast("Deze film staat al in je watchlist"))
                         } else {
                             throw e
                         }
+                    } catch (e: IOException) {
+                        _eventFlow.emit(WatchlistEvent.ShowToast("Kon de server niet bereiken. Probeer later opnieuw."))
                     }
                 }
             }
         }
     }
-
 
     fun isInWatchlist(movieId: Int): Boolean {
         return _watchlist.value.any { it.id == movieId }
@@ -150,13 +163,14 @@ open class WatchlistViewModel(
 class WatchlistViewModelFactory(
     private val watchlistRepo: IWatchlistRepo,
     private val userManager: UserManager,
+    private val movieRepo: IMovieRepo,
     private val application: Application
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WatchlistViewModel::class.java)) {
             return WatchlistViewModel(
-                watchlistRepo, userManager, application
+                watchlistRepo, movieRepo, userManager, application
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

@@ -3,11 +3,15 @@ package com.example.riseandroid.util
 import com.example.riseandroid.data.entitys.Cinema
 import com.example.riseandroid.data.entitys.EventEntity
 import com.example.riseandroid.data.entitys.tenturncard.TenturncardEntity
+import com.example.riseandroid.data.entitys.MovieEntity
 import com.example.riseandroid.data.entitys.watchlist.MovieWatchlistEntity
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.response.EventResponse
+import com.example.riseandroid.data.response.TicketResponse
 import com.example.riseandroid.model.EventModel
 import com.example.riseandroid.model.MovieWatchlistModel
 import com.example.riseandroid.model.Tenturncard
+import com.example.riseandroid.model.Ticket
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -34,10 +38,68 @@ fun Tenturncard.asEntity(): TenturncardEntity {
 
         )
 }
+fun TicketEntity.asExternalModel(): Ticket {
+    return Ticket(
+        id = id,
+        dateTime = dateTime,
+        location = location,
+        type = type,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId,
+        movie = movie,
+        event = event
 
+        )
+}
+
+fun Ticket.asEntity(): TicketEntity {
+    return TicketEntity(
+        id = id,
+        dateTime = dateTime ?: "unknown",
+        location = location ?: "unknown",
+        type = type ?: 0,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId,
+        movie = movie,
+        event = event
+    )
+}
+fun TicketResponse.asExternalModel(): Ticket {
+    return Ticket(
+        id = id,
+        dateTime = dateTime,
+        location = location,
+        type = type,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId,
+        movie = movie,
+        event = event
+
+    )
+}
+
+fun TicketResponse.asEntity(): TicketEntity {
+    return TicketEntity(
+        id = id,
+        dateTime = dateTime ?: "unknown",
+        location = location ?: "unknown",
+        type = type ?: 0,
+        movieId = movieId,
+        eventId = eventId,
+        accountId = accountId,
+        movie = movie,
+        event = event
+    )
+}
 fun EventEntity.asExternalModel(): EventModel {
     val cinemaType = object : TypeToken<List<Cinema>>() {}.type
+    val movieType = object : TypeToken<List<MovieEntity>>() {}.type
+
     val cinemaList: List<Cinema> = gson.fromJson(cinemasJson, cinemaType) ?: emptyList()
+    val movieList: List<MovieEntity> = gson.fromJson(moviesJson,movieType ) ?: emptyList()
 
     return EventModel(
         id = id,
@@ -52,7 +114,8 @@ fun EventEntity.asExternalModel(): EventModel {
         videoPlaceholderUrl = videoPlaceholderUrl,
         releaseDate = releaseDate,
         cinemas = cinemaList,
-        location = location ?: ""
+        location = location ?: "",
+        movies = movieList
     )
 }
 
@@ -65,6 +128,8 @@ fun EventModel.asEntity(): EventEntity {
     } ?: 0
 
     val cinemasJson = gson.toJson(cinemas)
+    val movieJson = gson.toJson(movies)
+
 
     return EventEntity(
         id = id,
@@ -79,7 +144,8 @@ fun EventModel.asEntity(): EventEntity {
         cover = cover,
         eventLink = eventLink ?: "",
         cinemasJson = cinemasJson,
-        location = location ?: ""
+        location = location ?: "",
+        moviesJson = movieJson
     )
 }
 
@@ -97,12 +163,15 @@ fun EventResponse.toDomainModel(): EventModel {
         cover = cover,
         location = location ?: "Onbekend",
         eventLink = eventLink ?: "",
-        cinemas = cinemas ?: emptyList()
+        cinemas = cinemas ?: emptyList(),
+        movies = movies ?: emptyList()
     )
 }
 
 fun EventResponse.toEntity(): EventEntity {
     val cinemasJson = gson.toJson(cinemas)
+    val movieJson = gson.toJson(movies)
+
     val durationInMinutes = duration?.let {
         val regex = Regex("\\d+")
         regex.find(it)?.value?.toIntOrNull() ?: 0
@@ -121,7 +190,8 @@ fun EventResponse.toEntity(): EventEntity {
         cover = cover,
         eventLink = eventLink ?: "",
         cinemasJson = cinemasJson,
-        location = location ?: ""
+        location = location ?: "",
+        moviesJson = movieJson
     )
 }
 

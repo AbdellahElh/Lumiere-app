@@ -1,6 +1,7 @@
 package com.example.riseandroid.ui.screens.homepage.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -84,6 +85,11 @@ fun EventItem(
 ) {
     Column(
         modifier = modifier
+            .border(
+                width = 1.dp,
+                color = Color.Gray,
+                shape = RoundedCornerShape(8.dp)
+            )
             .fillMaxWidth()
             .clickable { navController.navigate("eventDetail/${event.id}") }
             .padding(16.dp)
@@ -104,13 +110,11 @@ fun EventItem(
             text = event.title ?: "Geen titel",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = event.description ?: "Geen beschrijving",
             fontSize = 16.sp,
-            color = Color.White,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
@@ -118,7 +122,6 @@ fun EventItem(
         Text(
             text = event.location ?: "Onbekend",
             fontSize = 16.sp,
-            color = Color.White
         )
     }
 }
@@ -142,13 +145,11 @@ fun CinemaDropdownMenu(
         ) {
             Text(
                 text = selectedOption,
-                color = Color.White,
                 modifier = Modifier.weight(1f)
             )
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = "Open Dropdown",
-                tint = Color.White
             )
         }
 

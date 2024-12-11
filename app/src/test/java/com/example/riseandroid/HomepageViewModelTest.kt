@@ -68,7 +68,9 @@ class HomepageViewModelTest {
                 videoPlaceholderUrl = null,
                 releaseDate = "2023-10-01",
                 cinemas = emptyList(),
-                location = "Brugge"
+                location = "Brugge",
+                movies = emptyList()
+
             )
         )
 

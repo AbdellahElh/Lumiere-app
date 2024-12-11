@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.riseandroid.model.MovieModel
+import com.example.riseandroid.network.ResponseMovie
 
 @Composable
 fun MoviePoster(movie: MovieModel,
@@ -58,7 +59,6 @@ fun MoviePoster(movie: MovieModel,
         Text(
             text = movie.title,
             modifier = Modifier.fillMaxWidth().padding(8.dp).testTag(movie.title),
-            color = Color.White,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )

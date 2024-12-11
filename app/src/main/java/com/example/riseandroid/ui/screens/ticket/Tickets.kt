@@ -59,8 +59,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.riseandroid.R
+import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.model.Ticket
+import java.util.Locale
 import com.example.riseandroid.repository.TenturncardRepository
 import com.example.riseandroid.ui.screens.account.AuthState
 import com.example.riseandroid.ui.screens.account.AuthViewModel
@@ -74,18 +76,22 @@ import com.example.riseandroid.ui.screens.movieDetail.MovieDetailUiState
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 
 import com.example.riseandroid.ui.screens.watchlist.WatchlistViewModel
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import kotlin.text.format
 
 @Composable
 fun TicketScreen(
     userId: Long,
     authToken: String,
     navController: NavController,
-    viewModel: TicketViewModel = viewModel(
-        factory = TicketViewModel.provideFactory(userId)
-    ),
-
-  //  tenturncardRepository: TenturncardRepository
-) {
+    viewModel: TicketViewModel = viewModel(factory = TicketViewModel.Factory),
+    ) {
+    LaunchedEffect(Unit) {
+        viewModel.getTickets()
+    }
     when (val uiState = viewModel.ticketUiState) {
         is TicketUiState.Loading -> LoadingScreen()
         is TicketUiState.Error -> ErrorScreen()
@@ -103,7 +109,7 @@ fun TicketScreen(
 @Composable
 fun TicketsScreenContent(
     TicketList: List<Ticket>,
-   authToken: String, // Accept AuthViewModel
+   authToken: String,
 ) {
     var isTicket by remember { mutableStateOf(true) }
     BrightnessControl(isTicketScreen = true)
@@ -131,14 +137,12 @@ fun TicketsScreenContent(
                             text = "E-Tickets",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
                         )
                     } else {
                         Text(
                             text = "Beurtenkaarten",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -151,14 +155,12 @@ fun TicketsScreenContent(
                         text = "Instructies",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Kom naar de bioscoop, toon en scan de barcode naar de daarvoor bestemde ruimte. Blijf de gezondheidsprotocollen naleven.",
                         fontSize = 19.sp,
                         fontWeight = FontWeight.Light,
-                        color = Color(0xFFB2B5BB)
                     )
                     Spacer(modifier = Modifier.height(40.dp))
                     if (isEmptyTickets) {
@@ -170,7 +172,6 @@ fun TicketsScreenContent(
                                 text = "Geen Tickets",
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color.White,
                             )
                             Box(
                                 modifier = Modifier
@@ -217,6 +218,18 @@ fun TicketsScreenContent(
 
 @Composable
 fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket: Ticket) {
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+    val date = dateFormatter.parse(ticket.dateTime)
+    val milliseconds = date?.time
+    val formattedDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date(milliseconds ?: 0))
+    val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(milliseconds ?: 0))
+    var title = ""
+    if (ticket.movie != null) {
+         title = "Film: ${ticket.movie.title}"
+
+    }else{
+        title = "Event: ${ticket.event?.title}"
+    }
     Box(
         modifier = modifier
             .fillMaxWidth(0.85f)
@@ -241,8 +254,8 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "${ticket.hours}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
-                Text(text = "${ticket.ticketId}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(text = "${formattedTime}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(text = "${ticket.id}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -258,7 +271,7 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "${ticket.date}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(text = "${formattedDate}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
                 Text(text = "${ticket.location}", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -276,8 +289,26 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Film: ${ticket.movie}", color = Color.Black, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
-                Text("e-ticket", color = Color(0xFFF14763), fontSize =20.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.rotate(180f))
+                Text(
+                    text = title,
+                    color = Color.Black,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .rotate(180f)
+                        .weight(1f, fill = false)
+                        .alignByBaseline()
+                )
+                Text(
+                    text = "e-ticket",
+                    color = Color(0xFFF14763),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .rotate(180f)
+                        .weight(0.5f)
+                        .alignByBaseline()
+                )
             }
 
 
@@ -286,7 +317,7 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
                 .fillMaxWidth()
                 .rotate(180f)), contentAlignment = Alignment.Center) {
 
-                QRCodeScreen(id = ticket.ticketId.toString())
+                QRCodeScreen(id = ticket.id.toString())
             }
 
         }
@@ -311,7 +342,7 @@ fun QRCodeScreen(id: String) {
     val qrCodeBitmap = generateQRCode(id)
     Image(
         bitmap = qrCodeBitmap.asImageBitmap(),
-        contentDescription = "QR Code",
+        contentDescription = "QR Code$id",
         modifier = Modifier.size(180.dp)
     )
 }
