@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class ForgotPasswordViewModel(
+open class ForgotPasswordViewModel(
     private val authApi: Auth0Api,
     private val context: Context,
     auth0: Auth0
