@@ -101,7 +101,10 @@ class TenturncardRepository(
 
             if (apiResponse.isSuccessful) {
 
-                tenturncardDao.updateTenturncard(existingCard)
+                tenturncardDao.updateTenturncard(
+                    existingCard.id,
+                    amountLeft = existingCard.amountLeft
+                )
 
                 emit(ApiResource.Success(existingCard))
             } else {

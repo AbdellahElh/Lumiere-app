@@ -16,6 +16,6 @@ interface TenturncardApi {
     @POST("/api/tenturncard/add/{activationCode}")
     fun addTenturncard(@Path("activationCode") activationCode: String) : Call<Unit>
 
-    @PUT("/api/Tenturncard/update/{id}")
+    @POST("/api/Tenturncard/update/{id}")
     fun updateTenturncard(@Path("id") id : Int) : Call<Unit>
 }

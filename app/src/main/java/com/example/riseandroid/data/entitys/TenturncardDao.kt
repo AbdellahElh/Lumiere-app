@@ -21,9 +21,8 @@ interface TenturncardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTenturncard(card : TenturncardEntity)
 
-    @Update
-    suspend fun updateTenturncard(card: TenturncardEntity)
-
+    @Query("UPDATE tenturncards SET amountLeft = (:amountLeft -1) WHERE id = :id")
+    suspend fun updateTenturncard(id: Int, amountLeft: Int)
 
     @Delete
     suspend fun deleteTenturncard(card: TenturncardEntity)
