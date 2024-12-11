@@ -84,12 +84,12 @@ class TenturncardRepository(
             }
         }.flowOn(Dispatchers.IO)
 
-    override fun updateTenturncard(id: Int): Flow<ApiResource<TenturncardEntity>> = flow {
+    override fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
         emit(ApiResource.Loading())
 
         try {
 
-            val existingCard = tenturncardDao.getTenturncardById(id)
+            val existingCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
 
             if (existingCard == null) {
                 emit(ApiResource.Error("Tenturncard niet gevonden"))
@@ -97,12 +97,12 @@ class TenturncardRepository(
             }
 
 
-            val apiResponse = tenturncardApi.updateTenturncard(id).awaitResponse()
+            val apiResponse = tenturncardApi.updateTenturncard(activationCode).awaitResponse()
 
             if (apiResponse.isSuccessful) {
 
                 tenturncardDao.updateTenturncard(
-                    existingCard.id,
+                    existingCard.ActivationCode,
                     amountLeft = existingCard.amountLeft
                 )
 

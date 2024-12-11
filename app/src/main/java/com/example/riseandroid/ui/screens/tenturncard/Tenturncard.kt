@@ -69,8 +69,8 @@ fun TenturncardScreen(
                     items(cards) { card ->
                         TenturnCardItem(
                             card = card,
-                            onQrCodeClick = { cardId ->
-                                tenTurnCardViewModel.updateCardById(cardId)
+                            onQrCodeClick = { cardActivationCode ->
+                                tenTurnCardViewModel.updateCardById(cardActivationCode)
                             }
                         )
                     }
@@ -130,7 +130,7 @@ fun inputActivationCodeField(
     }
 }
 @Composable
-fun TenturnCardItem(card: Tenturncard,onQrCodeClick: (Int) -> Unit) {
+fun TenturnCardItem(card: Tenturncard,onQrCodeClick: (String) -> Unit) {
     Card(
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -191,7 +191,7 @@ fun TenturnCardItem(card: Tenturncard,onQrCodeClick: (Int) -> Unit) {
                     modifier = Modifier
                         .height(100.dp)
                         .width(100.dp)
-                        .clickable { onQrCodeClick(card.id) }
+                        .clickable { onQrCodeClick(card.ActivationCode) }
                 )
             }
 

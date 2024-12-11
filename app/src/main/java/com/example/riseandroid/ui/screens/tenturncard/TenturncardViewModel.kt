@@ -70,11 +70,11 @@ class TenturncardViewModel(
     fun updateInputText(newText: String) {
         _inputText.value = newText
     }
-    fun updateCardById(cardId: Int) {
+    fun updateCardById(cardActivationCode: String) {
         viewModelScope.launch {
             tenturncardUiState = TenturncardUiState.Loading
             try {
-                tenturncardRepository.updateTenturncard(cardId).collect { resource ->
+                tenturncardRepository.updateTenturncard(cardActivationCode).collect { resource ->
                     when (resource) {
                         is ApiResource.Loading -> {
                             tenturncardUiState = TenturncardUiState.Loading
