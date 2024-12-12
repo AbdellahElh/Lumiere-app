@@ -89,32 +89,36 @@ class TenturncardRepository(
         }.flowOn(Dispatchers.IO)
 
 
-    override suspend fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardResponse>> = flow {
+    override suspend fun minOneUpdateCardById(activationCode: String): Flow<ApiResource<TenturncardResponse>> = flow {
         emit(ApiResource.Loading())
 
-        try {
-            val existingCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
-            if (existingCard == null) {
-                emit(ApiResource.Error("Tenturncard niet gevonden"))
-                return@flow
-            }
 
             val apiResponse = tenturncardApi.updateTenturncard(activationCode).awaitResponse()
 
             if (apiResponse.isSuccessful) {
+                try {
+                    val existingCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
+                    if (existingCard == null) {
+                        emit(ApiResource.Error("Tenturncard niet gevonden"))
+                        return@flow
+                    }
+                    tenturncardDao.updateTenturncard(
+                        ActivationCode = activationCode,
+                        amountLeft = (existingCard.amountLeft - 1)
+                    )
+                    val updatedCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
 
-                // Update lokale database
-                tenturncardDao.updateTenturncard(
-                    ActivationCode = activationCode,
-                    amountLeft = (existingCard.amountLeft - 1)
-                )
-                emit(ApiResource.Success(existingCard.asResponse())) // Succesvolle response
+                    if (updatedCard != null) {
+                        emit(ApiResource.Success(updatedCard.asResponse()))
+                    }
+                } catch (e: Exception) {
+                    emit(ApiResource.Error<TenturncardResponse>("Er is een fout opgetreden: ${e.localizedMessage}"))
+                }
+
             } else {
                 emit(ApiResource.Error<TenturncardResponse>("Fout: lege response van de API"))
             }
-        } catch (e: Exception) {
-        emit(ApiResource.Error<TenturncardResponse>("Er is een fout opgetreden: ${e.localizedMessage}"))
-    }
+
     }.flowOn(Dispatchers.IO)
 
 
@@ -131,15 +135,15 @@ class TenturncardRepository(
         // Emit the loading state
         emit(ApiResource.Loading())
         try {
-            // Update the dao object
-            tenturncardDao.updateTenturncard(
-                cardEntity.ActivationCode,
-                amountLeft = cardEntity.amountLeft,
-            )
+
             // Send the request to the api
             val response = tenturncardApi.editTenturncard(cardResponse).awaitResponse()
             // Emit the correct state based on the api response
             if (response.isSuccessful) {
+                tenturncardDao.updateTenturncard(
+                    cardEntity.ActivationCode,
+                    amountLeft = cardEntity.amountLeft,
+                )
                 emit(ApiResource.Success(cardResponse))
             }
             else{

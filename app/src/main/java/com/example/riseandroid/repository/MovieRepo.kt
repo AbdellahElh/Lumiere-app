@@ -74,7 +74,7 @@ class MovieRepo(
             return movieFromApi
         } catch (e: Exception) {
             Log.e("MovieRepo", "Error fetching movie from API: ${e.message}")
-            return movieEntity?.asResponse() ?: ResponseMovie(
+            return ResponseMovie(
                 id = 0,
                 eventId = 0,
                 title = "",

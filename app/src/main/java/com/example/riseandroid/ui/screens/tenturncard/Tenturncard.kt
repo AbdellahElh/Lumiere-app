@@ -73,7 +73,7 @@ fun TenturncardScreen(
                 ) {
                     items(cards) { card ->
                         TenturnCardItem(card, viewModel = tenTurnCardViewModel,  onQrCodeClick = { cardActivationCode ->
-                            tenTurnCardViewModel.updateCardById(cardActivationCode)
+                            tenTurnCardViewModel.minOneUpdateCardById(cardActivationCode)
                         })
                     }
                 }
