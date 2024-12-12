@@ -12,7 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FakeTicketRepository : ITicketRepository {
+open class FakeTicketRepository : ITicketRepository {
 
     private var fakeTickets = mutableListOf(
         Ticket(

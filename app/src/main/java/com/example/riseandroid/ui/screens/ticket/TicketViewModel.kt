@@ -36,18 +36,16 @@ open class TicketViewModel(
     ) : ViewModel() {
 
     var ticketUiState: TicketUiState by mutableStateOf(TicketUiState.Loading)
-        private set
-
 
 
     private val _allTickets = MutableStateFlow<List<Ticket>>(emptyList())
-    val Alltickets = _allTickets.asStateFlow()
+    open val Alltickets = _allTickets.asStateFlow()
 
 
     init {
         getTickets()
     }
-    fun getTickets() {
+    open fun getTickets() {
         viewModelScope.launch {
             ticketUiState = TicketUiState.Loading
             try {
@@ -68,7 +66,7 @@ open class TicketViewModel(
             }
         }
     }
-    fun addTicket(
+    open fun addTicket(
         newTicket: AddTicketDTO
     ) {
         viewModelScope.launch {
