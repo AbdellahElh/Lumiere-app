@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -285,31 +286,22 @@ fun TicketDetail(backgroundImage: Painter, modifier: Modifier = Modifier, ticket
             }
 
             Spacer(modifier = Modifier.height(34.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                horizontalAlignment = Alignment.End
             ) {
                 Text(
                     text = title,
                     color = Color.Black,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .rotate(180f)
-                        .weight(1f, fill = false)
-                        .alignByBaseline()
+                    modifier = Modifier.rotate(180f)
                 )
-                Text(
-                    text = "e-ticket",
-                    color = Color(0xFFF14763),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .rotate(180f)
-                        .weight(0.5f)
-                        .alignByBaseline()
-                )
+
             }
+            Spacer(modifier = Modifier.height(34.dp))
 
 
             Spacer(modifier = Modifier.weight(1f))
