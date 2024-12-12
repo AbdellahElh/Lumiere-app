@@ -30,7 +30,8 @@ data class CinemaEntity(
 @Entity(
     tableName = "showtimes",
     foreignKeys = [
-        ForeignKey(entity = MovieEntity::class, parentColumns = ["id"], childColumns = ["movieId"]),
+        ForeignKey(entity = MovieEntity::class, parentColumns = ["id"], childColumns = ["movieId"] , onDelete = ForeignKey.CASCADE // Enables cascading delete
+        ),
         ForeignKey(entity = CinemaEntity::class, parentColumns = ["id"], childColumns = ["cinemaId"])
     ],
     indices = [Index("movieId"), Index("cinemaId")]

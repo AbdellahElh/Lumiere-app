@@ -25,13 +25,13 @@ sealed interface MovieDetailUiState {
     object Loading : MovieDetailUiState
 }
 
-class MovieDetailViewModel(
+open class MovieDetailViewModel(
     private val movieId: Int,
     private val movieRepo: IMovieRepo,
 ) : ViewModel() {
 
-    var movieDetailUiState: MovieDetailUiState by mutableStateOf(MovieDetailUiState.Loading)
-        private set
+    open var movieDetailUiState: MovieDetailUiState by mutableStateOf(MovieDetailUiState.Loading)
+        set
 
     private val _selectedMovie = MutableStateFlow<ResponseMovie>(ResponseMovie(
         id = 0,
@@ -50,7 +50,7 @@ class MovieDetailViewModel(
         posterImageUrl = "",
         movieLink = ""
     ))
-    val selectedMovie: StateFlow<ResponseMovie> = _selectedMovie.asStateFlow()
+    open val selectedMovie: StateFlow<ResponseMovie> = _selectedMovie.asStateFlow()
 
     init {
         getMovieDetails()
