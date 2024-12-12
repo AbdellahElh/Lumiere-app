@@ -42,13 +42,12 @@ fun ForgotPasswordScreen(
     val emailError by remember { derivedStateOf { viewModel.emailError.value } }
 
     IconButton(
-        onClick = { navController.navigate("login") },
+        onClick = { navController.navigate("account/login") },
         modifier = Modifier.padding(bottom = 20.dp)
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back",
-            tint = Color.White
+            contentDescription = "Back"
         )
     }
 

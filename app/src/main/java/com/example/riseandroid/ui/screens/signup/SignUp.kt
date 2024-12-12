@@ -90,8 +90,7 @@ fun SignUp(signUp: (Credentials) -> Unit,
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back",
-            tint = Color.White
+            contentDescription = "Back"
         )
     }
 
