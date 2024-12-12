@@ -19,6 +19,7 @@ import com.example.riseandroid.ui.screens.movieDetail.MovieDetailScreen
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailViewModel
 import androidx.compose.ui.platform.LocalContext
 import com.example.riseandroid.fake.FakeMovieDetailViewModel
+import com.example.riseandroid.fake.FakeTicketViewModelAll
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.movieDetail.MovieDetailUiState
 import org.junit.Rule
@@ -43,7 +44,7 @@ class MovieDetailUITest {
                     movieId = movie.id,
                     navController = navController,
                     viewModel = FakeMovieDetailViewModel(MovieDetailUiState.Success(movie)),
-                    ticketViewModel = FakeTicketViewModel(
+                    ticketViewModel = FakeTicketViewModelAll(
                         ticketRepository = FakeTicketRepository()
                     ),
                     watchlistViewModel = FakeWatchlistViewModel(
@@ -74,7 +75,7 @@ class MovieDetailUITest {
             val navController = rememberNavController()
 
             // Use your fake or mock ViewModels
-            val ticketViewModel = FakeTicketViewModel(FakeTicketRepository())
+            val ticketViewModel = FakeTicketViewModelAll(FakeTicketRepository())
             val watchlistViewModel = FakeWatchlistViewModel(
                 watchlistRepo = FakeWatchlistRepo(),
                 movieRepo = fakeRepo,
