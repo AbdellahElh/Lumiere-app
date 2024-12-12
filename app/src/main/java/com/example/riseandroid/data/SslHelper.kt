@@ -31,7 +31,7 @@ object SslHelper {
     }
 
     private val hostnameVerifier = HostnameVerifier { hostname, session ->
-        hostname == "localhost" || hostname == "10.0.2.2"
+        hostname == "https://lumieregent5.vichogent.be/"
     }
 
     fun createOkHttpClient(context: Context, loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
