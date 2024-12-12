@@ -13,7 +13,9 @@ import com.example.riseandroid.util.asDomainModel
 import com.example.riseandroid.util.asEntity
 import com.example.riseandroid.util.asResponse
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
@@ -28,7 +30,6 @@ class MovieRepo(
     private val movieDao: MovieDao,
     private val movieApi: MoviesApi
 ):IMovieRepo {
-
     override suspend fun getAllMoviesList(
         selectedDate: String,
         selectedCinemas: List<String>,
@@ -36,16 +37,15 @@ class MovieRepo(
     ): Flow<List<MovieModel>> {
         val searchTitleWithPercent = if (searchTitle.isNullOrEmpty()) "%" else "%$searchTitle%"
 
-        return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas,searchTitleWithPercent)
+       
+        withContext(Dispatchers.IO) {
+            refreshMovies(selectedDate, selectedCinemas, searchTitle)
+        }
+
+
+        return movieDao.getFilteredMoviesByCinemaAndDate(selectedDate, selectedCinemas, searchTitleWithPercent)
             .map { entities -> entities.map(MovieEntity::asDomainModel) }
-            .onStart {
-                withContext(Dispatchers.IO) {
-                    refreshMovies(selectedDate, selectedCinemas, searchTitle)
-                }
-            }
-
     }
-
 
     override suspend fun getMovieById(id: Int): ResponseMovie {
         val movieEntity = movieDao.getMovieById(id)
@@ -95,7 +95,11 @@ class MovieRepo(
     }
 
 
-    suspend fun refreshMovies(selectedDate: String, selectedCinemas: List<String>,searchTitle:String?) {
+    suspend fun refreshMovies(
+        selectedDate: String,
+        selectedCinemas: List<String>,
+        searchTitle: String?
+    ) {
         try {
             val search = if (searchTitle.isNullOrEmpty()) null else searchTitle
             val moviesFromApi = movieApi.getAllMovies(
@@ -104,10 +108,17 @@ class MovieRepo(
                 title = search
             )
             val moviesAsEntities = moviesFromApi.map { it.asEntity() }
+
+
             movieDao.insertMovies(moviesAsEntities)
+
+
             for (movie in moviesFromApi) {
                 saveCinemasAndShowtimes(movie)
             }
+
+
+            delay(200)
         } catch (e: Exception) {
             Log.d("MovieRepo", "Network connection failed")
         }
