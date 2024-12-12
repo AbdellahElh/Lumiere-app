@@ -1,15 +1,17 @@
 package com.example.riseandroid.fake
 
+import android.provider.CallLog
 import com.example.riseandroid.data.entitys.tenturncard.TenturncardResponse
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.network.TenturncardApi
+import kotlinx.coroutines.flow.Flow
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.mock.Calls
 
 class FakeTenturncardApi : TenturncardApi {
-    override suspend fun getTenturncards(): List<Tenturncard> {
+    override suspend fun getTenturncards(): List<TenturncardResponse> {
         TODO("Not yet implemented")
     }
 
@@ -29,5 +31,9 @@ class FakeTenturncardApi : TenturncardApi {
         else{
             Calls.response(Response.error(400, "Invalid activation code".toResponseBody(null)))
         }
+    }
+
+    override fun updateTenturncard(activationCode: String): Call<Unit> {
+        TODO("Not yet implemented")
     }
 }

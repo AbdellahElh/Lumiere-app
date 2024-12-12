@@ -17,7 +17,11 @@ class FakeTenturncardDao : TenturncardDao {
             return tenturncards.value.find { card -> card.id == id }
         }
 
-        override suspend fun insertTenturncards(cards: List<TenturncardEntity>) {
+    override suspend fun getTenturncardByActivationCode(activationCode: String): TenturncardEntity? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun insertTenturncards(cards: List<TenturncardEntity>) {
             TODO("Not yet implemented")
         }
 
@@ -25,13 +29,18 @@ class FakeTenturncardDao : TenturncardDao {
             tenturncards.value += card
         }
 
-        override suspend fun updateTenturncard(card: TenturncardEntity) {
-            tenturncards.value = tenturncards.value.map { existingCard ->
-                if (existingCard.id == card.id) card else existingCard
+    override suspend fun updateTenturncard(ActivationCode: String, amountLeft: Int) {
+        tenturncards.value = tenturncards.value.map { existingCard ->
+            if (existingCard.ActivationCode == ActivationCode) {
+                existingCard.copy(amountLeft = amountLeft)
+            } else {
+                existingCard
             }
         }
+    }
 
-        override suspend fun deleteTenturncard(card: TenturncardEntity) {
+
+    override suspend fun deleteTenturncard(card: TenturncardEntity) {
             tenturncards.value = tenturncards.value.filter { it.id != card.id }
         }
 

@@ -176,7 +176,9 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeC
                         .height(100.dp)
                         .width(100.dp)
                         .clickable { onQrCodeClick(card.ActivationCode) }
+                        .testTag("qrCode")
                 )
+
             }
             Spacer(modifier = Modifier.height(20.dp))
             Text(

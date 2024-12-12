@@ -1,7 +1,6 @@
 package com.example.riseandroid.fake
 
 import com.example.riseandroid.data.entitys.MovieEntity
-import com.example.riseandroid.data.entitys.TenturncardEntity
 import com.example.riseandroid.data.entitys.Tickets.TicketEntity
 import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.model.Tenturncard
