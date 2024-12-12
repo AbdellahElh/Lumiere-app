@@ -34,6 +34,11 @@ class FakeTenturncardApi : TenturncardApi {
     }
 
     override fun updateTenturncard(activationCode: String): Call<Unit> {
-        TODO("Not yet implemented")
+        return if(activationCode == "testCode") {
+            Calls.response(Response.success(Unit))
+        }
+        else{
+            Calls.response(Response.error(400, "Invalid activation code".toResponseBody(null)))
+        }
     }
 }

@@ -69,7 +69,7 @@ class TenturncardDaoTest {
     @Throws(Exception::class)
     fun daoAdd_editTenturncardToDb() = runBlocking {
         tenturncardDao.addTenturncard(toAddTenturncard)
-        tenturncardDao.updateTenturncard("activationCode",8)
+        tenturncardDao.updateTenturncard(toUpdateCard.ActivationCode,toUpdateCard.amountLeft)
         val updatedCard = tenturncardDao.getTenturncardById(toAddTenturncard.id)
         if (updatedCard != null) {
             assertEquals(updatedCard.amountLeft, toUpdateCard.amountLeft)

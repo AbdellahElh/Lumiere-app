@@ -18,7 +18,7 @@ class FakeTenturncardDao : TenturncardDao {
         }
 
     override suspend fun getTenturncardByActivationCode(activationCode: String): TenturncardEntity? {
-        TODO("Not yet implemented")
+        return tenturncards.value.find { card -> card.ActivationCode == activationCode }
     }
 
     override suspend fun insertTenturncards(cards: List<TenturncardEntity>) {
