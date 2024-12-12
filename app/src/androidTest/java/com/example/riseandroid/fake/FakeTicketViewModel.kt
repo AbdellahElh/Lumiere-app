@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.collect
+class FakeTicketViewModelAll(
+    private val ticketRepository: ITicketRepository
+) : TicketViewModel(ticketRepository)
 
 class FakeTicketViewModel(
     private val ticketRepository: ITicketRepository
