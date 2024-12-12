@@ -1,6 +1,5 @@
 package com.example.riseandroid.fake
 
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.model.Ticket
@@ -13,9 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.collect
-class FakeTicketViewModelAll(
-    private val ticketRepository: ITicketRepository
-) : TicketViewModel(ticketRepository)
+
 
 class FakeTicketViewModel(
     private val ticketRepository: ITicketRepository
