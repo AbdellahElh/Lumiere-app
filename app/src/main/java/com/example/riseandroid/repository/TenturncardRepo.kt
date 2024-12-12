@@ -87,36 +87,37 @@ class TenturncardRepository(
                 tenturncardDao.deleteTenturncard(newTenturncard)
             }
         }.flowOn(Dispatchers.IO)
-    override fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
+
+
+    override suspend fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardResponse>> = flow {
         emit(ApiResource.Loading())
 
         try {
-
             val existingCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
-
             if (existingCard == null) {
                 emit(ApiResource.Error("Tenturncard niet gevonden"))
                 return@flow
             }
 
-
             val apiResponse = tenturncardApi.updateTenturncard(activationCode).awaitResponse()
 
             if (apiResponse.isSuccessful) {
 
+                // Update lokale database
                 tenturncardDao.updateTenturncard(
-                    existingCard.ActivationCode,
-                    amountLeft = (existingCard.amountLeft -1)
+                    ActivationCode = activationCode,
+                    amountLeft = (existingCard.amountLeft - 1)
                 )
-
-                emit(ApiResource.Success(existingCard))
+                emit(ApiResource.Success(existingCard.asResponse())) // Succesvolle response
             } else {
-                emit(ApiResource.Error<TenturncardEntity>("API-update mislukt met status: ${apiResponse.code()}"))
+                emit(ApiResource.Error<TenturncardResponse>("Fout: lege response van de API"))
             }
         } catch (e: Exception) {
-            emit(ApiResource.Error<TenturncardEntity>("Er is een fout opgetreden: ${e.localizedMessage}"))
-        }
+        emit(ApiResource.Error<TenturncardResponse>("Er is een fout opgetreden: ${e.localizedMessage}"))
+    }
     }.flowOn(Dispatchers.IO)
+
+
 
     override suspend fun editTenturncard(toUpdateCard: Tenturncard): Flow<ApiResource<TenturncardResponse>> = flow {
         // Grab the card before updating it in case you need to reverse the action
