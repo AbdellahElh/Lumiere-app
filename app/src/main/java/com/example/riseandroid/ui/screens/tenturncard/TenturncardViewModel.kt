@@ -12,6 +12,7 @@ import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.ITenturncardRepository
+import com.example.riseandroid.util.asDomainModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 sealed interface TenturncardUiState {
     data class Succes(val allTenturncards: StateFlow<List<Tenturncard>>,
 
-    ) : TenturncardUiState
+                      ) : TenturncardUiState
     data class Error(val message: String?) : TenturncardUiState
     object Loading : TenturncardUiState
     data class EditSucces(val message : String?) : TenturncardUiState
@@ -81,10 +82,23 @@ class TenturncardViewModel(
                             tenturncardUiState = TenturncardUiState.Loading
                         }
                         is ApiResource.Success -> {
+                            var updatedCard  = resource.data?.asDomainModel()
+                            if (updatedCard != null) {
+                                val index = _tenturncards.value.indexOfFirst { it.id == updatedCard.id }
+
+                                if (index != -1) {
+
+                                    val updatedList = _tenturncards.value.toMutableList()
+                                    updatedList[index] = updatedCard
+
+                                    _tenturncards.value = updatedList
+                                }
+                            }
+
                             tenturncardUiState = TenturncardUiState.Succes(
-                                allTenturncards = tenturncards
+                                allTenturncards = _tenturncards
                             )
-                            Log.d("TenturncardViewModel", "Kaart succesvol geüpdatet: ${resource.data}")
+                            Log.d("TenturncardViewModel", "Kaart succesvol geÃ¼pdatet: ${resource.data}")
                         }
                         is ApiResource.Error -> {
                             tenturncardUiState = TenturncardUiState.Error(resource.message)
@@ -144,7 +158,7 @@ class TenturncardViewModel(
         viewModelScope.launch {
             try {
                 tenturncardRepository.editTenturncard(card).collect {
-                    resource ->
+                        resource ->
                     when(resource) {
                         is ApiResource.Error -> {
                             mutableToastMessage = resource.message ?: "Er ging iets fout"

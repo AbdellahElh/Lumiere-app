@@ -51,6 +51,17 @@ fun Tenturncard.asEntity(): TenturncardEntity {
 
         )
 }
+fun TenturncardResponse.asDomainModel(): Tenturncard {
+    return Tenturncard(
+        id = id,
+        amountLeft = amountLeft,
+        purchaseDate = purchaseDate?:"",
+        expirationDate = expirationDate?:"",
+        IsActivated = isActivated?: false,
+        ActivationCode = activationCode?: "",
+
+        )
+}
 
 fun TicketEntity.asExternalModel(): Ticket {
     return Ticket(
