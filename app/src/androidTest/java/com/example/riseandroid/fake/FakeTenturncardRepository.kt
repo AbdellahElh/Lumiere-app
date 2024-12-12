@@ -6,8 +6,12 @@ import com.example.riseandroid.model.Tenturncard
 import com.example.riseandroid.repository.ApiResource
 import com.example.riseandroid.repository.ITenturncardRepository
 import com.example.riseandroid.util.asResponse
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import retrofit2.Response
 
 class FakeTenturncardRepository : ITenturncardRepository {
     private val toAddCard = TenturncardEntity(
@@ -46,7 +50,7 @@ class FakeTenturncardRepository : ITenturncardRepository {
 
     override suspend fun getTenturncards(): Flow<List<Tenturncard>> {
         return flow {
-            kotlinx.coroutines.delay(1000)
+            delay(1000)
             emit(fakeCards)
         }
     }
@@ -54,7 +58,7 @@ class FakeTenturncardRepository : ITenturncardRepository {
     override suspend fun editTenturncard(toUpdateCard: Tenturncard): Flow<ApiResource<TenturncardResponse>> {
         return flow {
             // Simulate a delay for API-like behavior
-            kotlinx.coroutines.delay(1000)
+            delay(1000)
 
             // Check if the card exists in the list
             val updatedCards = fakeCards.map { card ->
@@ -70,6 +74,46 @@ class FakeTenturncardRepository : ITenturncardRepository {
             }
         }
     }
+
+    override suspend fun minOneUpdateCardById(activationCode: String): Flow<ApiResource<TenturncardResponse>> = flow {
+        emit(ApiResource.Loading())
+
+        val apiResponse = Response.success(Unit)
+
+        if (apiResponse.isSuccessful) {
+            try {
+
+                val existingCard = TenturncardEntity(
+                    amountLeft = 5,
+                    id = 1,
+                    purchaseDate = "date1",
+                    expirationDate = "date2",
+                    ActivationCode = "code1",
+                )
+
+                if (existingCard.ActivationCode != activationCode) {
+                    emit(ApiResource.Error("Tenturncard niet gevonden"))
+                    return@flow
+                }
+
+                val updatedAmountLeft = existingCard.amountLeft - 1
+                val updatedCard = TenturncardEntity(
+                    amountLeft =updatedAmountLeft ,
+                    id = 1,
+                    purchaseDate = "date1",
+                    expirationDate = "date2",
+                    ActivationCode = "code1",
+                )
+
+                emit(ApiResource.Success(updatedCard.asResponse()))
+            } catch (e: Exception) {
+                emit(ApiResource.Error<TenturncardResponse>("Er is een fout opgetreden: ${e.localizedMessage}"))
+            }
+        } else {
+            emit(ApiResource.Error<TenturncardResponse>("Fout: lege response van de API"))
+        }
+    }.flowOn(Dispatchers.IO)
+
 
 
     override fun addTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> {

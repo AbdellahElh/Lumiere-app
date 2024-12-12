@@ -31,11 +31,6 @@ class TenturncardRepository(
     override suspend fun getTenturncards(): Flow<List<Tenturncard>> {
         return tenturncardDao.getAllTenturncards()
             .map { entities -> entities.map(TenturncardEntity::asExternalModel) }
-            .onEach { cards ->
-                cards.forEach { cards ->
-                    Log.d("MoviesList", cards.toString())
-                }
-            }
             .onStart {
                 withContext(Dispatchers.IO) {
                     refreshTenturncards()
@@ -87,36 +82,41 @@ class TenturncardRepository(
                 tenturncardDao.deleteTenturncard(newTenturncard)
             }
         }.flowOn(Dispatchers.IO)
-    override fun updateTenturncard(activationCode: String): Flow<ApiResource<TenturncardEntity>> = flow {
+
+
+    override suspend fun minOneUpdateCardById(activationCode: String): Flow<ApiResource<TenturncardResponse>> = flow {
         emit(ApiResource.Loading())
 
-        try {
 
-            val existingCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
+        val apiResponse = tenturncardApi.updateTenturncard(activationCode).awaitResponse()
 
-            if (existingCard == null) {
-                emit(ApiResource.Error("Tenturncard niet gevonden"))
-                return@flow
-            }
-
-
-            val apiResponse = tenturncardApi.updateTenturncard(activationCode).awaitResponse()
-
-            if (apiResponse.isSuccessful) {
-
+        if (apiResponse.isSuccessful) {
+            try {
+                val existingCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
+                if (existingCard == null) {
+                    emit(ApiResource.Error("Tenturncard niet gevonden"))
+                    return@flow
+                }
                 tenturncardDao.updateTenturncard(
-                    existingCard.ActivationCode,
-                    amountLeft = (existingCard.amountLeft -1)
+                    ActivationCode = activationCode,
+                    amountLeft = (existingCard.amountLeft - 1)
                 )
+                val updatedCard = tenturncardDao.getTenturncardByActivationCode(activationCode)
+                //    val cards = tenturncardDao.getAllTenturncards()
 
-                emit(ApiResource.Success(existingCard))
-            } else {
-                emit(ApiResource.Error<TenturncardEntity>("API-update mislukt met status: ${apiResponse.code()}"))
+                if (updatedCard != null) {
+                    emit(ApiResource.Success(updatedCard.asResponse()))
+                }
+            } catch (e: Exception) {
+                emit(ApiResource.Error<TenturncardResponse>("Er is een fout opgetreden: ${e.localizedMessage}"))
             }
-        } catch (e: Exception) {
-            emit(ApiResource.Error<TenturncardEntity>("Er is een fout opgetreden: ${e.localizedMessage}"))
+
+        } else {
+            emit(ApiResource.Error<TenturncardResponse>("Fout: lege response van de API"))
         }
+
     }.flowOn(Dispatchers.IO)
+
 
     override suspend fun editTenturncard(toUpdateCard: Tenturncard): Flow<ApiResource<TenturncardResponse>> = flow {
         // Grab the card before updating it in case you need to reverse the action
@@ -130,15 +130,15 @@ class TenturncardRepository(
         // Emit the loading state
         emit(ApiResource.Loading())
         try {
-            // Update the dao object
-            tenturncardDao.updateTenturncard(
-                cardEntity.ActivationCode,
-                amountLeft = cardEntity.amountLeft,
-            )
+
             // Send the request to the api
             val response = tenturncardApi.editTenturncard(cardResponse).awaitResponse()
             // Emit the correct state based on the api response
             if (response.isSuccessful) {
+                tenturncardDao.updateTenturncard(
+                    cardEntity.ActivationCode,
+                    amountLeft = cardEntity.amountLeft,
+                )
                 emit(ApiResource.Success(cardResponse))
             }
             else{

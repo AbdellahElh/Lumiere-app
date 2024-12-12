@@ -37,7 +37,15 @@ class TenturnCardsUITest {
         composeTestRule.onAllNodesWithText("2024-01-01")[0].assertIsDisplayed()
         composeTestRule.onAllNodesWithText("5")[0].assertIsDisplayed()
         composeTestRule.onAllNodesWithText("Bewerken")[0].assertIsDisplayed()
+        composeTestRule.onAllNodesWithTag("qrCode")[0].assertIsDisplayed()
 
+    }
+    @Test
+    fun valueIsChangedWhenQrCodeIsClicked() = runTest {
+        Thread.sleep(3000)
+        composeTestRule.onAllNodesWithTag("qrCode")[0].assertIsDisplayed()
+        composeTestRule.onAllNodesWithTag("qrCode")[0].performClick()
+        composeTestRule.onAllNodesWithText("5")[0].assertIsDisplayed()
     }
 
     @Test

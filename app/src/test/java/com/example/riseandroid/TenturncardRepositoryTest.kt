@@ -53,7 +53,7 @@ class TenturncardRepositoryTest {
         amountLeft = 7,
         purchaseDate = " ",
         expirationDate = " ",
-        ActivationCode = activationCode,
+        ActivationCode = "errorTest",
         IsActivated = false,
     )
 
@@ -124,5 +124,34 @@ class TenturncardRepositoryTest {
             if (updatedCard != null) {
                 assertEquals(toAddTenturncard.amountLeft, updatedCard.amountLeft)
             }
+        }
+    @Test
+    fun tenturncardRepository_minOneUpdateCardById_emits_succesTest() =
+        runTest {
+            // Setup
+            tenturncardDao.addTenturncard(toAddTenturncard)
+            // Execute to be tested code
+            val flow = tenturncardRepo.minOneUpdateCardById(toAddTenturncard.ActivationCode)
+            // Assert
+            val emissions = flow.toList()
+            assert(emissions[0] is ApiResource.Loading)
+            assert(emissions[1] is ApiResource.Success)
+            val updatedCard = tenturncardDao.getTenturncardById(toAddTenturncard.id)
+            if (updatedCard != null) {
+                assertEquals(updatedCard.amountLeft, 9)
+            }
+        }
+
+    @Test
+    fun tenturncardRepository_minOneUpdateCardById_emits_errorTest() =
+        runTest {
+            // Setup
+            tenturncardDao.addTenturncard(toAddTenturncard)
+            // Execute to be tested code
+            val flow = tenturncardRepo.minOneUpdateCardById(toUpdateCardError.ActivationCode)
+            // Assert
+            val emissions = flow.toList()
+            assert(emissions[0] is ApiResource.Loading)
+            assert(emissions[1] is ApiResource.Error)
         }
 }

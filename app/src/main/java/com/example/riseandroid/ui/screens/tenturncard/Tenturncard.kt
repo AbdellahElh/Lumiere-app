@@ -1,3 +1,4 @@
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,31 +56,32 @@ fun TenturncardScreen(
     val inputText by tenTurnCardViewModel.inputText.collectAsState()
 
 
+
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-            inputActivationCodeField(
-                inputText = inputText,
-                onValueChange = { tenTurnCardViewModel.updateInputText(it) },
-                onSubmit = { tenTurnCardViewModel.submitActivationCode(inputText) }
-            )
-            if (cards.isEmpty()) {
-                Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
-            } else {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    items(cards) { card ->
-                        TenturnCardItem(card, viewModel = tenTurnCardViewModel,  onQrCodeClick = { cardActivationCode ->
-                            tenTurnCardViewModel.updateCardById(cardActivationCode)
-                        })
-                    }
+        inputActivationCodeField(
+            inputText = inputText,
+            onValueChange = { tenTurnCardViewModel.updateInputText(it) },
+            onSubmit = { tenTurnCardViewModel.submitActivationCode(inputText) }
+        )
+        if (cards.isEmpty()) {
+            Text(text = "Loading cards...", style = MaterialTheme.typography.bodyLarge)
+        } else {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                items(cards, key = { it.id }) { card ->
+                    TenturnCardItem(card, viewModel = tenTurnCardViewModel, onQrCodeClick = { cardActivationCode ->
+                        tenTurnCardViewModel.minOneUpdateCardById(cardActivationCode)
+                    })
                 }
             }
         }
+    }
 }
 fun formatDate(dateString: String): String {
     val dateParts = dateString.substring(0, 10).split("-")
@@ -91,7 +94,7 @@ fun inputActivationCodeField(
     inputText: String,
     onValueChange: (String) -> Unit,
     onSubmit: () -> Unit
-    )
+)
 {
     Column(
         modifier = Modifier
@@ -142,10 +145,8 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeC
         elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
             .padding(16.dp)
-            .height(350.dp)
+            .height(500.dp)
             .width(250.dp)
-            .verticalScroll(rememberScrollState()) //Allow scrolling to ensure the CardEditor does not disappear beneath the cardItem
-
     ) {
         Column(
             modifier = Modifier
@@ -156,11 +157,11 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeC
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-                Text(
-                    text = "Tienrittenkaart",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            Text(
+                text = "Tienrittenkaart",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 24.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -175,45 +176,47 @@ fun TenturnCardItem(card: Tenturncard, viewModel: TenturncardViewModel,onQrCodeC
                         .height(100.dp)
                         .width(100.dp)
                         .clickable { onQrCodeClick(card.ActivationCode) }
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Vervaldatum:",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = if (card.expirationDate == "") {
-                        "-"
-                    } else {
-                        formatDate(card.expirationDate)
-                    },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Aankoopdatum:",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = if (card.purchaseDate == "") {
-                        "-"
-                    } else {
-                        formatDate(card.purchaseDate)
-                    },
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                        .testTag("qrCode")
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Beurten over:",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Vervaldatum:",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Text(
+                text = if (card.expirationDate == "") {
+                    "-"
+                } else {
+                    formatDate(card.expirationDate)
+                },
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Aankoopdatum:",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Text(
+                text = if (card.purchaseDate == "") {
+                    "-"
+                } else {
+                    formatDate(card.purchaseDate)
+                },
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Beurten over:",
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp,fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
             CardEditor(card, viewModel)
         }
     }
@@ -226,6 +229,9 @@ fun CardEditor(card: Tenturncard, viewModel: TenturncardViewModel) {
     var amountLeftState by remember { mutableStateOf(card.amountLeft.toString()) }
     val uiState = viewModel.tenturncardUiState
 
+    LaunchedEffect(card.amountLeft) {
+        amountLeftState = card.amountLeft.toString()
+    }
 
     Column(modifier = Modifier
         .fillMaxWidth()
