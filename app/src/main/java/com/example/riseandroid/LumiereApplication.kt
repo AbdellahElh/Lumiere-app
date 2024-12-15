@@ -60,12 +60,14 @@ class LumiereApplication : Application() {
 
 
 
-    fun displayImmediateNotification(context: Context, movieId: Int, movieName: String, location: String, date: String) {
+    fun displayImmediateNotification(context: Context, movieId: Int, movieName: String, location: String, date: String, time: String) {
         if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+            val notificationText = "Your movie at $location on $date at $time is coming up soon."
+
             val notification = NotificationCompat.Builder(context, "REMINDER_CHANNEL")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle("Reminder for $movieName")
-                .setContentText("Your movie at $location on $date is coming up soon.")
+                .setContentText(notificationText)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .build()
 

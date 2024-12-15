@@ -32,10 +32,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.riseandroid.LumiereApplication
 import com.example.riseandroid.data.entitys.event.AddTicketDTO
 import com.example.riseandroid.network.ResponseCinema
 import com.example.riseandroid.network.ResponseMovie
 import com.example.riseandroid.ui.screens.ticket.TicketViewModel
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,6 +206,57 @@ fun onCheckoutEvent(
         else -> ""
     }
     val showtime = date + "T" + selectedTime + ":00"
+
+    // Parse the showtime into a Calendar object
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+    val showDate: Calendar? = try {
+        Calendar.getInstance().apply {
+            time = dateFormat.parse(showtime) ?: throw IllegalArgumentException("Invalid date format")
+        }
+    } catch (e: Exception) {
+        println("Error parsing showtime: ${e.message}")
+        null
+    }
+
+    if (showDate != null) {
+        // Calculate notification time (2 days before the show)
+        val notificationTime = Calendar.getInstance().apply {
+            timeInMillis = showDate.timeInMillis
+            add(Calendar.DAY_OF_YEAR, -2)
+        }
+
+        val currentTime = Calendar.getInstance()
+
+        // Access LumiereApplication to schedule or display notifications
+        val lumiereApp = context.applicationContext as LumiereApplication
+
+        if (notificationTime.before(currentTime)) {
+            println("Triggering immediate notification for movieId: ${movie.id}")
+            // Trigger immediate notification if the notification time has already passed
+            lumiereApp.displayImmediateNotification(
+                context,
+                movie.id,
+                movie.title,
+                selectedCinema,
+                date,
+                selectedTime
+            )
+        } else {
+            println("Scheduling notification for movieId: ${movie.id} at ${notificationTime.time}")
+            // Schedule the notification for 2 days before the show
+            lumiereApp.scheduleNotification(
+                context,
+                movie.id,
+                movie.title,
+                selectedCinema,
+                date,
+                notificationTime
+            )
+        }
+    } else {
+        println("ShowDate is null, notification scheduling skipped")
+    }
+
     if (url.isNotEmpty()) {
         val newTicket =  AddTicketDTO(
             MovieId = movieId,
