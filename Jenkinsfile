@@ -12,7 +12,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the code from the repository
-                 git branch: 'main', credentialsId: 'keyandroid', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
+                 git branch: 'OPS-android-branch', credentialsId: 'keyandroid', url: 'git@github.com:HOGENT-RISE/android-2425-gent5.git'
             }
         }
         
