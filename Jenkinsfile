@@ -23,11 +23,11 @@ pipeline {
                 sh './gradlew wrapper --gradle-version 8.10.2'
                 sh './gradlew --version'
                   // Test android lint
-               // sh './gradlew lint'
+                sh './gradlew lint'
                   // Kotlin code analyse
-                //sh './gradlew test'
+                sh './gradlew test'
                   // Unit Tests
-                //sh './gradlew testDebugUnitTest'
+                sh './gradlew testDebugUnitTest'
                   // Use Gradle to clean and build the APK
                 sh './gradlew clean assembleRelease'
             }
